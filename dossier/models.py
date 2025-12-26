@@ -12,6 +12,7 @@ def _utcnow() -> datetime:
 
 @dataclass
 class Dossier:
+    """Represents a therapy dossier (psychiatrist's information on the subject) tracking emotions, feelings, situations, and personal bio context."""
     """Represents a poker player dossier with analysis data."""
 
     id: str

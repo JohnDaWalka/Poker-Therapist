@@ -1,5 +1,14 @@
 # Poker Therapist
 
+This repository contains both Advent of Code automation and a Poker Therapist dossier management system focused on capturing emotions, feelings, and situational context for long-term, AI-assisted therapy.
+
+## Dossier MCP Server (Therapy Context)
+
+The dossier module provides a Model Context Protocol (MCP) server for managing a personal therapy dossier—tracking emotions, feelings, situations, and biographical context (the psychiatrist's information on the subject) with persistent PostgreSQL storage so your AI therapist can build and recall rich context over time.
+
+### Features
+
+- **Dossier Management**: Create, read, update, and delete emotion- and situation-focused therapy dossiers
 This repository contains both Advent of Code automation and a Poker Therapist dossier management system.
 
 ## Dossier MCP Server
