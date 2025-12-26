@@ -5,6 +5,13 @@ This module implements a Model Context Protocol (MCP) server for managing person
 ## Features
 
 - **Dossier Management**: Create, read, update, and delete therapy dossiers centered on emotions, feelings, situations, and personal bio data
+# Poker Therapist - Dossier MCP Server
+
+This module implements a Model Context Protocol (MCP) server for managing poker player dossiers with PostgreSQL storage.
+
+## Features
+
+- **Dossier Management**: Create, read, update, and delete poker player dossiers
 - **JSON Merge Patch**: Apply RFC 7396 JSON Merge Patch for flexible updates
 - **PostgreSQL Storage**: Persistent storage with JSONB support
 - **Dual Protocol Support**: Both stdio and HTTP server modes
@@ -150,6 +157,7 @@ List all dossiers.
 The server exposes dossier resources via URIs:
 
 - `dossier://<dossier_id>`: Access a specific therapy dossier (emotions, feelings, situations)
+- `dossier://<dossier_id>`: Access a specific dossier
 
 ## Database Schema
 

@@ -9,6 +9,15 @@ The dossier module provides a Model Context Protocol (MCP) server for managing a
 ### Features
 
 - **Dossier Management**: Create, read, update, and delete emotion- and situation-focused therapy dossiers
+This repository contains both Advent of Code automation and a Poker Therapist dossier management system.
+
+## Dossier MCP Server
+
+The dossier module provides a Model Context Protocol (MCP) server for managing poker player dossiers with PostgreSQL storage.
+
+### Features
+
+- **Dossier Management**: Create, read, update, and delete poker player dossiers
 - **JSON Merge Patch**: Apply RFC 7396 JSON Merge Patch for flexible updates
 - **PostgreSQL Storage**: Persistent storage with JSONB support
 - **Dual Protocol Support**: Both stdio and HTTP server modes
