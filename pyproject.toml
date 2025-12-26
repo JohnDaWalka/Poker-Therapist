@@ -5,9 +5,11 @@ description = "Python project for solving Advent of Code challenges"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aiohttp>=3.9.1",
     "beautifulsoup4>=4.12.3",
     "httpx>=0.28.1",
     "markdownify>=0.14.1",
+    "psycopg2-binary>=2.9.9",
     "typer>=0.15.1",
     "types-beautifulsoup4>=4.12.0",
 ]
