@@ -1,0 +1,91 @@
+name: Submit Advent of Code Solution
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'puzzles/year_*/day_*/answer_part*.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  repository-dispatch: write
+
+env:
+  AOC_SESSION: ${{ secrets.AOC_SESSION }}
+  GH_TOKEN: ${{ secrets.USER_TOKEN }}
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
+      
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v46
+        with:
+          files: puzzles/year_*/day_*/answer_part*.txt
+
+      - name: Extract year, day and part from filename
+        id: extract-info
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "No file changes to process"
+            exit 0
+          fi
+          
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            if [[ $file =~ puzzles/year_([0-9]+)/day_([0-9]+)/answer_part([12]).txt ]]; then
+              echo "year=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+              echo "day=${BASH_REMATCH[2]}" >> $GITHUB_OUTPUT
+              echo "part=${BASH_REMATCH[3]}" >> $GITHUB_OUTPUT
+            fi
+          done
+
+      - name: Submit solution
+        id: submit
+        if: steps.extract-info.outputs.year != ''
+        continue-on-error: true
+        run: |
+          output=$(uv run advent_of_code.py submit ${{ steps.extract-info.outputs.year }} ${{ steps.extract-info.outputs.day }} ${{ steps.extract-info.outputs.part }})
+          echo "submission_result=$output" >> $GITHUB_OUTPUT
+
+      - name: Update results in README
+        if: steps.extract-info.outputs.year != ''
+        run: uv run advent_of_code.py update-results ${{ steps.extract-info.outputs.year }}
+
+      - name: Download part 2 if part 1 was correct
+        id: download-part2
+        if: steps.extract-info.outputs.part == '1' && steps.submit.outcome == 'success'
+        run: |
+          file_path=$(uv run advent_of_code.py download ${{ steps.extract-info.outputs.year }} ${{ steps.extract-info.outputs.day }})
+          echo "file_path=$file_path" >> $GITHUB_OUTPUT
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Commit and push changes
+        run: |
+          git add puzzles/year_${{ steps.extract-info.outputs.year }}/day_${{ steps.extract-info.outputs.day }}
+          git add README.md
+          git commit -m "Update puzzle files for year ${{ steps.extract-info.outputs.year }} day ${{ steps.extract-info.outputs.day }}"
+          git push
+
+      - name: Trigger create-puzzle-issue workflow
+        if: steps.download-part2.outputs.file_path != ''
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ env.GH_TOKEN }}
+          event-type: create-puzzle-issue
+          client-payload: '{"year": "${{ steps.extract-info.outputs.year }}", "day": "${{ steps.extract-info.outputs.day }}", "part": "2"}'
