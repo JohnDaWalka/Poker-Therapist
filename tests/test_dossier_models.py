@@ -2,8 +2,6 @@
 
 from datetime import datetime
 
-import pytest
-
 from dossier.models import Dossier
 
 
@@ -12,7 +10,7 @@ def test_dossier_creation() -> None:
     dossier = Dossier(
         id="player123",
         player_name="John Doe",
-        data={"skill_level": "advanced"}
+        data={"skill_level": "advanced"},
     )
     assert dossier.id == "player123"
     assert dossier.player_name == "John Doe"
@@ -26,10 +24,10 @@ def test_dossier_to_dict() -> None:
     dossier = Dossier(
         id="player123",
         player_name="John Doe",
-        data={"skill_level": "advanced"}
+        data={"skill_level": "advanced"},
     )
     result = dossier.to_dict()
-    
+
     assert result["id"] == "player123"
     assert result["player_name"] == "John Doe"
     assert result["data"] == {"skill_level": "advanced"}
@@ -44,10 +42,10 @@ def test_dossier_from_dict() -> None:
         "player_name": "Jane Smith",
         "data": {"wins": 10, "losses": 5},
         "created_at": "2024-01-01T00:00:00",
-        "updated_at": "2024-01-02T00:00:00"
+        "updated_at": "2024-01-02T00:00:00",
     }
     dossier = Dossier.from_dict(data)
-    
+
     assert dossier.id == "player456"
     assert dossier.player_name == "Jane Smith"
     assert dossier.data == {"wins": 10, "losses": 5}
@@ -66,12 +64,12 @@ def test_dossier_round_trip() -> None:
     original = Dossier(
         id="player999",
         player_name="Round Trip",
-        data={"test": "value"}
+        data={"test": "value"},
     )
-    
+
     as_dict = original.to_dict()
     restored = Dossier.from_dict(as_dict)
-    
+
     assert restored.id == original.id
     assert restored.player_name == original.player_name
     assert restored.data == original.data

@@ -1,6 +1,5 @@
 """Tests for JSON Merge Patch implementation."""
 
-import pytest
 
 from dossier.json_merge_patch import merge_patch
 
@@ -67,13 +66,13 @@ def test_merge_patch_complex_scenario() -> None:
         "title": "Goodbye!",
         "author": {"givenName": "John", "familyName": "Doe"},
         "tags": ["example", "sample"],
-        "content": "This will be unchanged"
+        "content": "This will be unchanged",
     }
     patch = {
         "title": "Hello!",
         "phoneNumber": "+01-123-456-7890",
         "author": {"familyName": None},
-        "tags": ["example"]
+        "tags": ["example"],
     }
     result = merge_patch(target, patch)
     assert result == {
@@ -81,7 +80,7 @@ def test_merge_patch_complex_scenario() -> None:
         "author": {"givenName": "John"},
         "tags": ["example"],
         "content": "This will be unchanged",
-        "phoneNumber": "+01-123-456-7890"
+        "phoneNumber": "+01-123-456-7890",
     }
 
 

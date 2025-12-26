@@ -2,7 +2,6 @@
 
 import asyncio
 import json
-from typing import Any
 
 from aiohttp import web
 
@@ -21,7 +20,7 @@ class MCPHTTPServer:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        """Setup HTTP routes."""
+        """Set up HTTP routes."""
         self.app.router.add_post("/mcp", self.handle_mcp_request)
         self.app.router.add_get("/health", self.health_check)
 
@@ -36,7 +35,7 @@ class MCPHTTPServer:
         except Exception as e:
             return web.json_response({"error": str(e)}, status=500)
 
-    async def health_check(self, request: web.Request) -> web.Response:
+    async def health_check(self, _request: web.Request) -> web.Response:
         """Health check endpoint."""
         return web.json_response({"status": "ok"})
 
@@ -47,7 +46,7 @@ class MCPHTTPServer:
         site = web.TCPSite(runner, self.host, self.port)
         await site.start()
         print(f"MCP HTTP Server running on http://{self.host}:{self.port}")
-        
+
         # Keep running
         try:
             await asyncio.Event().wait()
@@ -58,7 +57,7 @@ class MCPHTTPServer:
 
 
 async def main() -> None:
-    """Main entry point for HTTP server."""
+    """Run the HTTP server."""
     server = MCPHTTPServer()
     await server.run()
 
