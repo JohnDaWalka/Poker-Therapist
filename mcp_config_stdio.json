@@ -5,7 +5,7 @@
       "command": "python",
       "args": ["-m", "dossier.mcp_server"],
       "env": {
-        "DATABASE_URL": "${workspaceFolder}/.env"
+        "DATABASE_URL": "postgresql://localhost:5432/poker_therapist"
       }
     }
   }

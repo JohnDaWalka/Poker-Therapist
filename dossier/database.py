@@ -100,8 +100,7 @@ class DossierDatabase:
         with self._get_connection() as conn, conn.cursor() as cursor:
             cursor.execute("DELETE FROM dossiers WHERE id = %s", (dossier_id,))
             conn.commit()
-            rowcount: int = cursor.rowcount or 0
-            return rowcount > 0
+            return cursor.rowcount > 0
 
     def list_all(self) -> list[Dossier]:
         """List all dossiers."""

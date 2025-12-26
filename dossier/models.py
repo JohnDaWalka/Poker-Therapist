@@ -33,10 +33,11 @@ class Dossier:
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Dossier":
         """Create dossier from dictionary representation."""
+        default_time = _utcnow().isoformat()
         return cls(
             id=data["id"],
             player_name=data["player_name"],
             data=data.get("data", {}),
-            created_at=datetime.fromisoformat(data.get("created_at", _utcnow().isoformat())),
-            updated_at=datetime.fromisoformat(data.get("updated_at", _utcnow().isoformat())),
+            created_at=datetime.fromisoformat(data.get("created_at", default_time)),
+            updated_at=datetime.fromisoformat(data.get("updated_at", default_time)),
         )

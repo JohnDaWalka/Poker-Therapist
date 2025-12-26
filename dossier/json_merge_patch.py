@@ -20,11 +20,7 @@ def merge_patch(target: Any, patch: Any) -> Any:
     if not isinstance(patch, dict):
         return patch
 
-    result: dict[str, Any]
-    if not isinstance(target, dict):
-        result = {}
-    else:
-        result = target.copy()
+    result: dict[str, Any] = {} if not isinstance(target, dict) else target.copy()
 
     for key, value in patch.items():
         if value is None:
