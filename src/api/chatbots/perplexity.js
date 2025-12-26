@@ -8,7 +8,7 @@ const PERPLEXITY_API_URL = 'https://api.perplexity.ai/chat/completions';
  */
 export class PerplexityClient {
   constructor(apiKey) {
-    this.apiKey = apiKey || process.env.PERPLEXITY_API_KEY;
+    this.apiKey = apiKey || process.env.VUE_APP_PERPLEXITY_API_KEY;
     this.model = 'llama-3.1-sonar-large-128k-online';
   }
 

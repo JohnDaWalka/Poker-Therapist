@@ -8,7 +8,7 @@ const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
  */
 export class GeminiClient {
   constructor(apiKey) {
-    this.apiKey = apiKey || process.env.GEMINI_API_KEY;
+    this.apiKey = apiKey || process.env.VUE_APP_GEMINI_API_KEY;
     this.model = 'gemini-1.5-pro';
   }
 
@@ -70,11 +70,11 @@ export class GeminiClient {
   /**
    * Analyze a poker hand from an image
    * @param {string} imageData - Base64 encoded image data
-   * @param {string} mimeType - MIME type (e.g., 'image/jpeg', 'image/png')
    * @param {string} question - Question about the hand
+   * @param {string} mimeType - MIME type (e.g., 'image/jpeg', 'image/png')
    * @returns {Promise<string>} Analysis from the image
    */
-  async analyzeHandImage(imageData, mimeType = 'image/jpeg', question = 'Analyze this poker hand and provide strategic advice.') {
+  async analyzeHandImage(imageData, question = 'Analyze this poker hand and provide strategic advice.', mimeType = 'image/jpeg') {
     const contents = [
       {
         role: 'user',

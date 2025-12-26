@@ -8,8 +8,9 @@ const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
  */
 export class AnthropicClient {
   constructor(apiKey) {
-    this.apiKey = apiKey || process.env.ANTHROPIC_API_KEY;
+    this.apiKey = apiKey || process.env.VUE_APP_ANTHROPIC_API_KEY;
     this.model = 'claude-3-5-sonnet-20241022';
+    this.apiVersion = '2023-06-01'; // Anthropic API version
   }
 
   /**
@@ -32,7 +33,7 @@ export class AnthropicClient {
         {
           headers: {
             'x-api-key': this.apiKey,
-            'anthropic-version': '2023-06-01',
+            'anthropic-version': this.apiVersion,
             'Content-Type': 'application/json',
           },
         }
@@ -63,11 +64,11 @@ export class AnthropicClient {
   /**
    * Analyze a poker hand from an image
    * @param {string} imageData - Base64 encoded image data
-   * @param {string} mediaType - Media type (e.g., 'image/jpeg', 'image/png')
    * @param {string} question - Question about the hand
+   * @param {string} mediaType - Media type (e.g., 'image/jpeg', 'image/png')
    * @returns {Promise<string>} Analysis from the image
    */
-  async analyzeHandImage(imageData, mediaType = 'image/jpeg', question = 'Analyze this poker hand and provide strategic advice.') {
+  async analyzeHandImage(imageData, question = 'Analyze this poker hand and provide strategic advice.', mediaType = 'image/jpeg') {
     const messages = [
       {
         role: 'user',

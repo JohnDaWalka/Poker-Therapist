@@ -8,7 +8,7 @@ const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
  */
 export class OpenAIClient {
   constructor(apiKey) {
-    this.apiKey = apiKey || process.env.OPENAI_API_KEY;
+    this.apiKey = apiKey || process.env.VUE_APP_OPENAI_API_KEY;
     this.model = 'gpt-4o';
   }
 
