@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "dossier": {
+      "type": "http",
+      "url": "http://localhost:7331/mcp"
+    }
+  }
+}

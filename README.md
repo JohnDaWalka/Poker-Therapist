@@ -1,4 +1,41 @@
-# Autonomous advent of code
+# Poker Therapist
+
+This repository contains both Advent of Code automation and a Poker Therapist dossier management system.
+
+## Dossier MCP Server
+
+The dossier module provides a Model Context Protocol (MCP) server for managing poker player dossiers with PostgreSQL storage.
+
+### Features
+
+- **Dossier Management**: Create, read, update, and delete poker player dossiers
+- **JSON Merge Patch**: Apply RFC 7396 JSON Merge Patch for flexible updates
+- **PostgreSQL Storage**: Persistent storage with JSONB support
+- **Dual Protocol Support**: Both stdio and HTTP server modes
+- **MCP Compliant**: Full MCP protocol implementation
+
+See [dossier/README.md](dossier/README.md) for detailed documentation.
+
+### Quick Start
+
+```bash
+# Install dependencies
+pip install -e .
+
+# Configure database
+cp .env.example .env
+# Edit .env with your PostgreSQL connection string
+
+# Run stdio mode
+python -m dossier.mcp_server
+
+# Or run HTTP mode
+python -m dossier.http_server
+```
+
+---
+
+## Autonomous Advent of Code
 
 - Each day during advent of code this repo solves the latest puzzle and submits the solution - all without human intervention
 - All code in this repo was written by `sourcery-ai[bot]`
