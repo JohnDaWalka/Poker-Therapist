@@ -129,8 +129,6 @@ celerybeat.pid
 
 # Environments
 .env
-.env.local
-.env.*.local
 .venv
 env/
 venv/
@@ -171,14 +169,3 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-
-# Node.js / JavaScript
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.DS_Store
-
-# Vue.js
-dist/
-.cache/
