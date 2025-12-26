@@ -1,0 +1,28 @@
+name: Merge Repos
+
+on:
+  repository_dispatch:
+    types: [merge-repos]
+
+permissions:
+  contents: write
+
+jobs:
+  merge-repos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out target repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.client_payload.target_repo }}
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Merge source repository
+        run: |
+          git remote add source https://github.com/${{ github.event.client_payload.source_repo }}.git
+          git fetch source
+          git merge source/main --allow-unrelated-histories
+
+      - name: Push changes to target repository
+        run: |
+          git push origin main
