@@ -1,0 +1,6 @@
+# CLI dependencies
+rich>=13.0.0
+click>=8.1.0
+httpx>=0.25.0
+python-dotenv>=1.0.0
+pydantic>=2.5.0
