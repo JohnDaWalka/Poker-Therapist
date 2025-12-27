@@ -169,3 +169,26 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Therapy Rex specific
+backend/therapy_rex.db
+backend/therapy_rex.db-journal
+*.db
+*.db-journal
+
+# Node modules (for Windows/Electron app)
+node_modules/
+package-lock.json
+
+# iOS build artifacts
+ios/build/
+ios/Pods/
+ios/*.xcworkspace
+ios/.swiftpm/
+
+# Electron build
+windows/dist/
+windows/build/
+
+# Temporary files
+/tmp/
