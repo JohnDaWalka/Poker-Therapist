@@ -42,9 +42,9 @@ export default {
       loading.value = true;
       try {
         const res = await api.analyzeHand({ history: handHistory.value, type: gameType.value });
-        result.value = res.data;
+        result.value = res;
       } catch (e) {
-        console.error(e);
+        console.error('Failed to analyze hand:', e);
       } finally {
         loading.value = false;
       }

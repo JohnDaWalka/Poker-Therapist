@@ -40,12 +40,12 @@ const api = {
   
   async getUserProfile() {
     const response = await axios.get(`${API_URL}/api/profile/${USER_ID}`)
-    return response
+    return response.data
   },
   
   async getUserStats() {
     const response = await axios.get(`${API_URL}/api/stats/${USER_ID}`)
-    return response
+    return response.data
   }
 }
 
