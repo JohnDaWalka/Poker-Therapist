@@ -10,6 +10,7 @@ import {
   getHistoricalData,
   getVisualElements,
 } from '../api/pokerHandAnalysis';
+import chatbot from './chatbot';
 
 Vue.use(Vuex);
 
@@ -102,4 +103,7 @@ export default new Vuex.Store({
   mutations,
   actions,
   getters,
+  modules: {
+    chatbot,
+  },
 });
