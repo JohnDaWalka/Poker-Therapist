@@ -36,6 +36,16 @@ const api = {
   async getPlaybook() {
     const response = await axios.get(`${API_URL}/api/playbook/${USER_ID}`)
     return response.data
+  },
+  
+  async getUserProfile() {
+    const response = await axios.get(`${API_URL}/api/profile/${USER_ID}`)
+    return response.data
+  },
+  
+  async getUserStats() {
+    const response = await axios.get(`${API_URL}/api/stats/${USER_ID}`)
+    return response.data
   }
 }
 
