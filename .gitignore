@@ -182,3 +182,8 @@ yarn-error.log*
 # Vue.js
 dist/
 .cache/
+
+# Streamlit
+.streamlit/secrets.toml
+chatbot_history.db
+chatbot_history.db-journal
