@@ -14,103 +14,96 @@ DB_PATH = Path("chatbot_history.db")
 
 def init_database() -> None:
     """Initialize SQLite database for message history."""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
 
-    # Create users table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT UNIQUE NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
+        # Create users table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT UNIQUE NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
 
-    # Create messages table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            role TEXT NOT NULL,
-            content TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    """)
+        # Create messages table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        """)
 
-    conn.commit()
-    conn.close()
+        conn.commit()
 
 
 def get_or_create_user(email: str) -> int:
     """Get user ID by email or create new user."""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
 
-    # Try to get existing user
-    cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
-    result = cursor.fetchone()
+        # Try to get existing user
+        cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+        result = cursor.fetchone()
 
-    if result:
-        user_id = result[0]
-    else:
+        if result:
+            return result[0]
+
         # Create new user
         cursor.execute("INSERT INTO users (email) VALUES (?)", (email,))
         conn.commit()
-        user_id = cursor.lastrowid
-
-    conn.close()
-    return user_id
+        return cursor.lastrowid
 
 
 def save_message(user_id: int, role: str, content: str) -> None:
     """Save message to database."""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
 
-    cursor.execute(
-        "INSERT INTO messages (user_id, role, content) VALUES (?, ?, ?)",
-        (user_id, role, content),
-    )
+        cursor.execute(
+            "INSERT INTO messages (user_id, role, content) VALUES (?, ?, ?)",
+            (user_id, role, content),
+        )
 
-    conn.commit()
-    conn.close()
+        conn.commit()
 
 
 def load_messages(user_id: int, limit: int = 50) -> list[dict[str, Any]]:
     """Load message history for user."""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
 
-    cursor.execute(
-        """
-        SELECT role, content, created_at
-        FROM messages
-        WHERE user_id = ?
-        ORDER BY created_at DESC
-        LIMIT ?
-        """,
-        (user_id, limit),
-    )
+        cursor.execute(
+            """
+            SELECT role, content, created_at
+            FROM messages
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            (user_id, limit),
+        )
 
-    messages = [
-        {"role": row[0], "content": row[1], "created_at": row[2]}
-        for row in cursor.fetchall()
-    ]
+        messages = [
+            {"role": row[0], "content": row[1], "created_at": row[2]}
+            for row in cursor.fetchall()
+        ]
 
-    conn.close()
-    return list(reversed(messages))  # Return in chronological order
+        return list(reversed(messages))  # Return in chronological order
 
 
 def clear_user_history(user_id: int) -> None:
     """Clear all messages for a user."""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
 
-    cursor.execute("DELETE FROM messages WHERE user_id = ?", (user_id,))
+        cursor.execute("DELETE FROM messages WHERE user_id = ?", (user_id,))
 
-    conn.commit()
-    conn.close()
+        conn.commit()
 
 
 def get_xai_client() -> OpenAI:
