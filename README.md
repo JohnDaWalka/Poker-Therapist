@@ -11,6 +11,24 @@ Get expert poker strategy advice from multiple AI providers:
 - **Anthropic Claude** - Deep analytical capabilities for complex situations
 - **Google Gemini** - Fast multimodal hand analysis
 
+### 💬 Streamlit Chatbot (NEW!)
+A standalone Streamlit chatbot with persistent memory:
+- **Persistent Memory** - SQLite database stores conversation history
+- **Multi-User Support** - Email-based user identification
+- **xAI Integration** - Powered by xAI's Grok model
+- **Streaming Responses** - Real-time AI responses
+- **Thinking Display** - See the AI's reasoning process
+
+Quick start for Streamlit chatbot:
+```bash
+pip install streamlit openai
+cp .streamlit/secrets.toml.example .streamlit/secrets.toml
+# Add your xAI API key to .streamlit/secrets.toml
+streamlit run chatbot_app.py
+```
+
+See [CHATBOT_QUICKSTART.md](CHATBOT_QUICKSTART.md) for details.
+
 ### 📊 Hand Analysis
 - Interactive poker hand analysis dashboard
 - Visual charts and tables
@@ -24,6 +42,8 @@ Get expert poker strategy advice from multiple AI providers:
 - Real-time coaching feedback
 
 ## Quick Start
+
+### Vue.js Application
 
 1. **Clone the repository**
    ```bash
@@ -46,6 +66,26 @@ Get expert poker strategy advice from multiple AI providers:
 4. **Navigate to the AI Coach tab** and start chatting!
 
 For detailed setup and API key configuration, see [docs/CHATBOT_INTEGRATION.md](docs/CHATBOT_INTEGRATION.md)
+
+### Streamlit Chatbot
+
+1. **Install dependencies**
+   ```bash
+   pip install streamlit openai
+   ```
+
+2. **Configure xAI API key**
+   ```bash
+   cp .streamlit/secrets.toml.example .streamlit/secrets.toml
+   # Edit .streamlit/secrets.toml and add your xAI API key
+   ```
+
+3. **Run the chatbot**
+   ```bash
+   streamlit run chatbot_app.py
+   ```
+
+For detailed documentation, see [docs/STREAMLIT_CHATBOT.md](docs/STREAMLIT_CHATBOT.md)
 
 ---
 

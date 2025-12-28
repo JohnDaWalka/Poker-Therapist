@@ -2,7 +2,6 @@
 
 import os
 import sqlite3
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -125,7 +124,10 @@ def get_xai_client() -> OpenAI:
         api_key = os.getenv("XAI_API_KEY")
 
     if not api_key:
-        st.error("xAI API key not found. Please configure XAI_API_KEY in secrets.toml or environment.")
+        st.error(
+            "xAI API key not found. "
+            "Please configure XAI_API_KEY in secrets.toml or environment.",
+        )
         st.stop()
 
     return OpenAI(
@@ -165,9 +167,8 @@ class ThinksCallback:
             self.in_thinking = False
             # Show thinking in expander when complete
             if self.thinking_text:
-                with self.container:
-                    with st.expander("💭 AI Thinking Process", expanded=False):
-                        st.markdown(self.thinking_text)
+                with self.container, st.expander("💭 AI Thinking Process", expanded=False):
+                    st.markdown(self.thinking_text)
             # Add text after closing tag to response
             if len(parts) > 1:
                 self.response_text += parts[1]
@@ -182,8 +183,8 @@ class ThinksCallback:
             self.container.markdown(self.response_text)
 
 
-def main() -> None:
-    """Main Streamlit application."""
+def main() -> None:  # noqa: C901, PLR0912, PLR0915
+    """Run the main Streamlit chatbot application."""
     st.set_page_config(
         page_title="AI Chatbot",
         page_icon="🤖",
@@ -355,10 +356,13 @@ def main() -> None:
                 # Save assistant message to database
                 save_message(st.session_state.user_id, "assistant", response)
 
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 error_msg = f"❌ Error: {e!s}"
                 message_placeholder.error(error_msg)
-                st.error("Please check your API key configuration in secrets.toml or environment variables.")
+                st.error(
+                    "Please check your API key configuration "
+                    "in secrets.toml or environment variables.",
+                )
 
 
 if __name__ == "__main__":
