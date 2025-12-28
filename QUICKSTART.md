@@ -15,7 +15,7 @@ You need at least **one** API key. Choose your preferred provider:
 #### Option B: OpenAI GPT-4 (Best for image analysis)
 1. Go to https://platform.openai.com/api-keys
 2. Sign up or log in
-3. Create new API key
+3. Create a new API key
 4. Copy the key
 
 #### Option C: Anthropic Claude (Advanced reasoning)
