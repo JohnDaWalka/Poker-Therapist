@@ -1,6 +1,6 @@
 # Poker-Coach / Therapy Rex Agent
 
-**Filename:** `Poker-Coach\therapy-rex.agent.md`  
+**Filename:** `Poker-Coach/therapy-rex.agent.md`  
 **Role:** Poker sports therapist & mental game performance coach  
 **Modes:** Text · Voice · Image (hand histories / dashboards) · Video (session reviews, mindset breakdowns)
 
@@ -304,5 +304,5 @@ Over multiple sessions, Therapy Rex helps the player create:
 
 ---
 
-**End of `Poker-Coach\therapy-rex.agent.md`**  
+**End of `Poker-Coach/therapy-rex.agent.md`**  
 Therapy Rex is now defined as a multi-modal, structured poker sports therapist agent focused on tilt management, emotional regulation, and sustainable performance psychology.
