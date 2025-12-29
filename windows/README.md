@@ -27,6 +27,12 @@ npm run dev
 npm run build
 ```
 
+### Local path mapping (Windows)
+- Project root (local): `C:\Users\mfane\Poker-Coach---`
+- Optional chroma integration clone: `C:\Users\mfane\chroma-poker`
+
+With hash-based routing enabled in the Windows build, ensure the packaged Electron app loads from the generated `dist` output and that any assets or shared modules referenced from the paths above are available.
+
 ## Features
 
 - **Triage View**: Quick tilt intervention
