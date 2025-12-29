@@ -3,7 +3,15 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
-createApp(App)
+const app = createApp(App)
   .use(router)
   .use(store)
-  .mount('#app')
+
+// Enable navigation requests from Electron tray/menu
+if (window.electronAPI?.onNavigate) {
+  window.electronAPI.onNavigate((route) => {
+    router.push(route)
+  })
+}
+
+app.mount('#app')

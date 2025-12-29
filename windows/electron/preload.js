@@ -1,6 +1,6 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron')
 
+// Expose a minimal API for future renderer-to-main communication.
 contextBridge.exposeInMainWorld('electronAPI', {
-    getUserDataPath: () => ipcRenderer.invoke('get-user-data-path'),
-    onNavigate: (callback) => ipcRenderer.on('navigate', callback)
-});
+  onNavigate: (callback) => ipcRenderer.on('navigate', (_event, route) => callback(route))
+})
