@@ -193,6 +193,9 @@ backend/therapy_rex.db-journal
 *.db
 *.db-journal
 
+# Dossier storage (user session data)
+dossiers/
+
 # Node modules (for Windows/Electron app)
 node_modules/
 package-lock.json
