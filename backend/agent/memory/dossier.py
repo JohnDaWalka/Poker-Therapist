@@ -100,11 +100,12 @@ class Dossier:
         path.parent.mkdir(parents=True, exist_ok=True)
 
         # Create temp file in same directory (for atomic rename)
-        fd, temp_path = tempfile.mkstemp(
+        fd, temp_path_str = tempfile.mkstemp(
             dir=path.parent,
             prefix=f".{path.name}.",
             suffix=".tmp",
         )
+        temp_path = Path(temp_path_str)
 
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as f:
@@ -117,8 +118,9 @@ class Dossier:
         except Exception:
             # Clean up temp file on error
             try:
-                os.unlink(temp_path)
-            except OSError:
+                temp_path.unlink()
+            except FileNotFoundError:
+                # File already cleaned up, ignore
                 pass
             raise
 
