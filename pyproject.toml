@@ -1,7 +1,7 @@
 [project]
-name = "test-aoc"
-version = "0.1.0"
-description = "Python project for solving Advent of Code challenges"
+name = "poker-therapist"
+version = "1.0.0"
+description = "Poker Therapist - AI Coach with Voice Integration (Rex personality)"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -11,8 +11,12 @@ dependencies = [
     "requests>=2.31.0",
     "typer>=0.15.1",
     "types-beautifulsoup4>=4.12.0",
-    "streamlit>=1.39.0",
-    "openai>=1.55.0",
+    "streamlit>=1.40.0",
+    "openai>=1.58.1",
+    # Audio processing for voice features
+    "sounddevice>=0.4.6",
+    "pydub>=0.25.1",
+    "scipy>=1.11.0",
 ]
 
 [dependency-groups]
