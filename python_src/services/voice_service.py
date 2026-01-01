@@ -1,4 +1,4 @@
-"""Voice service abstraction for TTS and STR with Rex personality using x.ai API."""
+"""Voice service abstraction for TTS and STT with Rex personality using x.ai API."""
 
 import os
 from typing import Any, Optional

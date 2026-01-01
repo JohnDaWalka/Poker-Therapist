@@ -1,6 +1,6 @@
 """Reusable chat UI components for Streamlit chatbot."""
 
-from typing import Any
+from typing import Any, Optional
 
 import streamlit as st
 
@@ -96,7 +96,7 @@ def render_model_info(model: str, streaming: bool, thinking: bool) -> None:
     st.sidebar.info(f"💭 Thinking: {'Enabled' if thinking else 'Disabled'}")
 
 
-def render_quick_actions() -> str | None:
+def render_quick_actions() -> Optional[str]:
     """
     Render quick action buttons for common queries.
 

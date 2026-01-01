@@ -36,7 +36,8 @@ except ImportError:
 DB_PATH = Path("chatbot_history.db")
 
 # Authorized email addresses for Rex Poker Coach
-AUTHORIZED_EMAILS = [
+# Can be overridden via AUTHORIZED_EMAILS environment variable (comma-separated)
+_DEFAULT_AUTHORIZED_EMAILS = [
     "m.fanelli1@icloud.com",
     "johndawalka@icloud.com",
     "mauro.fanelli@ctstate.edu",
@@ -44,6 +45,14 @@ AUTHORIZED_EMAILS = [
     "cooljack87@icloud.com",
     "jdwalka@pm.me",
 ]
+
+# Load from environment if available
+_env_emails = os.getenv("AUTHORIZED_EMAILS", "").strip()
+AUTHORIZED_EMAILS = (
+    [email.strip() for email in _env_emails.split(",") if email.strip()]
+    if _env_emails
+    else _DEFAULT_AUTHORIZED_EMAILS
+)
 
 
 def init_database() -> None:

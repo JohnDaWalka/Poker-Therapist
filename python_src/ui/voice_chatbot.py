@@ -57,22 +57,26 @@ def render_audio_player(audio_data: bytes, autoplay: bool = True) -> None:
 def render_voice_recorder() -> Optional[bytes]:
     """
     Render voice recorder component.
+    
+    Note: This is currently a file upload implementation. 
+    Real-time recording requires additional components:
+    - streamlit-webrtc for WebRTC audio capture
+    - audio_recorder_streamlit component
+    - Custom JavaScript component
+    
+    Future enhancement will add browser-based recording.
 
     Returns:
         Recorded audio data as bytes, or None if no recording
 
     """
-    st.info("🎤 **Voice Input**: Click the button below to start recording")
-
-    # Note: Streamlit doesn't have native audio recording yet
-    # This is a placeholder for future implementation
-    # In production, you would use:
-    # - streamlit-webrtc for real-time audio
-    # - audio_recorder_streamlit component
-    # - Custom JavaScript component
+    st.info("🎤 **Voice Input**: Upload an audio file for transcription")
+    
+    # Note: Browser-based recording will be added in future version
+    st.caption("💡 Real-time recording coming soon. Currently supports file uploads.")
 
     uploaded_audio = st.file_uploader(
-        "Or upload an audio file",
+        "Upload an audio file (WAV, MP3, M4A, OGG)",
         type=["wav", "mp3", "m4a", "ogg"],
         help="Upload a voice recording to transcribe",
     )
