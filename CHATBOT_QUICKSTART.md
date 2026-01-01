@@ -70,14 +70,14 @@ pytest tests/test_chatbot_app.py --cov=chatbot_app
 
 ## Database
 
-The chatbot uses SQLite (`chatbot_history.db`) to store:
+The chatbot uses SQLite (`RexVoice.db`) to store:
 - User accounts (email-based)
 - Message history per user
 - Timestamps for all messages
 
 To clear history:
 - Use the "🗑️ Clear Chat History" button in the app
-- Or delete `chatbot_history.db` file
+- Or delete `RexVoice.db` file
 
 ## Troubleshooting
 
@@ -88,7 +88,7 @@ To clear history:
 
 ### Database Locked
 - Close other instances of the app
-- Delete `chatbot_history.db` if corrupted
+- Delete `RexVoice.db` if corrupted
 
 ### No Streaming
 - Check internet connection

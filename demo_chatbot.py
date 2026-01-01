@@ -112,7 +112,7 @@ def demo_database_operations() -> None:
     print("  2. Run: streamlit run chatbot_app.py")
     print()
     print(f"Note: Demo database created at: {DB_PATH}")
-    print("You can delete it with: rm chatbot_history.db")
+    print("You can delete it with: rm RexVoice.db")
 
 
 if __name__ == "__main__":

@@ -51,6 +51,13 @@ def test_init_database(tmp_path: Path) -> None:
     conn.close()
 
 
+def test_default_db_path() -> None:
+    """Ensure the default database path uses RexVoice.db."""
+    import chatbot_app
+
+    assert chatbot_app.DB_PATH.name == "RexVoice.db"
+
+
 def test_get_or_create_user_new(test_db: Path) -> None:
     """Test creating a new user."""
     email = "test@example.com"

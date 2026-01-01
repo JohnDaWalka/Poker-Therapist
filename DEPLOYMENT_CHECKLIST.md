@@ -131,7 +131,7 @@ streamlit run chatbot_app.py
 ### Optional Files
 - ✅ .env (user creates from .env.example)
 - ✅ .streamlit/secrets.toml (user creates or setup script creates)
-- ✅ chatbot_history.db (auto-created on first run)
+- ✅ RexVoice.db (auto-created on first run)
 
 ## 🎯 User Acceptance Criteria
 

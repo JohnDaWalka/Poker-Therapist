@@ -149,7 +149,7 @@ Be conversational and engaging, like you're coaching someone at the table.
 
 ### Database
 - **Type**: SQLite
-- **File**: `chatbot_history.db`
+- **File**: `RexVoice.db`
 - **Tables**: users, messages
 - **Features**: Per-user history, multi-user support
 

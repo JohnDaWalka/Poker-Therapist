@@ -13,7 +13,7 @@ This is a Streamlit-based chatbot application with the following features:
 ## Features
 
 ### 🧠 Persistent Memory
-- All conversations are stored in a local SQLite database (`chatbot_history.db`)
+- All conversations are stored in a local SQLite database (`RexVoice.db`)
 - Each user's conversation history is preserved across sessions
 - Users can resume conversations from where they left off
 
@@ -147,7 +147,7 @@ The application uses the `grok-beta` model from xAI. This model:
 
 ## Database Schema
 
-The SQLite database (`chatbot_history.db`) has two tables:
+The SQLite database (`RexVoice.db`) has two tables:
 
 ### Users Table
 ```sql
@@ -242,7 +242,7 @@ Save to Database (assistant message)
 ### Database Locked Error
 - Only one Streamlit instance should access the database
 - Close any other running instances
-- Delete `chatbot_history.db` and restart (will lose history)
+- Delete `RexVoice.db` and restart (will lose history)
 
 ### Streaming Not Working
 - Check your internet connection
