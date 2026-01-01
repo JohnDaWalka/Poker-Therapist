@@ -33,7 +33,7 @@ except ImportError:
     VOICE_AVAILABLE = False
 
 # Database configuration
-DB_PATH = Path("chatbot_history.db")
+DB_PATH = Path("RexVoice.db")
 
 # Authorized email addresses for Rex Poker Coach
 # Can be overridden via AUTHORIZED_EMAILS environment variable (comma-separated)

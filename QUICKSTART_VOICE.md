@@ -197,10 +197,10 @@ default_voice = "onyx"
 ```
 
 ### Database Location
-Default: `chatbot_history.db` in project root
+Default: `RexVoice.db` in project root
 To change, edit `chatbot_app.py`:
 ```python
-DB_PATH = Path("/custom/path/chatbot_history.db")
+DB_PATH = Path("/custom/path/RexVoice.db")
 ```
 
 ## Quick Actions

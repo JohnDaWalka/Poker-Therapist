@@ -87,8 +87,8 @@ Successfully implemented a Streamlit-based chatbot application with persistent m
 
 - **`.gitignore`**
   - Added `.streamlit/secrets.toml`
-  - Added `chatbot_history.db`
-  - Added `chatbot_history.db-journal`
+  - Added `RexVoice.db`
+  - Added `RexVoice.db-journal`
 
 - **`.env.example`**
   - Added `XAI_API_KEY` configuration
