@@ -1,8 +1,27 @@
 # Poker Therapist 🎰
 
-An AI-powered poker coaching application with advanced multimodal chatbot integration.
+An AI-powered poker coaching application with advanced multimodal chatbot integration and voice capabilities.
 
 ## Features
+
+### 🎙️ Rex - Voice-Enabled Poker Coach (NEW!)
+Meet Rex, your elite poker coach with voice integration:
+- **Voice Input (STR)** - Upload audio for transcription
+- **Voice Output (TTS)** - Rex speaks with an authoritative voice
+- **Rex Personality** - Direct, no-nonsense poker expert with decades of experience
+- **CFR Analysis** - Advanced Counterfactual Regret Minimization
+- **Psychological Coaching** - Mental game and wellness support
+- **x.ai Powered** - Grok @ x.ai for intelligent responses
+
+👥 **Authorized VIP Users**: Full voice features enabled for:
+- m.fanelli1@icloud.com
+- johndawalka@icloud.com
+- mauro.fanelli@ctstate.edu
+- maurofanellijr@gmail.com
+- cooljack87@icloud.com
+- jdwalka@pm.me
+
+See [VOICE_INTEGRATION.md](VOICE_INTEGRATION.md) for complete voice setup guide.
 
 ### 🤖 AI Poker Coaching
 Get expert poker strategy advice from multiple AI providers:
@@ -11,19 +30,21 @@ Get expert poker strategy advice from multiple AI providers:
 - **Anthropic Claude** - Deep analytical capabilities for complex situations
 - **Google Gemini** - Fast multimodal hand analysis
 
-### 💬 Streamlit Chatbot (NEW!)
+### 💬 Streamlit Chatbot
 A standalone Streamlit chatbot with persistent memory:
 - **Persistent Memory** - SQLite database stores conversation history
 - **Multi-User Support** - Email-based user identification
 - **xAI Integration** - Powered by xAI's Grok model
 - **Streaming Responses** - Real-time AI responses
 - **Thinking Display** - See the AI's reasoning process
+- **Voice Mode** - Enable Rex's voice for immersive coaching
 
 Quick start for Streamlit chatbot:
 ```bash
-pip install streamlit openai
-cp .streamlit/secrets.toml.example .streamlit/secrets.toml
-# Add your xAI API key to .streamlit/secrets.toml
+pip install streamlit openai sounddevice pydub scipy
+# Set your API keys
+export XAI_API_KEY=xai-your-key-here
+export OPENAI_API_KEY=sk-your-openai-key-here  # For voice fallback
 streamlit run chatbot_app.py
 ```
 

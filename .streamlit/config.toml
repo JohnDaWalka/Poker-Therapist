@@ -8,6 +8,16 @@ font = "sans serif"
 [server]
 headless = true
 port = 8501
+maxUploadSize = 200
 
 [browser]
 gatherUsageStats = false
+
+[voice]
+# Voice features configuration
+enable_tts = true
+enable_stt = true
+# Voice provider: xai (primary) with openai fallback for TTS/STT
+voice_provider = "xai"
+# Voice options: onyx (deep/authoritative), alloy, echo, fable, nova, shimmer
+default_voice = "onyx"

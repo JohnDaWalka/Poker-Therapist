@@ -2,14 +2,57 @@
 
 import os
 import sqlite3
+import sys
 from pathlib import Path
 from typing import Any
 
 import streamlit as st
 from openai import OpenAI
 
+# Add python_src to path for imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+# Import voice and UI components
+try:
+    from python_src.services.voice_service import VoiceService, REX_SYSTEM_PROMPT
+    from python_src.ui.voice_chatbot import (
+        render_audio_player,
+        render_voice_controls,
+        render_voice_recorder,
+        render_voice_settings,
+        show_voice_error,
+    )
+    from python_src.ui.chat_components import (
+        render_chat_header,
+        render_quick_actions,
+        render_user_info,
+    )
+
+    VOICE_AVAILABLE = True
+except ImportError:
+    VOICE_AVAILABLE = False
+
 # Database configuration
 DB_PATH = Path("chatbot_history.db")
+
+# Authorized email addresses for Rex Poker Coach
+# Can be overridden via AUTHORIZED_EMAILS environment variable (comma-separated)
+_DEFAULT_AUTHORIZED_EMAILS = [
+    "m.fanelli1@icloud.com",
+    "johndawalka@icloud.com",
+    "mauro.fanelli@ctstate.edu",
+    "maurofanellijr@gmail.com",
+    "cooljack87@icloud.com",
+    "jdwalka@pm.me",
+]
+
+# Load from environment if available
+_env_emails = os.getenv("AUTHORIZED_EMAILS", "").strip()
+AUTHORIZED_EMAILS = (
+    [email.strip() for email in _env_emails.split(",") if email.strip()]
+    if _env_emails
+    else _DEFAULT_AUTHORIZED_EMAILS
+)
 
 
 def init_database() -> None:
@@ -191,19 +234,54 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
     with st.sidebar:
         st.title("⚙️ Configuration")
 
-        # User email input
-        email = st.text_input(
-            "Your Email",
-            value=st.session_state.get("user_email", ""),
-            placeholder="user@example.com",
-            help="Enter your email to access your conversation history",
+        # User email input with authorized accounts
+        st.subheader("👤 Account Login")
+        
+        # Show dropdown for authorized emails or custom input
+        email_option = st.radio(
+            "Select or enter your email:",
+            options=["Select from authorized", "Enter custom email"],
+            help="Choose an authorized account or enter your own email",
         )
+        
+        if email_option == "Select from authorized":
+            email = st.selectbox(
+                "Authorized Accounts",
+                options=[""] + AUTHORIZED_EMAILS,
+                format_func=lambda x: "Select an account..." if x == "" else x,
+                help="Select your authorized email address",
+            )
+        else:
+            email = st.text_input(
+                "Your Email",
+                value=st.session_state.get("user_email", ""),
+                placeholder="user@example.com",
+                help="Enter your email to access your conversation history",
+            )
 
         if email and email != st.session_state.get("user_email", ""):
-            st.session_state.user_email = email
-            st.session_state.user_id = get_or_create_user(email)
-            st.success(f"✅ Logged in as: {email}")
-            st.rerun()
+            # Validate email format
+            if "@" in email and "." in email.split("@")[1]:
+                st.session_state.user_email = email
+                st.session_state.user_id = get_or_create_user(email)
+                
+                # Show special badge for authorized users
+                if email in AUTHORIZED_EMAILS:
+                    st.success(f"✅ Logged in as: {email} 🎰 (Authorized User)")
+                else:
+                    st.success(f"✅ Logged in as: {email}")
+                st.rerun()
+            else:
+                st.error("❌ Please enter a valid email address")
+
+        # Show user info if logged in
+        if "user_id" in st.session_state and "user_email" in st.session_state:
+            if st.session_state.user_email in AUTHORIZED_EMAILS:
+                st.info("🎰 **VIP Access**: Full voice and Rex personality features enabled")
+            
+            # Show message count
+            message_count = len(st.session_state.get("messages", []))
+            st.metric("Messages in Session", message_count)
 
         # Show clear history button if user is logged in
         if "user_id" in st.session_state:
@@ -229,24 +307,50 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
         st.info(f"🔄 Streaming: {'Enabled' if enable_streaming else 'Disabled'}")
         st.info(f"💭 Thinking Display: {'Enabled' if enable_thinking else 'Disabled'}")
 
+        # Voice mode controls
+        voice_enabled = False
+        voice_settings = {"voice": "onyx", "autoplay": True, "language": "en"}
+        if VOICE_AVAILABLE:
+            voice_enabled = render_voice_controls(
+                st.session_state.get("voice_enabled", False),
+            )
+            st.session_state.voice_enabled = voice_enabled
+
+            if voice_enabled:
+                voice_settings = render_voice_settings()
+
+        # Quick action buttons
+        if VOICE_AVAILABLE:
+            quick_action = render_quick_actions()
+            if quick_action:
+                st.session_state.quick_action = quick_action
+
     # Main chat interface
-    st.title("🤖 AI Chatbot with Persistent Memory")
+    if VOICE_AVAILABLE:
+        render_chat_header()
+    else:
+        st.title("🤖 AI Chatbot with Persistent Memory")
 
     # Check if user is logged in
     if "user_email" not in st.session_state or not st.session_state.user_email:
         st.warning("👈 Please enter your email in the sidebar to start chatting")
-        st.info("""
-        ### Welcome to the AI Chatbot!
+        if VOICE_AVAILABLE:
+            from python_src.ui.chat_components import render_welcome_message
 
-        This chatbot features:
-        - 🧠 **Persistent Memory**: Your conversations are saved and can be resumed later
-        - 👥 **Multi-User Support**: Each user has their own conversation history
-        - 🔄 **Streaming Responses**: See responses in real-time
-        - 💭 **Thinking Display**: Understand the AI's reasoning process
-        - 🔐 **Secure**: API keys stored in secrets or environment variables
+            render_welcome_message()
+        else:
+            st.info("""
+            ### Welcome to the AI Chatbot!
 
-        To get started, enter your email in the sidebar!
-        """)
+            This chatbot features:
+            - 🧠 **Persistent Memory**: Your conversations are saved and can be resumed later
+            - 👥 **Multi-User Support**: Each user has their own conversation history
+            - 🔄 **Streaming Responses**: See responses in real-time
+            - 💭 **Thinking Display**: Understand the AI's reasoning process
+            - 🔐 **Secure**: API keys stored in secrets or environment variables
+
+            To get started, enter your email in the sidebar!
+            """)
         return
 
     # Initialize session state for messages
@@ -266,8 +370,33 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # Chat input
-    if prompt := st.chat_input("Type your message here..."):
+    # Handle quick actions if set
+    if VOICE_AVAILABLE and st.session_state.get("quick_action"):
+        prompt = st.session_state.quick_action
+        st.session_state.quick_action = None
+        st.rerun()
+
+    # Voice input option
+    prompt = None
+    if VOICE_AVAILABLE and voice_enabled:
+        with st.expander("🎤 Voice Input", expanded=False):
+            audio_data = render_voice_recorder()
+            if audio_data:
+                try:
+                    voice_service = VoiceService()
+                    prompt = voice_service.speech_to_text(
+                        audio_data,
+                        language=voice_settings.get("language", "en"),
+                    )
+                    st.success(f"✅ Transcribed: {prompt}")
+                except Exception as e:
+                    show_voice_error(f"Speech recognition failed: {e!s}")
+
+    # Chat input (text)
+    if not prompt:
+        prompt = st.chat_input("Type your message here... or use voice input above 🎤" if voice_enabled else "Type your message here...")
+
+    if prompt:
         # Add user message to chat
         st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -290,6 +419,10 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
                     {"role": m["role"], "content": m["content"]}
                     for m in st.session_state.messages
                 ]
+                
+                # Add Rex personality system prompt for authorized users
+                if VOICE_AVAILABLE and st.session_state.get("user_email") in AUTHORIZED_EMAILS:
+                    conversation.insert(0, {"role": "system", "content": REX_SYSTEM_PROMPT})
 
                 # Get streaming and thinking settings
                 enable_streaming = True
@@ -348,6 +481,25 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
 
                 # Save assistant message to database
                 save_message(st.session_state.user_id, "assistant", response)
+
+                # Generate voice output if enabled
+                if VOICE_AVAILABLE and voice_enabled:
+                    try:
+                        with st.spinner("🎤 Rex is speaking..."):
+                            voice_service = VoiceService()
+                            audio_data = voice_service.text_to_speech(
+                                response,
+                                voice=voice_settings.get("voice", "onyx"),
+                            )
+                            st.markdown("---")
+                            st.markdown("🔊 **Rex's Voice Response:**")
+                            render_audio_player(
+                                audio_data,
+                                autoplay=voice_settings.get("autoplay", True),
+                            )
+                    except Exception as voice_error:
+                        show_voice_error(f"Voice generation failed: {voice_error!s}")
+                        st.info("💡 Rex's text response is still available above.")
 
             except Exception as e:  # noqa: BLE001
                 error_msg = f"❌ Error: {e!s}"
