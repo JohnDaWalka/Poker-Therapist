@@ -1,0 +1,25 @@
+# Poker Therapist - Voice Integration Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core Framework
+streamlit>=1.40.0
+
+# AI/ML APIs
+openai>=1.58.1
+
+# HTTP Client
+requests>=2.31.0
+httpx>=0.28.1
+
+# Audio Processing for Voice Features
+sounddevice>=0.4.6
+pydub>=0.25.1
+scipy>=1.11.0
+
+# Web Scraping (existing features)
+beautifulsoup4>=4.12.3
+markdownify>=0.14.1
+types-beautifulsoup4>=4.12.0
+
+# CLI Tools (existing features)
+typer>=0.15.1
