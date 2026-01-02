@@ -9,6 +9,7 @@ import pytest
 
 # Import functions from chatbot_app
 from chatbot_app import (
+    DB_PATH,
     ThinksCallback,
     clear_user_history,
     get_or_create_user,
@@ -53,9 +54,7 @@ def test_init_database(tmp_path: Path) -> None:
 
 def test_default_db_path() -> None:
     """Ensure the default database path uses RexVoice.db."""
-    import chatbot_app
-
-    assert chatbot_app.DB_PATH.name == "RexVoice.db"
+    assert DB_PATH.name == "RexVoice.db"
 
 
 def test_get_or_create_user_new(test_db: Path) -> None:
