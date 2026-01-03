@@ -27,10 +27,31 @@ try:
         render_quick_actions,
         render_user_info,
     )
+    
+    # Import enhanced voice features
+    from python_src.services.voice_streaming_service import (
+        VoiceStreamingService,
+        ConversationSession,
+        ConversationMode,
+    )
+    from python_src.services.rex_personality import RexPersonality, Language
+    from python_src.services.voice_cloning_service import VoiceCloningService
+    from python_src.ui.enhanced_voice_components import (
+        render_streaming_controls,
+        render_conversation_mode_controls,
+        render_emotion_display,
+        render_language_selector,
+        render_voice_cloning_uploader,
+        render_voice_profile_manager,
+        render_conversation_status,
+        show_feature_info,
+    )
 
     VOICE_AVAILABLE = True
-except ImportError:
+    ENHANCED_FEATURES_AVAILABLE = True
+except ImportError as e:
     VOICE_AVAILABLE = False
+    ENHANCED_FEATURES_AVAILABLE = False
 
 # Database configuration
 DB_PATH = Path("RexVoice.db")
@@ -318,6 +339,46 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
 
             if voice_enabled:
                 voice_settings = render_voice_settings()
+        
+        # Enhanced voice features (if available)
+        rex_language = "en"
+        conversation_mode = None
+        voice_profile_id = None
+        
+        if ENHANCED_FEATURES_AVAILABLE and voice_enabled:
+            # Language selector
+            rex_language = render_language_selector()
+            st.session_state.rex_language = rex_language
+            
+            # Conversation mode controls
+            conversation_mode = render_conversation_mode_controls()
+            st.session_state.conversation_mode = conversation_mode
+            
+            # Voice cloning features
+            voice_samples = render_voice_cloning_uploader()
+            if voice_samples:
+                # Create voice profile
+                if "voice_cloning_service" not in st.session_state:
+                    st.session_state.voice_cloning_service = VoiceCloningService()
+                
+                try:
+                    profile = st.session_state.voice_cloning_service.create_profile(
+                        name=f"Custom_{st.session_state.user_email}",
+                        voice_samples=voice_samples,
+                        description="Custom Rex voice profile",
+                    )
+                    st.sidebar.success(f"✅ Voice profile created: {profile.name}")
+                except Exception as e:
+                    st.sidebar.error(f"Failed to create profile: {e}")
+            
+            # Voice profile manager
+            if "voice_cloning_service" in st.session_state:
+                profiles = [
+                    p.to_dict() 
+                    for p in st.session_state.voice_cloning_service.list_profiles()
+                ]
+                voice_profile_id = render_voice_profile_manager(profiles)
+                st.session_state.voice_profile_id = voice_profile_id
 
         # Quick action buttons
         if VOICE_AVAILABLE:
@@ -378,6 +439,8 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
 
     # Voice input option
     prompt = None
+    emotion_data = None
+    
     if VOICE_AVAILABLE and voice_enabled:
         with st.expander("🎤 Voice Input", expanded=False):
             audio_data = render_voice_recorder()
@@ -389,6 +452,15 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
                         language=voice_settings.get("language", "en"),
                     )
                     st.success(f"✅ Transcribed: {prompt}")
+                    
+                    # Analyze emotion if enhanced features available
+                    if ENHANCED_FEATURES_AVAILABLE:
+                        streaming_service = VoiceStreamingService(
+                            enable_emotion_analysis=True
+                        )
+                        emotion_data = streaming_service.analyze_emotion(audio_data)
+                        render_emotion_display(emotion_data)
+                        
                 except Exception as e:
                     show_voice_error(f"Speech recognition failed: {e!s}")
 
@@ -422,7 +494,23 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
                 
                 # Add Rex personality system prompt for authorized users
                 if VOICE_AVAILABLE and st.session_state.get("user_email") in AUTHORIZED_EMAILS:
-                    conversation.insert(0, {"role": "system", "content": REX_SYSTEM_PROMPT})
+                    # Use multi-language personality if enhanced features available
+                    if ENHANCED_FEATURES_AVAILABLE:
+                        rex_personality = RexPersonality.from_code(
+                            st.session_state.get("rex_language", "en")
+                        )
+                        system_prompt = rex_personality.get_system_prompt()
+                        
+                        # Add emotion context if available
+                        if emotion_data and emotion_data.get("emotion") != "neutral":
+                            emotion = emotion_data.get("emotion")
+                            confidence = emotion_data.get("confidence", 0)
+                            emotion_context = f"\n\nUser's emotional state: {emotion} (confidence: {confidence:.0%}). Adjust your coaching style accordingly."
+                            system_prompt += emotion_context
+                    else:
+                        system_prompt = REX_SYSTEM_PROMPT
+                    
+                    conversation.insert(0, {"role": "system", "content": system_prompt})
 
                 # Get streaming and thinking settings
                 enable_streaming = True
@@ -486,11 +574,48 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
                 if VOICE_AVAILABLE and voice_enabled:
                     try:
                         with st.spinner("🎤 Rex is speaking..."):
-                            voice_service = VoiceService()
-                            audio_data = voice_service.text_to_speech(
-                                response,
-                                voice=voice_settings.get("voice", "onyx"),
-                            )
+                            # Check if using custom voice profile
+                            if (ENHANCED_FEATURES_AVAILABLE and 
+                                st.session_state.get("voice_profile_id") and
+                                "voice_cloning_service" in st.session_state):
+                                
+                                # Use voice cloning service
+                                cloning_service = st.session_state.voice_cloning_service
+                                profile = cloning_service.get_profile(
+                                    st.session_state.voice_profile_id
+                                )
+                                
+                                if profile:
+                                    audio_data = cloning_service.synthesize_with_profile(
+                                        response,
+                                        profile,
+                                        language=st.session_state.get("rex_language", "en"),
+                                    )
+                                else:
+                                    # Fallback to standard voice
+                                    voice_service = VoiceService()
+                                    audio_data = voice_service.text_to_speech(
+                                        response,
+                                        voice=voice_settings.get("voice", "onyx"),
+                                    )
+                            else:
+                                # Use standard voice service
+                                voice_service = VoiceService()
+                                
+                                # Get voice preference based on language if enhanced features available
+                                if ENHANCED_FEATURES_AVAILABLE:
+                                    rex_personality = RexPersonality.from_code(
+                                        st.session_state.get("rex_language", "en")
+                                    )
+                                    preferred_voice = rex_personality.get_voice_preference()
+                                else:
+                                    preferred_voice = voice_settings.get("voice", "onyx")
+                                
+                                audio_data = voice_service.text_to_speech(
+                                    response,
+                                    voice=preferred_voice,
+                                )
+                            
                             st.markdown("---")
                             st.markdown("🔊 **Rex's Voice Response:**")
                             render_audio_player(
