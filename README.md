@@ -4,14 +4,24 @@ An AI-powered poker coaching application with advanced multimodal chatbot integr
 
 ## Features
 
-### 🎙️ Rex - Voice-Enabled Poker Coach (NEW!)
-Meet Rex, your elite poker coach with voice integration:
+### 🎙️ Rex - Voice-Enabled Poker Coach (ENHANCED!)
+Meet Rex, your elite poker coach with advanced voice capabilities:
+
+**Core Features:**
 - **Voice Input (STR)** - Upload audio for transcription
 - **Voice Output (TTS)** - Rex speaks with an authoritative voice
 - **Rex Personality** - Direct, no-nonsense poker expert with decades of experience
 - **CFR Analysis** - Advanced Counterfactual Regret Minimization
 - **Psychological Coaching** - Mental game and wellness support
 - **x.ai Powered** - Grok @ x.ai for intelligent responses
+
+**🆕 NEW Enhanced Voice Features:**
+- 🔴 **Real-time Voice Streaming** - WebRTC streaming for instant interaction
+- 🎤 **Voice-Activated Recording** - Automatic recording triggered by your voice
+- 💬 **Conversation Mode** - Natural continuous dialogue with Rex
+- 😊 **Emotion Analysis** - Rex detects and responds to your emotional state
+- 🌍 **Multi-Language Support** - Rex speaks 8+ languages authentically
+- 🎭 **Voice Cloning** - Create custom Rex voice profiles
 
 👥 **Authorized VIP Users**: Full voice features enabled for:
 - m.fanelli1@icloud.com
@@ -21,7 +31,7 @@ Meet Rex, your elite poker coach with voice integration:
 - cooljack87@icloud.com
 - jdwalka@pm.me
 
-See [VOICE_INTEGRATION.md](VOICE_INTEGRATION.md) for complete voice setup guide.
+See [VOICE_INTEGRATION.md](VOICE_INTEGRATION.md) for voice setup and [ENHANCED_VOICE_GUIDE.md](ENHANCED_VOICE_GUIDE.md) for new features guide.
 
 ### 🤖 AI Poker Coaching
 Get expert poker strategy advice from multiple AI providers:
