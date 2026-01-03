@@ -16,6 +16,22 @@ sounddevice>=0.4.6
 pydub>=0.25.1
 scipy>=1.11.0
 
+# Real-time Voice Streaming (WebRTC)
+streamlit-webrtc>=0.47.1
+aiortc>=1.9.0
+av>=12.0.0
+
+# Voice Activity Detection
+webrtcvad>=2.0.10
+
+# Voice Emotion Analysis
+librosa>=0.10.1
+transformers>=4.36.0
+torch>=2.1.0
+
+# Voice Cloning & TTS
+coqui-tts>=0.22.0
+
 # Web Scraping (existing features)
 beautifulsoup4>=4.12.3
 markdownify>=0.14.1
