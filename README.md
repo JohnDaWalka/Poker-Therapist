@@ -131,7 +131,7 @@ Deploy the FastAPI backend to Vercel for serverless hosting:
    - `XAI_API_KEY`
    - `OPENAI_API_KEY`
    - `ANTHROPIC_API_KEY` (optional)
-   - `GOOGLE_API_KEY` (optional)
+   - `GOOGLE_API_KEY` (optional, for Gemini multimodal features)
    - `AUTHORIZED_EMAILS`
 
 3. **Deploy**
