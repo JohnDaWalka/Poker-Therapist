@@ -188,7 +188,7 @@ def get_gemini_client() -> genai.GenerativeModel:
         st.stop()
 
     genai.configure(api_key=api_key)
-    return genai.GenerativeModel("gemini-1.5-pro-latest")
+    return genai.GenerativeModel("gemini-2.0-flash-001")
 
 
 class ThinksCallback:

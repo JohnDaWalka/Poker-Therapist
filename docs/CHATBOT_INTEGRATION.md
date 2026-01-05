@@ -29,8 +29,8 @@ The Poker Therapist now includes a sophisticated AI coaching system that leverag
 - **Best for**: Complex hand histories, tournament strategy, GTO analysis
 
 ### 4. Google Gemini
-- **Model**: gemini-1.5-pro
-- **Strengths**: Multimodal understanding, fast responses
+- **Model**: gemini-2.0-flash-001
+- **Strengths**: Multimodal understanding, fast responses, latest Gemini 2.0 capabilities
 - **Best for**: Quick analysis, image-based hand reading, real-time coaching
 
 ## Setup

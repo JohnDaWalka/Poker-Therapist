@@ -24,8 +24,8 @@ Created modular clients for 4 AI providers:
 - Best for: Complex hand histories, GTO analysis
 
 #### Google Gemini (`src/api/chatbots/gemini.js`)
-- Model: gemini-1.5-pro
-- Capabilities: Text + image analysis, fast processing
+- Model: gemini-2.0-flash-001
+- Capabilities: Text + image analysis, fast processing, latest Gemini 2.0 features
 - Best for: Quick analysis, real-time coaching
 
 ### 2. Unified Manager (`src/api/chatbots/index.js`)
