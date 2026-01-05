@@ -542,9 +542,12 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
                     callback = ThinksCallback(message_placeholder)
                     full_response = ""
 
-                    # Start chat with history (excluding last message)
+                    # Start chat with history (excluding last message).
+                    # The system prompt is intentionally only prepended to the latest user turn
+                    # (i.e., not inserted as an initial system message in the history) so that
+                    # it scopes instructions to the current exchange rather than past turns.
                     chat = model.start_chat(history=conversation_history[:-1] if len(conversation_history) > 1 else [])
-                    
+
                     # Stream the response
                     stream = chat.send_message(
                         conversation_history[-1]['parts'][0],
