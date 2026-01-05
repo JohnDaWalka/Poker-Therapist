@@ -256,11 +256,14 @@ class PatternStorage:
                     datetime.now(UTC) + timedelta(minutes=expires_minutes)
                 ).isoformat()
             
+            # Use explicit timestamp for proper ordering
+            created_at = datetime.now(UTC).isoformat()
+            
             cursor.execute("""
                 INSERT INTO conversation_context 
-                (user_id, context_key, context_value, session_id, expires_at)
-                VALUES (?, ?, ?, ?, ?)
-            """, (user_id, context_key, context_value, session_id, expires_at))
+                (user_id, context_key, context_value, session_id, created_at, expires_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (user_id, context_key, context_value, session_id, created_at, expires_at))
             
             conn.commit()
     
@@ -335,11 +338,14 @@ class PatternStorage:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             
+            # Use explicit timestamp for proper ordering
+            created_at = datetime.now(UTC).isoformat()
+            
             cursor.execute("""
                 INSERT INTO user_insights 
-                (user_id, insight_type, insight_data, importance)
-                VALUES (?, ?, ?, ?)
-            """, (user_id, insight_type, json.dumps(insight_data), importance))
+                (user_id, insight_type, insight_data, importance, created_at)
+                VALUES (?, ?, ?, ?, ?)
+            """, (user_id, insight_type, json.dumps(insight_data), importance, created_at))
             
             conn.commit()
     

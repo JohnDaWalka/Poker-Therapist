@@ -183,9 +183,13 @@ def test_get_context_multiple_entries(
     user_id: int,
 ) -> None:
     """Test getting multiple context entries."""
+    import time
+    
     # Save multiple context entries
     pattern_storage.save_context(user_id, "topic", "preflop strategy")
+    time.sleep(0.01)  # Ensure different timestamps
     pattern_storage.save_context(user_id, "topic", "3betting")
+    time.sleep(0.01)
     pattern_storage.save_context(user_id, "topic", "position play")
     
     results = pattern_storage.get_context(user_id, "topic")
@@ -267,7 +271,7 @@ def test_get_insights_filtering(pattern_storage: PatternStorage, user_id: int) -
     """Test filtering insights by type and importance."""
     # Save insights with different types and importance
     pattern_storage.save_insight(user_id, "tilt_pattern", {"data": "tilt1"}, 0.9)
-    pattern_storage.save_insight(user_id, "tilt_pattern", {"data": "tilt2"}, 0.7)
+    pattern_storage.save_insight(user_id, "tilt_pattern", {"data": "tilt2"}, 0.75)
     pattern_storage.save_insight(user_id, "win_correlation", {"data": "win1"}, 0.8)
     pattern_storage.save_insight(user_id, "win_correlation", {"data": "win2"}, 0.4)
     
@@ -277,7 +281,7 @@ def test_get_insights_filtering(pattern_storage: PatternStorage, user_id: int) -
     
     # Get all insights with minimum importance
     important_insights = pattern_storage.get_insights(user_id, min_importance=0.75)
-    assert len(important_insights) == 3  # 0.9, 0.8, 0.7
+    assert len(important_insights) == 3  # 0.9, 0.8, 0.75
     
     # Get all insights
     all_insights = pattern_storage.get_insights(user_id)
@@ -286,6 +290,8 @@ def test_get_insights_filtering(pattern_storage: PatternStorage, user_id: int) -
 
 def test_get_insights_limit(pattern_storage: PatternStorage, user_id: int) -> None:
     """Test limiting number of insights returned."""
+    import time
+    
     # Save multiple insights
     for i in range(10):
         pattern_storage.save_insight(
@@ -294,6 +300,7 @@ def test_get_insights_limit(pattern_storage: PatternStorage, user_id: int) -> No
             {"index": i},
             0.5,
         )
+        time.sleep(0.01)  # Ensure different timestamps
     
     # Get limited results
     insights = pattern_storage.get_insights(user_id, limit=5)
