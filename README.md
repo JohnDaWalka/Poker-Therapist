@@ -71,7 +71,7 @@ See [CHATBOT_QUICKSTART.md](CHATBOT_QUICKSTART.md) for details.
 - Upload hand screenshots for AI analysis
 - Text + image combined analysis
 - Real-time coaching feedback
-
+[![Sourcery (https://img.shields.io/badge/Sourcery-enabled-brightgreen)](https://sourcery.ai)
 ## Quick Start
 
 ### Vue.js Application
@@ -131,6 +131,10 @@ Deploy the FastAPI backend to Vercel for serverless hosting:
    - `GOOGLE_API_KEY` (required for Gemini 2.0)
    - `OPENAI_API_KEY` (optional, for voice features)
    - `ANTHROPIC_API_KEY` (optional)
+   - `XAI_API_KEY`
+   - `OPENAI_API_KEY`
+   - `ANTHROPIC_API_KEY` (optional)
+   - `GOOGLE_API_KEY` (optional)
    - `AUTHORIZED_EMAILS`
 
 3. **Deploy**
