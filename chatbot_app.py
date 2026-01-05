@@ -238,6 +238,30 @@ class ThinksCallback:
             self.container.markdown(self.response_text)
 
 
+def validate_gemini_history(conversation_history: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Validate and fix conversation history for Gemini API requirements.
+    
+    Gemini API requires that the history alternates between user and model messages,
+    and when calling send_message with a user prompt, the history should not end
+    with a user message.
+    
+    Args:
+        conversation_history: The full conversation history including the current message
+        
+    Returns:
+        A validated history list that excludes the last message and ensures proper alternation
+    """
+    # Exclude the last message (which will be sent separately)
+    history = conversation_history[:-1] if len(conversation_history) > 1 else []
+    
+    # Validate that history alternates properly (should end with model message or be empty)
+    if history and history[-1]['role'] == 'user':
+        # If history ends with user message, remove it to maintain proper alternation
+        history = history[:-1]
+    
+    return history
+
+
 def main() -> None:  # noqa: C901, PLR0912, PLR0915
     """Run the main Streamlit chatbot application."""
     st.set_page_config(
@@ -546,12 +570,8 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
                     # The system prompt is intentionally only prepended to the latest user turn
                     # (i.e., not inserted as an initial system message in the history) so that
                     # it scopes instructions to the current exchange rather than past turns.
-                    # Ensure history ends with user message for Gemini API requirements
-                    history = conversation_history[:-1] if len(conversation_history) > 1 else []
-                    # Validate that history alternates properly (should end with model message or be empty)
-                    if history and history[-1]['role'] == 'user':
-                        # If history ends with user message, something is wrong - remove it
-                        history = history[:-1]
+                    # Validate history to ensure it meets Gemini API requirements
+                    history = validate_gemini_history(conversation_history)
                     chat = model.start_chat(history=history)
 
                     # Stream the response
@@ -585,12 +605,8 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
 
                 else:
                     # Non-streaming response
-                    # Ensure history ends with user message for Gemini API requirements
-                    history = conversation_history[:-1] if len(conversation_history) > 1 else []
-                    # Validate that history alternates properly (should end with model message or be empty)
-                    if history and history[-1]['role'] == 'user':
-                        # If history ends with user message, something is wrong - remove it
-                        history = history[:-1]
+                    # Validate history to ensure it meets Gemini API requirements
+                    history = validate_gemini_history(conversation_history)
                     chat = model.start_chat(history=history)
                     response_obj = chat.send_message(conversation_history[-1]['parts'][0])
                     response = response_obj.text
