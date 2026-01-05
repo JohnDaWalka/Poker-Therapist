@@ -4,12 +4,29 @@
 # Core Framework
 streamlit>=1.40.0
 
+# FastAPI Backend
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+python-multipart>=0.0.6
+
+# Database
+sqlalchemy>=2.0.23
+aiosqlite>=0.19.0
+
 # AI/ML APIs
 openai>=1.58.1
+anthropic>=0.7.0
+google-generativeai>=0.3.0
 
 # HTTP Client
 requests>=2.31.0
 httpx>=0.28.1
+aiofiles>=23.2.1
+
+# Environment
+python-dotenv>=1.0.0
 
 # Audio Processing for Voice Features
 sounddevice>=0.4.6
@@ -39,3 +56,7 @@ types-beautifulsoup4>=4.12.0
 
 # CLI Tools (existing features)
 typer>=0.15.1
+
+# Utilities
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4

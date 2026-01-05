@@ -1,0 +1,78 @@
+# Version control
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Testing
+tests/
+test_*.py
+*_test.py
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Database files
+*.db
+*.db-journal
+dossiers/
+
+# Node modules (for other parts of the project)
+node_modules/
+package-lock.json
+
+# iOS
+ios/
+
+# Windows
+windows/
+
+# Flutter
+flutter/
+
+# CLI
+cli/
+
+# Temporary files
+tmp/
+*.log
+*.tmp
+
+# Streamlit specific
+.streamlit/secrets.toml
+chatbot_history.db
+
+# Build artifacts
+*.pyc
+.cache/

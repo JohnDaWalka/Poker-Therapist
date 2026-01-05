@@ -118,6 +118,27 @@ For detailed setup and API key configuration, see [docs/CHATBOT_INTEGRATION.md](
 
 For detailed documentation, see [docs/STREAMLIT_CHATBOT.md](docs/STREAMLIT_CHATBOT.md)
 
+### ☁️ Vercel Deployment
+
+Deploy the FastAPI backend to Vercel for serverless hosting:
+
+1. **Connect your repository to Vercel**
+   - Visit https://vercel.com/new
+   - Import the repository
+   - Vercel will auto-detect the `vercel.json` configuration
+
+2. **Configure environment variables in Vercel dashboard**
+   - `XAI_API_KEY`
+   - `OPENAI_API_KEY`
+   - `ANTHROPIC_API_KEY` (optional)
+   - `GOOGLE_API_KEY` (optional)
+   - `AUTHORIZED_EMAILS`
+
+3. **Deploy**
+   - Click "Deploy" and your API will be live!
+
+For detailed deployment instructions, see [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)
+
 ---
 
 ## Original Project: Autonomous Advent of Code

@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "name": "poker-therapist",
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.py"
+    }
+  ],
+  "env": {
+    "XAI_API_KEY": "@xai_api_key",
+    "OPENAI_API_KEY": "@openai_api_key",
+    "ANTHROPIC_API_KEY": "@anthropic_api_key",
+    "GOOGLE_API_KEY": "@google_api_key",
+    "AUTHORIZED_EMAILS": "@authorized_emails"
+  },
+  "regions": ["iad1"]
+}
