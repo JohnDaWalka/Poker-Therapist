@@ -12,12 +12,9 @@ from typing import Any, Optional
 
 # Optional GCS support
 try:
-    # Use relative import to avoid circular dependencies
-    import importlib
-    gcs_module = importlib.import_module("python_src.services.gcs_storage_service")
-    GCSStorageService = gcs_module.GCSStorageService
+    from python_src.services.gcs_storage_service import GCSStorageService
     GCS_AVAILABLE = True
-except (ImportError, AttributeError):
+except ImportError:
     GCS_AVAILABLE = False
     GCSStorageService = None
 

@@ -2,7 +2,7 @@
 
 import json
 import sqlite3
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, Optional
 
@@ -251,7 +251,6 @@ class PatternStorage:
             # Calculate expiration
             expires_at = None
             if expires_minutes:
-                from datetime import timedelta
                 expires_at = (
                     datetime.now(UTC) + timedelta(minutes=expires_minutes)
                 ).isoformat()
