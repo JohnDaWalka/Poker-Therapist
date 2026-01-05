@@ -13,7 +13,7 @@ Meet Rex, your elite poker coach with advanced voice capabilities:
 - **Rex Personality** - Direct, no-nonsense poker expert with decades of experience
 - **CFR Analysis** - Advanced Counterfactual Regret Minimization
 - **Psychological Coaching** - Mental game and wellness support
-- **x.ai Powered** - Grok @ x.ai for intelligent responses
+- **Google Gemini 2.0 Powered** - Latest Gemini 2.0 Flash for intelligent responses
 
 **🆕 NEW Enhanced Voice Features:**
 - 🔴 **Real-time Voice Streaming** - WebRTC streaming for instant interaction
@@ -38,23 +38,23 @@ Get expert poker strategy advice from multiple AI providers:
 - **Perplexity AI** - Real-time, research-backed poker strategy
 - **OpenAI GPT-4** - Advanced reasoning with image analysis
 - **Anthropic Claude** - Deep analytical capabilities for complex situations
-- **Google Gemini** - Fast multimodal hand analysis
+- **Google Gemini 2.0** - Fast multimodal hand analysis with latest AI capabilities
 
 ### 💬 Streamlit Chatbot
 A standalone Streamlit chatbot with persistent memory:
 - **Persistent Memory** - SQLite database stores conversation history
 - **Multi-User Support** - Email-based user identification
-- **xAI Integration** - Powered by xAI's Grok model
+- **Google Gemini 2.0 Integration** - Powered by latest Gemini 2.0 Flash model
 - **Streaming Responses** - Real-time AI responses
 - **Thinking Display** - See the AI's reasoning process
 - **Voice Mode** - Enable Rex's voice for immersive coaching
 
 Quick start for Streamlit chatbot:
 ```bash
-pip install streamlit openai sounddevice pydub scipy
+pip install streamlit openai sounddevice pydub scipy google-generativeai
 # Set your API keys
-export XAI_API_KEY=xai-your-key-here
-export OPENAI_API_KEY=sk-your-openai-key-here  # For voice fallback
+export GOOGLE_API_KEY=your-google-api-key-here
+export OPENAI_API_KEY=sk-your-openai-key-here  # For voice features
 streamlit run chatbot_app.py
 ```
 
@@ -102,13 +102,13 @@ For detailed setup and API key configuration, see [docs/CHATBOT_INTEGRATION.md](
 
 1. **Install dependencies**
    ```bash
-   pip install streamlit openai
+   pip install streamlit openai google-generativeai
    ```
 
-2. **Configure xAI API key**
+2. **Configure Google API key**
    ```bash
    cp .streamlit/secrets.toml.example .streamlit/secrets.toml
-   # Edit .streamlit/secrets.toml and add your xAI API key
+   # Edit .streamlit/secrets.toml and add your Google API key
    ```
 
 3. **Run the chatbot**
@@ -128,10 +128,9 @@ Deploy the FastAPI backend to Vercel for serverless hosting:
    - Vercel will auto-detect the `vercel.json` configuration
 
 2. **Configure environment variables in Vercel dashboard**
-   - `XAI_API_KEY`
-   - `OPENAI_API_KEY`
+   - `GOOGLE_API_KEY` (required for Gemini 2.0)
+   - `OPENAI_API_KEY` (optional, for voice features)
    - `ANTHROPIC_API_KEY` (optional)
-   - `GOOGLE_API_KEY` (optional, for Gemini multimodal features)
    - `AUTHORIZED_EMAILS`
 
 3. **Deploy**

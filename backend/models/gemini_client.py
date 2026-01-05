@@ -10,13 +10,13 @@ class GeminiClient:
     """Client for Google Gemini API."""
 
     def __init__(
-        self, api_key: Optional[str] = None, model: str = "gemini-1.5-pro-latest"
+        self, api_key: Optional[str] = None, model: str = "gemini-2.0-flash-001"
     ) -> None:
         """Initialize Gemini client.
         
         Args:
             api_key: Google API key (or use GOOGLE_API_KEY env var)
-            model: Model name to use
+            model: Model name to use (default: gemini-2.0-flash-001)
         """
         api_key = api_key or os.getenv("GOOGLE_API_KEY")
         if not api_key:
