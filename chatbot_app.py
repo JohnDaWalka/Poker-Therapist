@@ -549,7 +549,7 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
 
                 # Prepare the final prompt
                 if system_prompt and conversation_history:
-                    # Prepend system prompt to first user message
+                    # Prepend system prompt to the current (latest) user message
                     final_prompt = f"{system_prompt}\n\n{conversation_history[-1]['parts'][0]}"
                     conversation_history[-1]['parts'][0] = final_prompt
 
