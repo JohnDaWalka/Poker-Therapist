@@ -524,7 +524,7 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
                         })
 
                 # Prepare the final prompt
-                if system_prompt:
+                if system_prompt and conversation_history:
                     # Prepend system prompt to first user message
                     final_prompt = f"{system_prompt}\n\n{conversation_history[-1]['parts'][0]}"
                     conversation_history[-1]['parts'][0] = final_prompt
@@ -546,7 +546,13 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
                     # The system prompt is intentionally only prepended to the latest user turn
                     # (i.e., not inserted as an initial system message in the history) so that
                     # it scopes instructions to the current exchange rather than past turns.
-                    chat = model.start_chat(history=conversation_history[:-1] if len(conversation_history) > 1 else [])
+                    # Ensure history ends with user message for Gemini API requirements
+                    history = conversation_history[:-1] if len(conversation_history) > 1 else []
+                    # Validate that history alternates properly (should end with model message or be empty)
+                    if history and history[-1]['role'] == 'user':
+                        # If history ends with user message, something is wrong - remove it
+                        history = history[:-1]
+                    chat = model.start_chat(history=history)
 
                     # Stream the response
                     stream = chat.send_message(
@@ -579,7 +585,13 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
 
                 else:
                     # Non-streaming response
-                    chat = model.start_chat(history=conversation_history[:-1] if len(conversation_history) > 1 else [])
+                    # Ensure history ends with user message for Gemini API requirements
+                    history = conversation_history[:-1] if len(conversation_history) > 1 else []
+                    # Validate that history alternates properly (should end with model message or be empty)
+                    if history and history[-1]['role'] == 'user':
+                        # If history ends with user message, something is wrong - remove it
+                        history = history[:-1]
+                    chat = model.start_chat(history=history)
                     response_obj = chat.send_message(conversation_history[-1]['parts'][0])
                     response = response_obj.text
                     message_placeholder.markdown(response)
