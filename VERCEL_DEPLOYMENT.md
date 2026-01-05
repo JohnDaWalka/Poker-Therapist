@@ -26,7 +26,7 @@ This guide explains how to deploy the Poker Therapist application to Vercel.
    - `XAI_API_KEY`: Your xAI API key
    - `OPENAI_API_KEY`: Your OpenAI API key
    - `ANTHROPIC_API_KEY`: Your Anthropic API key (optional)
-   - `GOOGLE_API_KEY`: Your Google API key (optional)
+   - `GOOGLE_API_KEY`: Your Google Gemini API key (optional, for multimodal processing)
    - `AUTHORIZED_EMAILS`: Comma-separated list of authorized user emails
 
 3. **Deploy**
