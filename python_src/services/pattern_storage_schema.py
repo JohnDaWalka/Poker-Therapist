@@ -67,7 +67,7 @@ def create_tables(cursor) -> None:
     Create all pattern storage tables and indexes.
     
     Args:
-        cursor: SQLite database cursor
+        cursor: SQLite database cursor (sqlite3.Cursor)
     """
     # Create tables
     cursor.execute(USER_PATTERNS_TABLE)
