@@ -6,7 +6,7 @@ import subprocess
 from typing import Iterable, Sequence
 
 # Limit which executables may be invoked by the audit pipeline.
-ALLOWED_EXECUTABLES: set[str] = {"python", "pip", "npm"}
+ALLOWED_EXECUTABLES: frozenset[str] = frozenset({"python", "pip", "npm"})
 
 
 def run_command(executable: str, args: Sequence[str] | None = None) -> None:
@@ -49,6 +49,13 @@ def run_pipeline(steps: Iterable[tuple[str, Sequence[str] | None]]) -> None:
     Each step is a pair of (executable, args). The executable must be whitelisted
     in ALLOWED_EXECUTABLES and arguments are passed positionally to avoid shell
     injection.
+    
+    Example:
+        run_pipeline([("pip", ["audit"]), ("npm", ["audit", "--production"])])
+    
+    Raises:
+        ValueError: If an unsupported executable is provided.
+        subprocess.CalledProcessError: If any command exits with a non-zero status.
     """
     for executable, args in steps:
         run_command(executable, args)
