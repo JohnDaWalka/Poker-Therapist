@@ -51,7 +51,7 @@ def run_pipeline(steps: Iterable[tuple[str, Sequence[str] | None]]) -> None:
     injection.
     
     Example:
-        run_pipeline([("pip", ["audit"]), ("npm", ["audit", "--production"])])
+        run_pipeline([("pip", ["list"]), ("npm", ["audit", "--production"])])
     
     Raises:
         ValueError: If an unsupported executable is provided.

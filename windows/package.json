@@ -26,7 +26,7 @@
     "concurrently": "^8.2.0",
     "wait-on": "^7.2.0"
   },
-  "_dependencyPolicy": "overrides target npm consumers; resolutions keep Yarn installs aligned—update both together",
+  "_dependencyPolicy": "overrides target npm consumers; resolutions keep Yarn installs aligned - update both together",
   "overrides": {
     "@babel/traverse": "^7.23.2",
     "cipher-base": "^1.0.5"
