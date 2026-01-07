@@ -29,6 +29,7 @@ def run_command(executable: str, args: Sequence[str] | None = None) -> None:
 
     result = subprocess.run(
         command,
+        shell=False,
         check=False,
         capture_output=True,
         text=True,
