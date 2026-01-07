@@ -27,7 +27,19 @@ def run_command(executable: str, args: Sequence[str] | None = None) -> None:
     if args:
         command.extend(args)
 
-    subprocess.run(command, check=True)
+    result = subprocess.run(
+        command,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise subprocess.CalledProcessError(
+            result.returncode,
+            result.args,
+            output=result.stdout,
+            stderr=result.stderr,
+        )
 
 
 def run_pipeline(steps: Iterable[tuple[str, Sequence[str] | None]]) -> None:
