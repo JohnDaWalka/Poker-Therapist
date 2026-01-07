@@ -1,6 +1,7 @@
 """Dossier class for patient session data management."""
 
 import json
+import logging
 import os
 import sys
 import tempfile
@@ -17,6 +18,9 @@ try:
 except ImportError:
     GCS_AVAILABLE = False
     GCSStorageService = None
+
+# Set up logger
+logger = logging.getLogger(__name__)
 
 
 class Dossier:
@@ -292,9 +296,12 @@ class Dossier:
                 }
                 self.update("voice_profiles", voice_profiles)
                 return
-            except Exception:
+            except Exception as e:
+                logger.warning(
+                    f"Failed to store voice profile in GCS for user {self.user_id}, "
+                    f"profile {profile_id}: {e}. Falling back to local storage."
+                )
                 # Fall through to local storage on GCS failure
-                pass
         
         # Fall back to local storage
         profile_dir = Path("voice_profiles") / self.user_id / profile_id
@@ -345,9 +352,12 @@ class Dossier:
                     "metadata": profile_info.get("metadata", {}),
                     "created_at": profile_info.get("created_at"),
                 }
-            except Exception:
+            except Exception as e:
+                logger.error(
+                    f"Failed to retrieve voice profile from GCS for user {self.user_id}, "
+                    f"profile {profile_id}: {e}. Attempting local fallback."
+                )
                 # Fall through to local if GCS fails
-                pass
         
         # Retrieve from local storage
         sample_paths = profile_info.get("sample_paths", [])
@@ -390,8 +400,11 @@ class Dossier:
             try:
                 blob_names = profile_info["blob_names"]
                 self.gcs_service.delete_voice_profile(blob_names)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning(
+                    f"Failed to delete voice profile from GCS for user {self.user_id}, "
+                    f"profile {profile_id}: {e}. Profile metadata will still be removed."
+                )
         else:
             # Delete from local storage
             sample_paths = profile_info.get("sample_paths", [])

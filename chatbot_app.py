@@ -56,10 +56,15 @@ except ImportError as e:
 # Import storage services
 try:
     from python_src.services.gcs_storage_service import get_gcs_service
-    from python_src.services.pattern_storage import get_pattern_storage
     GCS_STORAGE_AVAILABLE = True
 except ImportError:
     GCS_STORAGE_AVAILABLE = False
+
+try:
+    from python_src.services.pattern_storage import get_pattern_storage
+    PATTERN_STORAGE_AVAILABLE = True
+except ImportError:
+    PATTERN_STORAGE_AVAILABLE = False
 
 # Database configuration
 DB_PATH = Path("RexVoice.db")
@@ -255,25 +260,28 @@ def init_storage_services() -> tuple[Any, Any]:
     Returns:
         Tuple of (gcs_service, pattern_storage)
     """
+    import logging
+    
+    logger = logging.getLogger(__name__)
     gcs_service = None
     pattern_storage = None
     
-    if GCS_STORAGE_AVAILABLE:
-        # Initialize GCS if configured
-        if os.getenv("ENABLE_GCS_STORAGE", "").lower() == "true":
-            try:
-                gcs_service = get_gcs_service(fallback_to_local=True)
-                if gcs_service:
-                    st.sidebar.info("☁️ Google Cloud Storage: Enabled")
-            except Exception:
-                # Silently fall back to local storage
-                pass
-        
-        # Initialize pattern storage
+    # Initialize GCS if available and configured
+    if GCS_STORAGE_AVAILABLE and os.getenv("ENABLE_GCS_STORAGE", "").lower() == "true":
+        try:
+            gcs_service = get_gcs_service(fallback_to_local=True)
+            if gcs_service:
+                st.sidebar.info("☁️ Google Cloud Storage: Enabled")
+        except Exception as e:
+            logger.warning(f"Failed to initialize GCS storage: {e}")
+            # Fall back to local storage
+    
+    # Initialize pattern storage (independent of GCS)
+    if PATTERN_STORAGE_AVAILABLE:
         try:
             pattern_storage = get_pattern_storage(DB_PATH)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"Failed to initialize pattern storage: {e}")
     
     return gcs_service, pattern_storage
 
