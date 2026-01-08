@@ -1,0 +1,27 @@
+{
+    "editor.formatOnSave": true,
+    "files.autoSave": "onWindowChange",
+    "editor.defaultFormatter": "vscode.html-language-features",
+    "editor.wordWrap": "on",
+    "files.exclude": {
+        "**/.git": false
+    },
+    "editor.formatOnPaste": true,
+    "editor.allowVariableFontsInAccessibilityMode": true,
+    "editor.autoClosingQuotes": "always",
+    "editor.autoClosingComments": "always",
+    "editor.autoIndent": "advanced",
+    "editor.autoIndentOnPaste": true,
+    "editor.codeActions.triggerOnFocusChange": true,
+    "editor.experimental.preferTreeSitter.css": true,
+    "editor.experimental.asyncTokenizationVerification": true,
+    "editor.experimental.asyncTokenizationLogging": true,
+    "editor.experimental.preferTreeSitter.ini": true,
+    "editor.experimental.preferTreeSitter.regex": true,
+    "editor.experimental.preferTreeSitter.typescript": true,
+    "editor.experimental.treeSitterTelemetry": true,
+    "editor.experimentalGpuAcceleration": "on",
+    "editor.experimentalWhitespaceRendering": "svg",
+    "editor.foldingImportsByDefault": true,
+    "editor.gotoLocation.alternativeReferenceCommand": "editor.action.goToReferences"
+}
