@@ -8,8 +8,18 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from backend.agent.memory.database import Base
 
-# Get database URL from environment
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./therapy_rex.db")
+def _build_default_postgres_url() -> str:
+    """Construct default PostgreSQL URL targeting PokerTracker port (5432)."""
+    user = os.getenv("POSTGRES_USER", "postgres")
+    password = os.getenv("POSTGRES_PASSWORD", "postgres")
+    host = os.getenv("POSTGRES_HOST", "localhost")
+    port = os.getenv("POSTGRES_PORT", "5432")  # PokerTracker default port
+    db_name = os.getenv("POSTGRES_DB", "pokertracker")
+    return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db_name}"
+
+
+# Get database URL from environment, defaulting to PostgreSQL on PT4 port
+DATABASE_URL = os.getenv("DATABASE_URL") or _build_default_postgres_url()
 
 # Create async engine
 engine = create_async_engine(DATABASE_URL, echo=False)

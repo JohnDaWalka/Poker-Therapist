@@ -73,6 +73,25 @@ class HandAnalysisResponse(BaseModel):
     hud_insights: Optional[str] = None
     learning_points: List[str]
     models: List[str]
+    log_id: Optional[int] = None
+    source: str = "PokerTracker"
+    source_version: str = "4.18.16"
+
+
+class HandHistoryLog(BaseModel):
+    """Logged hand history entry."""
+
+    id: int
+    user_id: str
+    source: str
+    source_version: str
+    hand_history: str
+    emotional_context: str
+    gto_analysis: str
+    meta_context: str
+    hud_insights: Optional[str] = None
+    models: List[str] = Field(default_factory=list)
+    created_at: datetime
 
 
 class VoiceAnalysisRequest(BaseModel):

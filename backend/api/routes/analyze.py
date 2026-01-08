@@ -1,11 +1,21 @@
 """Analysis endpoints for hand, voice, and video."""
 
+from typing import List
+
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from backend.agent.ai_orchestrator import AIOrchestrator
+from backend.agent.memory.hand_history_logger import (
+    DEFAULT_SOURCE,
+    DEFAULT_SOURCE_VERSION,
+    fetch_hand_histories,
+    log_hand_history_entry,
+)
+from backend.agent.memory.db_session import get_db
 from backend.api.models import (
     HandAnalysisRequest,
     HandAnalysisResponse,
+    HandHistoryLog,
     VideoAnalysisResponse,
     VoiceAnalysisResponse,
 )
@@ -40,6 +50,18 @@ async def analyze_hand(request: HandAnalysisRequest) -> HandAnalysisResponse:
             "Consider opponent tendencies",
             "Review GTO baseline for this spot",
         ]
+
+        log_id = await log_hand_history_entry(
+            user_id=request.user_id,
+            hand_history=request.hand_history,
+            emotional_context=request.emotional_context or "",
+            analysis={
+                "gto_analysis": result.get("gto_analysis"),
+                "meta_context": result.get("meta_context"),
+                "hud_insights": result.get("hud_insights"),
+                "models": result.get("models"),
+            },
+        )
         
         return HandAnalysisResponse(
             gto_analysis=result["gto_analysis"],
@@ -47,8 +69,40 @@ async def analyze_hand(request: HandAnalysisRequest) -> HandAnalysisResponse:
             hud_insights=result.get("hud_insights"),
             learning_points=learning_points,
             models=result["models"],
+            log_id=log_id,
+            source=DEFAULT_SOURCE,
+            source_version=DEFAULT_SOURCE_VERSION,
         )
         
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+@router.get("/analyze/hand/history/{user_id}", response_model=List[HandHistoryLog])
+async def get_hand_history(
+    user_id: str, limit: int = 20
+) -> List[HandHistoryLog]:
+    """Return stored PokerTracker hand histories for a user."""
+    try:
+        async with get_db() as db:
+            records = await fetch_hand_histories(db, user_id, limit)
+
+            return [
+                HandHistoryLog(
+                    id=record.id,
+                    user_id=record.user_id,
+                    source=record.source or DEFAULT_SOURCE,
+                    source_version=record.source_version or DEFAULT_SOURCE_VERSION,
+                    hand_history=record.hand_history,
+                    emotional_context=record.emotional_context or "",
+                    gto_analysis=record.gto_analysis or "",
+                    meta_context=record.meta_context or "",
+                    hud_insights=record.hud_insights,
+                    models=record.models or [],
+                    created_at=record.created_at,
+                )
+                for record in records
+            ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
 
