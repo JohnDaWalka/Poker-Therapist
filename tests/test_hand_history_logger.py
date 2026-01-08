@@ -45,7 +45,7 @@ def test_log_hand_history_persists(hand_history_env) -> None:
         assert record.source == "PokerTracker"
         assert record.source_version == "4.18.16"
         assert "Hold'em" in record.hand_history
-        assert record.emotional_context.startswith("tilted")
+        assert record.emotional_context == "tilted after bad beat"
         assert record.models == ["perplexity", "openai"]
 
     asyncio.run(run())

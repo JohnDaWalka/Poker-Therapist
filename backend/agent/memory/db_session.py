@@ -13,7 +13,7 @@ def _build_default_postgres_url() -> str:
     user = os.getenv("POSTGRES_USER", "postgres")
     password = os.getenv("POSTGRES_PASSWORD", "postgres")
     host = os.getenv("POSTGRES_HOST", "localhost")
-    port = os.getenv("POSTGRES_PORT", "5432")  # PokerTracker default port
+    port = os.getenv("POSTGRES_PORT", "5432")  # PostgreSQL default port
     db_name = os.getenv("POSTGRES_DB", "pokertracker")
     return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db_name}"
 
