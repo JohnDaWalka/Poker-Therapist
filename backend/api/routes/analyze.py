@@ -1,5 +1,6 @@
 """Analysis endpoints for hand, voice, and video."""
 
+import logging
 from typing import List
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
@@ -22,6 +23,7 @@ from backend.api.models import (
 
 router = APIRouter()
 orchestrator = AIOrchestrator()
+logger = logging.getLogger(__name__)
 
 
 @router.post("/analyze/hand", response_model=HandAnalysisResponse)
@@ -74,8 +76,12 @@ async def analyze_hand(request: HandAnalysisRequest) -> HandAnalysisResponse:
             source_version=DEFAULT_SOURCE_VERSION,
         )
         
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
+    except Exception:
+        logger.exception("Hand analysis failed")
+        raise HTTPException(
+            status_code=500,
+            detail="Hand analysis failed. Please try again later.",
+        )
 
 
 @router.get("/analyze/hand/history/{user_id}", response_model=List[HandHistoryLog])

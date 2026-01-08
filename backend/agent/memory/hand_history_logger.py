@@ -1,6 +1,6 @@
 """Utilities for logging PokerTracker hand histories."""
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -59,7 +59,7 @@ async def log_hand_history_entry(
 
 async def fetch_hand_histories(
     db: AsyncSession, user_id: str, limit: int = 20
-) -> list[HandHistory]:
+) -> List[HandHistory]:
     """Fetch recent hand histories for a user."""
     result = await db.execute(
         select(HandHistory)
