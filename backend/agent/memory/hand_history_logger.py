@@ -53,7 +53,6 @@ async def log_hand_history_entry(
         )
         db.add(entry)
         await db.flush()
-        await db.commit()
         return entry.id
 
 

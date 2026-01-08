@@ -1,7 +1,6 @@
 """Tests for PokerTracker hand history logging."""
 
 import asyncio
-import importlib
 from pathlib import Path
 
 import pytest
@@ -16,10 +15,6 @@ def hand_history_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     import backend.agent.memory.database as database
     import backend.agent.memory.db_session as db_session
     import backend.agent.memory.hand_history_logger as hand_logger
-
-    database = importlib.reload(database)
-    db_session = importlib.reload(db_session)
-    hand_logger = importlib.reload(hand_logger)
 
     asyncio.run(db_session.init_db())
     return database, db_session, hand_logger
