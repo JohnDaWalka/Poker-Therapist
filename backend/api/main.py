@@ -48,7 +48,6 @@ vercel_url = os.environ.get("VERCEL_URL")
 if vercel_url:
     allowed_origins.extend([
         f"https://{vercel_url}",
-        "https://*.vercel.app",
         "https://poker-therapist.vercel.app",
     ])
 
