@@ -71,7 +71,7 @@ class KuhnPoker:
         
         elif action == PokerAction.CHECK:
             # Move to next player or end round
-            if len([h for p, a, _ in state.history if p == 0]) == 1:
+            if len([1 for p, a, _ in state.history if p == 0]) == 1:
                 # First player checked, second player's turn
                 new_state.current_player = 1
             else:
