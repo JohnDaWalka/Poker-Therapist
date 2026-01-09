@@ -1,5 +1,6 @@
 """FastAPI main application."""
 
+import os
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
@@ -35,16 +36,25 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:8080",
-        "http://localhost:5173",
+# CORS middleware - Base origins for local development
+allowed_origins = [
+    "http://localhost:3000",
+    "http://localhost:8080",
+    "http://localhost:5173",
+]
+
+# Add Vercel origins if deployed on Vercel or if explicitly configured
+vercel_url = os.environ.get("VERCEL_URL")
+if vercel_url:
+    allowed_origins.extend([
+        f"https://{vercel_url}",
         "https://*.vercel.app",
         "https://poker-therapist.vercel.app",
-    ],
+    ])
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -118,9 +118,11 @@ For detailed setup and API key configuration, see [docs/CHATBOT_INTEGRATION.md](
 
 For detailed documentation, see [docs/STREAMLIT_CHATBOT.md](docs/STREAMLIT_CHATBOT.md)
 
-### ☁️ Vercel Deployment
+### ☁️ Vercel Deployment (Optional)
 
-Deploy the FastAPI backend to Vercel for serverless hosting:
+**Note:** Vercel deployment is completely optional. The application can run locally or be deployed to any platform that supports Python applications.
+
+If you choose to deploy to Vercel for serverless hosting:
 
 1. **Connect your repository to Vercel**
    - Visit https://vercel.com/new
@@ -138,6 +140,14 @@ Deploy the FastAPI backend to Vercel for serverless hosting:
    - Click "Deploy" and your API will be live!
 
 For detailed deployment instructions, see [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)
+
+### 🐳 Alternative Deployment Options
+
+You can deploy this application using any of these alternatives:
+- **Local development:** Run `uvicorn backend.api.main:app --reload` (see below)
+- **Docker:** Use Docker/Docker Compose for containerized deployment
+- **Cloud platforms:** Deploy to AWS, GCP, Azure, Heroku, or any Python-supporting platform
+- **Self-hosted:** Run on your own server using uvicorn or gunicorn
 
 ---
 
