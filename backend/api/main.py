@@ -49,11 +49,12 @@ allowed_origins = [
 vercel_url = os.environ.get("VERCEL_URL")
 vercel_project_url = os.environ.get("VERCEL_PROJECT_URL", "poker-therapist.vercel.app")
 if vercel_url:
+    # Use set to automatically deduplicate if VERCEL_URL equals VERCEL_PROJECT_URL
     vercel_origins = {
         f"https://{vercel_url}",
         f"https://{vercel_project_url}",
     }
-    allowed_origins.extend(vercel_origins)
+    allowed_origins.extend(list(vercel_origins))
 
 app.add_middleware(
     CORSMiddleware,
