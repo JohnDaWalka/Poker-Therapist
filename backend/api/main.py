@@ -44,11 +44,14 @@ allowed_origins = [
 ]
 
 # Add Vercel origins if deployed on Vercel or if explicitly configured
+# VERCEL_URL is automatically set by Vercel and contains the deployment URL without protocol
+# (e.g., "my-app-abc123.vercel.app" or "my-app.vercel.app")
 vercel_url = os.environ.get("VERCEL_URL")
+vercel_project_url = os.environ.get("VERCEL_PROJECT_URL", "poker-therapist.vercel.app")
 if vercel_url:
     allowed_origins.extend([
         f"https://{vercel_url}",
-        "https://poker-therapist.vercel.app",
+        f"https://{vercel_project_url}",
     ])
 
 app.add_middleware(
