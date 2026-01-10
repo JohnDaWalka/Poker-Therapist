@@ -62,7 +62,6 @@ def verify_rng(text: str) -> Dict[str, Any]:
     for m in _VERIFY_LINE_RE.finditer(text):
         expected = m.group("expected").lower()
         input_hex = m.group("input")
-        tail = (m.group("tail") or "").lower()
 
         # Only treat as a verifiable line when it actually includes H(...)
         if not input_hex:
