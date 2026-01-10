@@ -21,11 +21,24 @@ Hero calls $1.00
 
     hands = parse_many(text)
     assert len(hands) == 2
+
+    # Hand 1 basic parsing
     assert hands[0].hand_id == "123"
     assert hands[0].stakes == "$0.50/$1.00"
     assert hands[0].hole_cards == "AhKh"
+    # No tx hash or RNG metadata in this hand
+    assert hands[0].tx_hash is None
+    assert hands[0].rng_phrase is None
+    assert hands[0].rng_combined_seed_hash is None
+
+    # Hand 2 has only a tx hash, no RNG phrase/combined-seed metadata
     assert hands[1].hand_id == "124"
-    assert hands[1].tx_hash is not None
+    assert (
+        hands[1].tx_hash
+        == "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    )
+    assert hands[1].rng_phrase is None
+    assert hands[1].rng_combined_seed_hash is None
 
 
 def test_coinpoker_rng_phrase_and_seed_extracted() -> None:
