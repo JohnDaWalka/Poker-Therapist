@@ -194,7 +194,7 @@ from backend.agent.memory.dossier import Dossier
 # Initialize dossier (with optional GCS)
 try:
     gcs_service = get_gcs_service(fallback_to_local=True) if 'get_gcs_service' in dir() else None
-except:
+except Exception:
     gcs_service = None
 
 dossier = Dossier(user_id=f"user_{user_id}", gcs_service=gcs_service)
