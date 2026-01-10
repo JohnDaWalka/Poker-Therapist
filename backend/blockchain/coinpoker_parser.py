@@ -101,23 +101,44 @@ class ParsedHand:
 
 
 def split_hands(text: str) -> list[str]:
-    chunks = [c.strip() for c in _HAND_SPLIT_RE.split(text) if c.strip()]
-    # If split failed (single-hand or unknown format), treat entire text as one chunk.
-    return chunks or [text.strip()]
+    # Find all hand starts using the hand ID regex to avoid spurious splits
+    hands = []
+    last_start = None
+    
+    for m in _HAND_ID_RE.finditer(text):
+        if last_start is not None:
+            # Extract the previous hand
+            hand_text = text[last_start:m.start()].strip()
+            if hand_text:
+                hands.append(hand_text)
+        last_start = m.start()
+    
+    # Don't forget the last hand
+    if last_start is not None:
+        hand_text = text[last_start:].strip()
+        if hand_text:
+            hands.append(hand_text)
+    
+    # If no hands found, treat entire text as one chunk
+    if not hands:
+        stripped = text.strip()
+        return [stripped] if stripped else []
+    return hands
 
 
 def parse_hand(text: str) -> ParsedHand:
     hand_id_m = _HAND_ID_RE.search(text)
     hand_id = hand_id_m.group("id") if hand_id_m else None
 
-    stakes_m = _STAKES_RE.search(text)
+    # Check for tournament blinds first (more specific)
+    tourney_m = _TOURNEY_BLINDS_RE.search(text)
     stakes = None
-    if stakes_m:
-        stakes = f"{stakes_m.group('s1')}/{stakes_m.group('s2')}"
+    if tourney_m:
+        stakes = f"{tourney_m.group('sb')}/{tourney_m.group('bb')} ante {tourney_m.group('ante')}"
     else:
-        tourney_m = _TOURNEY_BLINDS_RE.search(text)
-        if tourney_m:
-            stakes = f"{tourney_m.group('sb')}/{tourney_m.group('bb')} ante {tourney_m.group('ante')}"
+        stakes_m = _STAKES_RE.search(text)
+        if stakes_m:
+            stakes = f"{stakes_m.group('s1')}/{stakes_m.group('s2')}"
 
     dt_m = _DT_RE.search(text)
     date_played = _parse_dt(dt_m.group("dt")) if dt_m else None
