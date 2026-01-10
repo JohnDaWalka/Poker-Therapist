@@ -119,15 +119,21 @@ class PerplexityClient:
                 "content": (
                     "You are a poker strategy analyst with access to current meta analysis. "
                     "Given a batch of hands from one session, identify recurring strategic issues "
-                    "and provide evidence-based improvements."
+                    "and provide evidence-based improvements. Also include a brief Provably Fair / RNG Proof "
+                    "status note using the provided context."
                 ),
             },
             {
                 "role": "user",
                 "content": (
-                    "Review the following session hands. Provide: Session Summary, 3-7 Key Leaks, "
-                    "and concrete drills to fix them.\n\n"
-                    f"Hands:\n{session_hands}\n\nContext: {context}"
+                    "Review the following session hands.\n\n"
+                    "Return sections (use these exact headings):\n"
+                    "1) Provably Fair / RNG Proof (1-3 sentences)\n"
+                    "2) Session Summary\n"
+                    "3) 3-7 Key Leaks\n"
+                    "4) Concrete Drills\n\n"
+                    "In 'Provably Fair / RNG Proof': mention whether rng_verified_count matches num_hands and whether rng_mismatch_total is zero.\n\n"
+                    f"Hands:\n{session_hands}\n\nContext (JSON): {context}"
                 ),
             },
         ]

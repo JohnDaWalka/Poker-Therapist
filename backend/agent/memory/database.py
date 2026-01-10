@@ -161,4 +161,10 @@ class HandHistory(Base):
     tx_status = Column(Integer, nullable=True)  # 1 success, 0 fail
     verified = Column(Boolean, default=False)
 
+    # CoinPoker provably-fair / RNG proof (not necessarily on-chain)
+    rng_phrase = Column(String, nullable=True)
+    rng_combined_seed_hash = Column(String, nullable=True)
+    rng_verified = Column(Boolean, default=False)
+    rng_verification = Column(JSON, nullable=True)
+
     created_at = Column(DateTime, default=datetime.utcnow)

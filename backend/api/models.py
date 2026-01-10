@@ -150,11 +150,18 @@ class CoinPokerImportTextRequest(BaseModel):
         description="If true and rpc_url provided, attempt to verify any tx hashes in the export",
     )
 
+    verify_rng: bool = Field(
+        default=True,
+        description="If true, verify CoinPoker provably-fair RNG proofs when present (no RPC needed)",
+    )
+
 
 class CoinPokerImportResponse(BaseModel):
+    session_id: Optional[str] = None
     imported_hands: int
     verified_hands: int
     skipped_hands: int
+    rng_verified_hands: int = 0
 
 
 class CoinPokerSessionReviewRequest(BaseModel):
@@ -168,3 +175,21 @@ class CoinPokerSessionReviewResponse(BaseModel):
     therapy_review: str
     citations: List[str] = []
     models: List[str]
+
+
+class CoinPokerSessionSummary(BaseModel):
+    session_id: str
+    hands: int
+    rng_verified_hands: int
+    last_played: Optional[datetime] = None
+
+
+class CoinPokerSessionListResponse(BaseModel):
+    user_id: str
+    sessions: List[CoinPokerSessionSummary]
+
+
+class CoinPokerSessionHandsResponse(BaseModel):
+    user_id: str
+    session_id: str
+    hands: List[dict[str, Any]]

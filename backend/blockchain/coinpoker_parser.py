@@ -17,7 +17,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Iterable, Optional
+from typing import Optional
 
 
 _TX_HASH_RE = re.compile(r"0x[a-fA-F0-9]{64}")
@@ -30,8 +30,17 @@ _STAKES_RE = re.compile(
     r"(?P<s1>(?:\$|€)?\d+(?:\.\d+)?)[\s/]*/[\s/]*(?P<s2>(?:\$|€)?\d+(?:\.\d+)?)"
 )
 
+# Tournament blind/ante format seen in CoinPoker exports:
+# "(... No Limit (160/320 ante 40 play) 2026/01/10 01:08:19 GMT)"
+_TOURNEY_BLINDS_RE = re.compile(
+    r"\((?P<sb>\d+)\s*/\s*(?P<bb>\d+)\s+ante\s+(?P<ante>\d+)",
+    re.IGNORECASE,
+)
+
 # Try to catch common ISO-like stamps: 2026-01-09 21:13:00 UTC
-_DT_RE = re.compile(r"(?P<dt>\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2})(?:\s*(?P<tz>[A-Z]{2,5}))?")
+_DT_RE = re.compile(
+    r"(?P<dt>\d{4}[-/]\d{2}[-/]\d{2}[ T]\d{2}:\d{2}:\d{2})(?:\s*(?P<tz>[A-Z]{2,5}))?"
+)
 
 _DEALT_RE = re.compile(
     r"Dealt\s+to\s+(?P<player>[^\s]+)\s+\[(?P<cards>[2-9TJQKA][cdhs](?:\s+[2-9TJQKA][cdhs]){1,3})\]",
@@ -56,10 +65,18 @@ _WON_RE = re.compile(
     re.IGNORECASE,
 )
 
+_RNG_PHRASE_RE = re.compile(r"^\s*phrase:\s*(?P<phrase>.+?)\s*$", re.IGNORECASE | re.MULTILINE)
+_COMBINED_SEED_RE = re.compile(r"^\s*(?P<hex>[a-f0-9]{64})\s*\(combined\)\s*$", re.IGNORECASE | re.MULTILINE)
+
 
 def _parse_dt(dt_raw: str) -> Optional[datetime]:
     # Store naive UTC (the rest of the app uses datetime.utcnow without tzinfo)
-    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"):
+    for fmt in (
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y/%m/%d %H:%M:%S",
+        "%Y/%m/%dT%H:%M:%S",
+    ):
         try:
             return datetime.strptime(dt_raw, fmt)
         except Exception:
@@ -78,6 +95,8 @@ class ParsedHand:
     actions: Optional[str]
     won_amount: Optional[float]
     tx_hash: Optional[str]
+    rng_phrase: Optional[str]
+    rng_combined_seed_hash: Optional[str]
     raw_text: str
 
 
@@ -95,6 +114,10 @@ def parse_hand(text: str) -> ParsedHand:
     stakes = None
     if stakes_m:
         stakes = f"{stakes_m.group('s1')}/{stakes_m.group('s2')}"
+    else:
+        tourney_m = _TOURNEY_BLINDS_RE.search(text)
+        if tourney_m:
+            stakes = f"{tourney_m.group('sb')}/{tourney_m.group('bb')} ante {tourney_m.group('ante')}"
 
     dt_m = _DT_RE.search(text)
     date_played = _parse_dt(dt_m.group("dt")) if dt_m else None
@@ -122,6 +145,12 @@ def parse_hand(text: str) -> ParsedHand:
     tx_m = _TX_HASH_RE.search(text)
     tx_hash = tx_m.group(0) if tx_m else None
 
+    rng_phrase_m = _RNG_PHRASE_RE.search(text)
+    rng_phrase = rng_phrase_m.group("phrase").strip() if rng_phrase_m else None
+
+    combined_m = _COMBINED_SEED_RE.search(text)
+    rng_combined_seed_hash = combined_m.group("hex").lower() if combined_m else None
+
     # Actions: keep something human-readable; best-effort slice.
     actions_lines: list[str] = []
     hole_idx = text.upper().find("HOLE CARDS")
@@ -145,6 +174,8 @@ def parse_hand(text: str) -> ParsedHand:
         actions=actions,
         won_amount=won_amount,
         tx_hash=tx_hash,
+        rng_phrase=rng_phrase,
+        rng_combined_seed_hash=rng_combined_seed_hash,
         raw_text=text.strip(),
     )
 

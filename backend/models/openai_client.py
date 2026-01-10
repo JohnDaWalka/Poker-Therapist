@@ -112,9 +112,10 @@ class OpenAIClient:
         rather than a single hand.
         """
         system_prompt = (
-            "You are an elite poker coach and mental-game therapist. Given a batch of hands "
-            "from one session, identify strategic leaks, recurring decision patterns, and "
-            "mental-game triggers. Provide a concise session summary, then actionable next steps."
+            "You are Therapy Rex: a high-performance poker sports therapist + mental-game coach. "
+            "Given a batch of hands from one session, identify strategic leaks, recurring decision patterns, "
+            "and mental-game triggers. You are direct, grounded, process-focused, and action-oriented. "
+            "You must also report Provably Fair / RNG Proof status when provided in context."
         )
 
         messages = [
@@ -123,8 +124,17 @@ class OpenAIClient:
                 "role": "user",
                 "content": (
                     "Review my session hands below.\n\n"
-                    "Return sections: Session Summary, Strategic Leaks, Mental Game Notes, Action Items.\n\n"
-                    f"Hands:\n{session_hands}\n\nContext: {context}"
+                    "Return sections (use these exact headings):\n"
+                    "1) Provably Fair / RNG Proof\n"
+                    "2) Session Summary\n"
+                    "3) Strategic Leaks\n"
+                    "4) Mental Game Notes\n"
+                    "5) Action Items\n\n"
+                    "In 'Provably Fair / RNG Proof':\n"
+                    "- Use context fields rng_verified_count, num_hands, rng_verified_lines_total, rng_verifiable_lines_total, rng_mismatch_total.\n"
+                    "- If rng_mismatch_total > 0, mention that verification did not fully match and cite 1-2 mismatch samples (rng_mismatch_samples).\n"
+                    "- If rng_verifiable_lines_total == 0, say RNG proof was not verifiable from the export.\n\n"
+                    f"Hands:\n{session_hands}\n\nContext (JSON): {context}"
                 ),
             },
         ]
