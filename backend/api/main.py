@@ -1,13 +1,37 @@
 """FastAPI main application."""
 
+import os
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.agent.memory.db_session import init_db
-from backend.api.routes import analyze, deep_session, tracking, triage
+from backend.api.routes import analyze, deep_session, storage, tracking, triage
+
+
+def init_gcs_storage() -> Optional[object]:
+    """Initialize GCS storage service if enabled.
+    
+    Returns:
+        GCSStorageService instance or None if disabled
+    """
+    enable_gcs = os.getenv("ENABLE_GCS_STORAGE", "false").lower() == "true"
+    if not enable_gcs:
+        return None
+    
+    try:
+        # Import here to avoid dependency if GCS is disabled
+        from python_src.services.gcs_storage_service import GCSStorageService
+        
+        gcs_service = GCSStorageService()
+        return gcs_service
+    except Exception as e:
+        # Log warning but don't fail startup
+        import logging
+        logging.warning(f"Failed to initialize GCS storage: {e}")
+        return None
 
 
 @asynccontextmanager
@@ -22,6 +46,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     # Startup
     await init_db()
+    
+    # Initialize GCS storage (optional)
+    app.state.gcs_storage = init_gcs_storage()
+    
     yield
     # Shutdown
     pass
@@ -35,16 +63,29 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware
+# CORS middleware - Base origins for local development
+allowed_origins = [
+    "http://localhost:3000",
+    "http://localhost:8080",
+    "http://localhost:5173",
+]
+
+# Add Vercel origins if deployed on Vercel or if explicitly configured
+# VERCEL_URL is automatically set by Vercel and contains the deployment URL without protocol
+# (e.g., "my-app-abc123.vercel.app" or "my-app.vercel.app")
+vercel_url = os.environ.get("VERCEL_URL")
+vercel_project_url = os.environ.get("VERCEL_PROJECT_URL", "poker-therapist.vercel.app")
+if vercel_url:
+    # Use set to automatically deduplicate if VERCEL_URL equals VERCEL_PROJECT_URL
+    vercel_origins = {
+        f"https://{vercel_url}",
+        f"https://{vercel_project_url}",
+    }
+    allowed_origins.extend(list(vercel_origins))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:8080",
-        "http://localhost:5173",
-        "https://*.vercel.app",
-        "https://poker-therapist.vercel.app",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -55,6 +96,7 @@ app.include_router(triage.router, prefix="/api", tags=["Triage"])
 app.include_router(deep_session.router, prefix="/api", tags=["Deep Session"])
 app.include_router(analyze.router, prefix="/api", tags=["Analysis"])
 app.include_router(tracking.router, prefix="/api", tags=["Tracking"])
+app.include_router(storage.router, prefix="/api", tags=["Storage"])
 
 
 @app.get("/")

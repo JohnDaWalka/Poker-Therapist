@@ -19,12 +19,5 @@
       "src": "/(.*)",
       "dest": "/api/index.py"
     }
-  ],
-  "env": {
-    "XAI_API_KEY": "@xai_api_key",
-    "OPENAI_API_KEY": "@openai_api_key",
-    "ANTHROPIC_API_KEY": "@anthropic_api_key",
-    "GOOGLE_API_KEY": "@google_api_key",
-    "AUTHORIZED_EMAILS": "@authorized_emails"
-  }
+  ]
 }

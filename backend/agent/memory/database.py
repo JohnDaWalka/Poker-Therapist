@@ -117,3 +117,22 @@ class Playbook(Base):
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class HandHistory(Base):
+    """Logged poker hand histories (PokerTracker 4.18.16)."""
+
+    __tablename__ = "hand_histories"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(String, nullable=False, index=True)
+    source = Column(String, default="PokerTracker")
+    source_version = Column(String, default="4.18.16")
+    hand_id = Column(String, nullable=True, index=True)
+    hand_history = Column(Text, nullable=False)
+    emotional_context = Column(Text)
+    gto_analysis = Column(Text)
+    meta_context = Column(Text)
+    hud_insights = Column(Text)
+    models = Column(JSON)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)

@@ -9,10 +9,17 @@ FastAPI backend for Therapy Rex poker mental game coaching system.
 pip install -r requirements.txt
 ```
 
-2. Copy `.env.example` to `.env` and configure your API keys:
+2. Copy `.env.example` to `.env` and configure your API keys **and PostgreSQL settings** (PokerTracker uses PostgreSQL on port `5432`):
 ```bash
 cp .env.example .env
 # Edit .env with your actual API keys
+# For database, defaults:
+# POSTGRES_USER=postgres
+# POSTGRES_PASSWORD=postgres
+# POSTGRES_HOST=localhost
+# POSTGRES_PORT=5432
+# POSTGRES_DB=pokertracker
+# Or set DATABASE_URL directly (postgresql+asyncpg://user:pass@host:5432/db)
 ```
 
 3. Start the server:
