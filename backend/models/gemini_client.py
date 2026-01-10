@@ -15,12 +15,13 @@ class GeminiClient:
         """Initialize Gemini client.
         
         Args:
-            api_key: Google AI API key (or use GOOGLE_AI_API_KEY env var)
+            api_key: Google AI API key (or use GOOGLE_AI_API_KEY/GOOGLE_API_KEY env var)
             model: Model name to use
         """
-        api_key = api_key or os.getenv("GOOGLE_AI_API_KEY")
+        # Support both GOOGLE_AI_API_KEY (preferred) and GOOGLE_API_KEY (back-compat)
+        api_key = api_key or os.getenv("GOOGLE_AI_API_KEY") or os.getenv("GOOGLE_API_KEY")
         if not api_key:
-            raise RuntimeError("Set GOOGLE_AI_API_KEY in env or pass api_key parameter")
+            raise RuntimeError("Set GOOGLE_AI_API_KEY or GOOGLE_API_KEY in env or pass api_key parameter")
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel(model)
         self.model_name = model
