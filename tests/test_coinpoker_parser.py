@@ -59,13 +59,13 @@ Shuffled hashed deck:
     assert hands[0].rng_phrase == "111"
     assert hands[0].rng_combined_seed_hash == "ea3988ac5179a4490c728644f39b73e61a003c6eeb1f230b5cc58d820fefe0ed"
 
-    rng = verify_rng(text)
-    assert rng["phrase"] == "111"
-    assert rng["verifiable_lines"] == 1
+    rng_result = verify_rng(text)
+    assert rng_result["phrase"] == "111"
+    assert rng_result["verifiable_lines"] == 1
     # Note: The mock hash data above doesn't actually verify correctly,
     # but we still extract and attempt verification
-    assert rng["verified_lines"] == 0
-    assert rng["ok"] is False
+    assert rng_result["verified_lines"] == 0
+    assert rng_result["ok"] is False
 
 
 def test_full_hand_360327066_parsing() -> None:
@@ -233,8 +233,8 @@ Card Hash Card Hex Representation (salt + card) Card Text Representation
     assert hand.rng_combined_seed_hash == "ea3988ac5179a4490c728644f39b73e61a003c6eeb1f230b5cc58d820fefe0ed"
     
     # Verify RNG data is extracted
-    rng = verify_rng(text)
-    assert rng["phrase"] == "111"
-    assert rng["combined_seed_hash"] == "ea3988ac5179a4490c728644f39b73e61a003c6eeb1f230b5cc58d820fefe0ed"
+    rng_result = verify_rng(text)
+    assert rng_result["phrase"] == "111"
+    assert rng_result["combined_seed_hash"] == "ea3988ac5179a4490c728644f39b73e61a003c6eeb1f230b5cc58d820fefe0ed"
     # Should have multiple verifiable lines from the full export
-    assert rng["verifiable_lines"] > 10
+    assert rng_result["verifiable_lines"] > 10

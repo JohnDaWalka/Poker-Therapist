@@ -28,6 +28,7 @@ from backend.api.models import (
     CoinPokerSessionSummary,
 )
 from backend.blockchain.coinpoker_parser import parse_many
+from backend.blockchain.coinpoker_rng_verifier import verify_rng as verify_rng_proof
 from backend.blockchain.evm_rpc import verify_tx
 
 
@@ -98,7 +99,7 @@ async def _import_text(
                     verified += 1
 
             if verify_rng:
-                rng = verify_rng(h.raw_text)
+                rng = verify_rng_proof(h.raw_text)
                 model.rng_verification = rng
                 model.rng_phrase = rng.get("phrase") or model.rng_phrase
                 model.rng_combined_seed_hash = rng.get("combined_seed_hash") or model.rng_combined_seed_hash
