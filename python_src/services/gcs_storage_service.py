@@ -2,8 +2,6 @@
 
 import os
 from datetime import timedelta
-from io import BytesIO
-from pathlib import Path
 from typing import Optional
 
 try:
