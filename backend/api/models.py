@@ -215,3 +215,48 @@ class CoinPokerRngReportResponse(BaseModel):
     mismatch_total: int
     mismatch_samples: List[Dict[str, Any]] = []
     hands: List[CoinPokerRngHandSummary] = []
+
+
+# WPN / America's Cardroom Models
+class WpnImportTextRequest(BaseModel):
+    """Import WPN/ACR hand history text."""
+
+    user_id: str
+    session_id: Optional[str] = None
+    hand_history_text: str
+
+
+class WpnImportResponse(BaseModel):
+    session_id: Optional[str] = None
+    imported_hands: int
+    skipped_hands: int
+
+
+class WpnSessionReviewRequest(BaseModel):
+    user_id: str
+    session_id: str
+    max_hands: int = Field(default=50, ge=1, le=500)
+
+
+class WpnSessionReviewResponse(BaseModel):
+    strategy_review: str
+    therapy_review: str
+    citations: List[str] = []
+    models: List[str]
+
+
+class WpnSessionSummary(BaseModel):
+    session_id: str
+    hands: int
+    last_played: Optional[datetime] = None
+
+
+class WpnSessionListResponse(BaseModel):
+    user_id: str
+    sessions: List[WpnSessionSummary]
+
+
+class WpnSessionHandsResponse(BaseModel):
+    user_id: str
+    session_id: str
+    hands: List[dict[str, Any]]
