@@ -215,3 +215,48 @@ class CoinPokerRngReportResponse(BaseModel):
     mismatch_total: int
     mismatch_samples: List[Dict[str, Any]] = []
     hands: List[CoinPokerRngHandSummary] = []
+
+
+# WinningPokerNetwork (WPN) Models
+class WPNImportTextRequest(BaseModel):
+    """Import WPN hand history text from BetACR, Americas Cardroom, etc."""
+
+    user_id: str
+    session_id: Optional[str] = None
+    hand_history_text: str
+
+
+class WPNImportResponse(BaseModel):
+    session_id: Optional[str] = None
+    imported_hands: int
+    skipped_hands: int
+
+
+class WPNSessionReviewRequest(BaseModel):
+    user_id: str
+    session_id: str
+    max_hands: int = Field(default=50, ge=1, le=500)
+
+
+class WPNSessionReviewResponse(BaseModel):
+    strategy_review: str
+    therapy_review: str
+    citations: List[str] = []
+    models: List[str]
+
+
+class WPNSessionSummary(BaseModel):
+    session_id: str
+    hands: int
+    last_played: Optional[datetime] = None
+
+
+class WPNSessionListResponse(BaseModel):
+    user_id: str
+    sessions: List[WPNSessionSummary]
+
+
+class WPNSessionHandsResponse(BaseModel):
+    user_id: str
+    session_id: str
+    hands: List[dict[str, Any]]
