@@ -8,11 +8,17 @@ on:
   schedule:
     - cron: '31 22 * * 4'
 
+env:
+  # Repository variables with fallback defaults
+  # Configure these in Settings > Secrets and variables > Actions > Variables
+  CODEQL_QUERIES: ${{ vars.CODEQL_QUERIES || '' }}
+  CODEQL_CONFIG_FILE: ${{ vars.CODEQL_CONFIG_FILE || '' }}
+
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
-    timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || vars.CODEQL_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.CODEQL_TIMEOUT_MINUTES || (matrix.language == 'swift' && 120) || 360 }}
     permissions:
       security-events: write
       packages: read
@@ -39,6 +45,10 @@ jobs:
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
+        # Use repository variable CODEQL_QUERIES if set (e.g., "security-extended,security-and-quality")
+        queries: ${{ env.CODEQL_QUERIES }}
+        # Use repository variable CODEQL_CONFIG_FILE if set (path to config file)
+        config-file: ${{ env.CODEQL_CONFIG_FILE }}
 
     - if: matrix.build-mode == 'manual'
       shell: bash
