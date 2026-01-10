@@ -19,6 +19,8 @@ from backend.agent.memory.db_session import get_db
 from backend.api.models import (
     CoinPokerImportResponse,
     CoinPokerImportTextRequest,
+    CoinPokerRngHandSummary,
+    CoinPokerRngReportResponse,
     CoinPokerSessionHandsResponse,
     CoinPokerSessionListResponse,
     CoinPokerSessionReviewRequest,
@@ -311,5 +313,84 @@ async def get_coinpoker_session_hands(
         ]
 
         return CoinPokerSessionHandsResponse(user_id=user_id, session_id=session_id, hands=out)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+@router.get(
+    "/coinpoker/session/{user_id}/{session_id}/rng-report",
+    response_model=CoinPokerRngReportResponse,
+)
+async def get_coinpoker_rng_report(user_id: str, session_id: str, limit: int = 500) -> CoinPokerRngReportResponse:
+    """Return a structured provably-fair / RNG verification report for a session.
+
+    This is intended for UI badges and for deterministic post-session reporting,
+    independent of AI narrative.
+    """
+    try:
+        limit = max(1, min(limit, 500))
+        async with get_db() as db:
+            stmt = (
+                select(HandHistory)
+                .where(HandHistory.user_id == user_id)
+                .where(HandHistory.session_id == session_id)
+                .order_by(desc(HandHistory.date_played), desc(HandHistory.created_at))
+                .limit(limit)
+            )
+            result = await db.execute(stmt)
+            hands = list(result.scalars().all())
+
+        if not hands:
+            raise HTTPException(status_code=404, detail="No hands found for that session")
+
+        mismatch_samples = []
+        verifiable_total = 0
+        verified_total = 0
+        mismatch_total = 0
+
+        hand_summaries = []
+        for h in hands:
+            v = h.rng_verification or {}
+            verifiable_lines = int(v.get("verifiable_lines", 0) or 0) if isinstance(v, dict) else 0
+            verified_lines = int(v.get("verified_lines", 0) or 0) if isinstance(v, dict) else 0
+            mismatches = v.get("mismatches", []) if isinstance(v, dict) else []
+            mismatch_count = len(mismatches) if isinstance(mismatches, list) else 0
+
+            verifiable_total += verifiable_lines
+            verified_total += verified_lines
+            mismatch_total += mismatch_count
+
+            if mismatch_count and isinstance(mismatches, list):
+                for mm in mismatches[:2]:
+                    if len(mismatch_samples) >= 10:
+                        break
+                    mismatch_samples.append(mm)
+
+            hand_summaries.append(
+                CoinPokerRngHandSummary(
+                    hand_id=h.hand_id,
+                    rng_verified=bool(h.rng_verified),
+                    rng_phrase=h.rng_phrase,
+                    rng_combined_seed_hash=h.rng_combined_seed_hash,
+                    verifiable_lines=verifiable_lines,
+                    verified_lines=verified_lines,
+                    mismatch_count=mismatch_count,
+                )
+            )
+
+        rng_verified_hands = sum(1 for h in hands if h.rng_verified)
+        return CoinPokerRngReportResponse(
+            user_id=user_id,
+            session_id=session_id,
+            hands_total=len(hands),
+            rng_verified_hands=rng_verified_hands,
+            verifiable_lines_total=verifiable_total,
+            verified_lines_total=verified_total,
+            mismatch_total=mismatch_total,
+            mismatch_samples=mismatch_samples,
+            hands=hand_summaries,
+        )
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e

@@ -193,3 +193,25 @@ class CoinPokerSessionHandsResponse(BaseModel):
     user_id: str
     session_id: str
     hands: List[dict[str, Any]]
+
+
+class CoinPokerRngHandSummary(BaseModel):
+    hand_id: Optional[str] = None
+    rng_verified: bool
+    rng_phrase: Optional[str] = None
+    rng_combined_seed_hash: Optional[str] = None
+    verifiable_lines: int = 0
+    verified_lines: int = 0
+    mismatch_count: int = 0
+
+
+class CoinPokerRngReportResponse(BaseModel):
+    user_id: str
+    session_id: str
+    hands_total: int
+    rng_verified_hands: int
+    verifiable_lines_total: int
+    verified_lines_total: int
+    mismatch_total: int
+    mismatch_samples: List[Dict[str, Any]] = []
+    hands: List[CoinPokerRngHandSummary] = []
