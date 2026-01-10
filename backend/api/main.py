@@ -2,13 +2,36 @@
 
 import os
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.agent.memory.db_session import init_db
-from backend.api.routes import analyze, deep_session, tracking, triage
+from backend.api.routes import analyze, deep_session, storage, tracking, triage
+
+
+def init_gcs_storage() -> Optional[object]:
+    """Initialize GCS storage service if enabled.
+    
+    Returns:
+        GCSStorageService instance or None if disabled
+    """
+    enable_gcs = os.getenv("ENABLE_GCS_STORAGE", "false").lower() == "true"
+    if not enable_gcs:
+        return None
+    
+    try:
+        # Import here to avoid dependency if GCS is disabled
+        from python_src.services.gcs_storage_service import GCSStorageService
+        
+        gcs_service = GCSStorageService()
+        return gcs_service
+    except Exception as e:
+        # Log warning but don't fail startup
+        import logging
+        logging.warning(f"Failed to initialize GCS storage: {e}")
+        return None
 
 
 @asynccontextmanager
@@ -23,6 +46,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     # Startup
     await init_db()
+    
+    # Initialize GCS storage (optional)
+    app.state.gcs_storage = init_gcs_storage()
+    
     yield
     # Shutdown
     pass
@@ -69,6 +96,7 @@ app.include_router(triage.router, prefix="/api", tags=["Triage"])
 app.include_router(deep_session.router, prefix="/api", tags=["Deep Session"])
 app.include_router(analyze.router, prefix="/api", tags=["Analysis"])
 app.include_router(tracking.router, prefix="/api", tags=["Tracking"])
+app.include_router(storage.router, prefix="/api", tags=["Storage"])
 
 
 @app.get("/")

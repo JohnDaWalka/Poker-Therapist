@@ -1,7 +1,7 @@
 """Analysis endpoints for hand, voice, and video."""
 
 import logging
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
@@ -115,25 +115,52 @@ async def get_hand_history(
 
 @router.post("/analyze/voice", response_model=VoiceAnalysisResponse)
 async def analyze_voice(
-    audio: UploadFile = File(...),
+    audio: UploadFile = File(None),
+    blob_name: Optional[str] = None,
     user_id: str = "default",
 ) -> VoiceAnalysisResponse:
     """Analyze voice rant/recording.
     
+    Supports either direct upload or GCS blob reference.
+    
     Args:
-        audio: Audio file upload
+        audio: Audio file upload (multipart)
+        blob_name: Optional GCS blob name (alternative to direct upload)
         user_id: User ID
         
     Returns:
         Voice analysis response
     """
     try:
-        audio_data = await audio.read()
+        # Get audio data from either source
+        if blob_name:
+            # Fetch from GCS
+            from fastapi import Request
+            from backend.api.main import app
+            
+            gcs_storage = getattr(app.state, "gcs_storage", None)
+            if not gcs_storage:
+                raise HTTPException(
+                    status_code=400,
+                    detail="GCS storage not enabled. Upload file directly instead.",
+                )
+            
+            audio_data = await gcs_storage.download_blob(blob_name)
+            mime_type = "audio/wav"  # Default, could be stored in metadata
+        elif audio:
+            audio_data = await audio.read()
+            mime_type = audio.content_type or "audio/wav"
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Either 'audio' file or 'blob_name' must be provided.",
+            )
         
         context = {
             "audio_data": audio_data,
-            "mime_type": audio.content_type or "audio/wav",
+            "mime_type": mime_type,
             "user_id": user_id,
+            "blob_name": blob_name,  # Store reference for metadata
         }
         
         result = await orchestrator.route_query("voice_rant", context)
@@ -150,31 +177,60 @@ async def analyze_voice(
             models=result["models"],
         )
         
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.post("/analyze/video", response_model=VideoAnalysisResponse)
 async def analyze_video(
-    video: UploadFile = File(...),
+    video: UploadFile = File(None),
+    blob_name: Optional[str] = None,
     user_id: str = "default",
 ) -> VideoAnalysisResponse:
     """Analyze session video.
     
+    Supports either direct upload or GCS blob reference.
+    
     Args:
-        video: Video file upload
+        video: Video file upload (multipart)
+        blob_name: Optional GCS blob name (alternative to direct upload)
         user_id: User ID
         
     Returns:
         Video analysis response
     """
     try:
-        video_data = await video.read()
+        # Get video data from either source
+        if blob_name:
+            # Fetch from GCS
+            from fastapi import Request
+            from backend.api.main import app
+            
+            gcs_storage = getattr(app.state, "gcs_storage", None)
+            if not gcs_storage:
+                raise HTTPException(
+                    status_code=400,
+                    detail="GCS storage not enabled. Upload file directly instead.",
+                )
+            
+            video_data = await gcs_storage.download_blob(blob_name)
+            mime_type = "video/mp4"  # Default, could be stored in metadata
+        elif video:
+            video_data = await video.read()
+            mime_type = video.content_type or "video/mp4"
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Either 'video' file or 'blob_name' must be provided.",
+            )
         
         context = {
             "video_data": video_data,
-            "mime_type": video.content_type or "video/mp4",
+            "mime_type": mime_type,
             "user_id": user_id,
+            "blob_name": blob_name,  # Store reference for metadata
         }
         
         result = await orchestrator.route_query("session_video", context)
@@ -194,5 +250,7 @@ async def analyze_video(
             models=result["models"],
         )
         
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e

@@ -149,6 +149,44 @@ You can deploy this application using any of these alternatives:
 - **Cloud platforms:** Deploy to AWS, GCP, Azure, Heroku, or any Python-supporting platform
 - **Self-hosted:** Run on your own server using uvicorn or gunicorn
 
+### ☁️ Google Cloud Storage Integration (Optional)
+
+The application supports optional Google Cloud Storage for efficient file uploads/downloads using signed URLs.
+
+**Configuration:**
+```bash
+# Enable GCS storage
+export ENABLE_GCS_STORAGE=true
+export GCS_BUCKET_NAME=your-bucket-name
+
+# Option 1: Use service account JSON file
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
+
+# Option 2: Use inline JSON secret (for serverless/Vercel)
+export GCS_SERVICE_ACCOUNT_JSON='{"type":"service_account",...}'
+```
+
+**Features:**
+- Direct-to-GCS uploads via signed URLs (reduces server load)
+- Signed download URLs for secure file access
+- Optional blob references for analyze endpoints
+- Works with existing multipart uploads (non-breaking)
+
+**CORS Configuration for Web Clients:**
+If uploading directly from browser, configure your GCS bucket CORS:
+```json
+[
+  {
+    "origin": ["http://localhost:3000", "https://your-domain.com"],
+    "method": ["GET", "PUT", "POST"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  }
+]
+```
+
+**Important:** Use a service account with minimal permissions (Storage Object Creator/Viewer). Do not use personal Gmail credentials for runtime authentication.
+
 ---
 
 ## Original Project: Autonomous Advent of Code
