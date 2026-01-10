@@ -23,7 +23,7 @@ load_dotenv()
 
 # Configuration
 PT4_API_URL = os.getenv("POKER_THERAPIST_API_URL", "http://localhost:8000/api/pt4")
-USER_ID = os.getenv("POKER_THERAPIST_USER_ID", "default_user")
+USER_ID = os.getenv("POKER_THERAPIST_USER_ID", "JohnDaWalka")
 PLAYER_NAME = os.getenv("PT4_PLAYER_NAME", "")
 
 
