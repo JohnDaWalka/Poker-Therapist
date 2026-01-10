@@ -3,7 +3,7 @@
 import logging
 from typing import List, Optional
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 
 from backend.agent.ai_orchestrator import AIOrchestrator
 from backend.agent.memory.hand_history_logger import (
@@ -115,6 +115,7 @@ async def get_hand_history(
 
 @router.post("/analyze/voice", response_model=VoiceAnalysisResponse)
 async def analyze_voice(
+    request: Request,
     audio: UploadFile = File(None),
     blob_name: Optional[str] = None,
     user_id: str = "default",
@@ -124,6 +125,7 @@ async def analyze_voice(
     Supports either direct upload or GCS blob reference.
     
     Args:
+        request: FastAPI request (to access app state)
         audio: Audio file upload (multipart)
         blob_name: Optional GCS blob name (alternative to direct upload)
         user_id: User ID
@@ -132,29 +134,34 @@ async def analyze_voice(
         Voice analysis response
     """
     try:
+        # Validate that exactly one source is provided
+        if not audio and not blob_name:
+            raise HTTPException(
+                status_code=400,
+                detail="Either 'audio' file or 'blob_name' must be provided.",
+            )
+        if audio and blob_name:
+            raise HTTPException(
+                status_code=400,
+                detail="Provide either 'audio' file or 'blob_name', not both.",
+            )
+        
         # Get audio data from either source
         if blob_name:
             # Fetch from GCS
-            from fastapi import Request
-            from backend.api.main import app
-            
-            gcs_storage = getattr(app.state, "gcs_storage", None)
+            gcs_storage = getattr(request.app.state, "gcs_storage", None)
             if not gcs_storage:
                 raise HTTPException(
                     status_code=400,
                     detail="GCS storage not enabled. Upload file directly instead.",
                 )
             
-            audio_data = await gcs_storage.download_blob(blob_name)
+            audio_data = gcs_storage.download_blob(blob_name)
             mime_type = "audio/wav"  # Default, could be stored in metadata
-        elif audio:
+        else:
+            # audio is guaranteed to be not None here due to validation above
             audio_data = await audio.read()
             mime_type = audio.content_type or "audio/wav"
-        else:
-            raise HTTPException(
-                status_code=400,
-                detail="Either 'audio' file or 'blob_name' must be provided.",
-            )
         
         context = {
             "audio_data": audio_data,
@@ -185,6 +192,7 @@ async def analyze_voice(
 
 @router.post("/analyze/video", response_model=VideoAnalysisResponse)
 async def analyze_video(
+    request: Request,
     video: UploadFile = File(None),
     blob_name: Optional[str] = None,
     user_id: str = "default",
@@ -194,6 +202,7 @@ async def analyze_video(
     Supports either direct upload or GCS blob reference.
     
     Args:
+        request: FastAPI request (to access app state)
         video: Video file upload (multipart)
         blob_name: Optional GCS blob name (alternative to direct upload)
         user_id: User ID
@@ -202,29 +211,34 @@ async def analyze_video(
         Video analysis response
     """
     try:
+        # Validate that exactly one source is provided
+        if not video and not blob_name:
+            raise HTTPException(
+                status_code=400,
+                detail="Either 'video' file or 'blob_name' must be provided.",
+            )
+        if video and blob_name:
+            raise HTTPException(
+                status_code=400,
+                detail="Provide either 'video' file or 'blob_name', not both.",
+            )
+        
         # Get video data from either source
         if blob_name:
             # Fetch from GCS
-            from fastapi import Request
-            from backend.api.main import app
-            
-            gcs_storage = getattr(app.state, "gcs_storage", None)
+            gcs_storage = getattr(request.app.state, "gcs_storage", None)
             if not gcs_storage:
                 raise HTTPException(
                     status_code=400,
                     detail="GCS storage not enabled. Upload file directly instead.",
                 )
             
-            video_data = await gcs_storage.download_blob(blob_name)
+            video_data = gcs_storage.download_blob(blob_name)
             mime_type = "video/mp4"  # Default, could be stored in metadata
-        elif video:
+        else:
+            # video is guaranteed to be not None here due to validation above
             video_data = await video.read()
             mime_type = video.content_type or "video/mp4"
-        else:
-            raise HTTPException(
-                status_code=400,
-                detail="Either 'video' file or 'blob_name' must be provided.",
-            )
         
         context = {
             "video_data": video_data,

@@ -113,7 +113,7 @@ class GCSStorageService:
             "method": "GET",
         }
 
-    async def download_blob(self, blob_name: str) -> bytes:
+    def download_blob(self, blob_name: str) -> bytes:
         """Download blob content as bytes.
         
         Args:
