@@ -384,7 +384,7 @@ def test_get_pattern_storage() -> None:
 
 def test_pattern_storage_indexes(temp_db: Path) -> None:
     """Test that performance indexes are created."""
-    storage = PatternStorage(db_path=temp_db)
+    PatternStorage(db_path=temp_db)
     
     with sqlite3.connect(temp_db) as conn:
         cursor = conn.cursor()
