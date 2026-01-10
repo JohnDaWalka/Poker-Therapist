@@ -10,7 +10,16 @@ These tables extend the existing RexVoice.db database.
 """
 
 import sqlite3
+import sys
 from pathlib import Path
+
+# Add parent directory to path for imports if needed
+# This allows the migration to run both as a script and when imported
+_parent_dir = str(Path(__file__).parent.parent)
+if _parent_dir not in sys.path:
+    sys.path.insert(0, _parent_dir)
+
+from python_src.services.pattern_storage_schema import create_tables
 
 
 def upgrade(db_path: Path | str = "RexVoice.db") -> None:
@@ -25,68 +34,8 @@ def upgrade(db_path: Path | str = "RexVoice.db") -> None:
         
         print(f"Applying migration to {db_path}...")
         
-        # Create user_patterns table
-        print("Creating user_patterns table...")
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS user_patterns (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                pattern_type TEXT NOT NULL,
-                pattern_key TEXT NOT NULL,
-                pattern_value TEXT NOT NULL,
-                confidence REAL DEFAULT 1.0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id),
-                UNIQUE(user_id, pattern_type, pattern_key)
-            )
-        """)
-        
-        # Create conversation_context table
-        print("Creating conversation_context table...")
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS conversation_context (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                context_key TEXT NOT NULL,
-                context_value TEXT NOT NULL,
-                session_id TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                expires_at TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id)
-            )
-        """)
-        
-        # Create user_insights table
-        print("Creating user_insights table...")
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS user_insights (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                insight_type TEXT NOT NULL,
-                insight_data TEXT NOT NULL,
-                importance REAL DEFAULT 0.5,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id)
-            )
-        """)
-        
-        # Create indexes for performance
-        print("Creating indexes...")
-        cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_user_patterns_user_type 
-            ON user_patterns(user_id, pattern_type)
-        """)
-        
-        cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_conversation_context_user 
-            ON conversation_context(user_id, session_id)
-        """)
-        
-        cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_user_insights_user 
-            ON user_insights(user_id, insight_type)
-        """)
+        # Use shared schema definition
+        create_tables(cursor)
         
         conn.commit()
         print("Migration completed successfully!")
