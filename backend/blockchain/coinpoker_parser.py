@@ -102,21 +102,25 @@ class ParsedHand:
 
 def split_hands(text: str) -> list[str]:
     # Find all hand starts using the hand ID regex to avoid spurious splits
-    matches = list(_HAND_ID_RE.finditer(text))
-    if not matches:
-        # No hands found, treat entire text as one chunk
-        return [text.strip()] if text.strip() else []
-    
-    # Extract hands based on match positions
     hands = []
-    for i, m in enumerate(matches):
-        start = m.start()
-        end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
-        hand_text = text[start:end].strip()
+    last_start = None
+    
+    for m in _HAND_ID_RE.finditer(text):
+        if last_start is not None:
+            # Extract the previous hand
+            hand_text = text[last_start:m.start()].strip()
+            if hand_text:
+                hands.append(hand_text)
+        last_start = m.start()
+    
+    # Don't forget the last hand
+    if last_start is not None:
+        hand_text = text[last_start:].strip()
         if hand_text:
             hands.append(hand_text)
     
-    return hands
+    # If no hands found, treat entire text as one chunk
+    return hands if hands else ([text.strip()] if text.strip() else [])
 
 
 def parse_hand(text: str) -> ParsedHand:
