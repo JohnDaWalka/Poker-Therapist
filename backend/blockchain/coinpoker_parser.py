@@ -120,7 +120,10 @@ def split_hands(text: str) -> list[str]:
             hands.append(hand_text)
     
     # If no hands found, treat entire text as one chunk
-    return hands if hands else ([text.strip()] if text.strip() else [])
+    if not hands:
+        stripped = text.strip()
+        return [stripped] if stripped else []
+    return hands
 
 
 def parse_hand(text: str) -> ParsedHand:
