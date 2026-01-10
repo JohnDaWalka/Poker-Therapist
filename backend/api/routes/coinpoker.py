@@ -29,7 +29,6 @@ from backend.api.models import (
 )
 from backend.blockchain.coinpoker_parser import parse_many
 from backend.blockchain.evm_rpc import verify_tx
-from backend.blockchain.coinpoker_rng_verifier import verify_rng
 
 
 router = APIRouter()
