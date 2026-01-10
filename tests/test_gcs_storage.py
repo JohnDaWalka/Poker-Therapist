@@ -7,7 +7,6 @@ import pytest
 
 # Mock google-cloud-storage if not available
 try:
-    from google.cloud.exceptions import NotFound
     GCS_AVAILABLE = True
 except ImportError:
     GCS_AVAILABLE = False
