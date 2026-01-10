@@ -417,6 +417,8 @@ class Dossier:
             try:
                 profile_dir.rmdir()
             except OSError:
+                # Directory removal is best-effort; it's safe to ignore errors such as
+                # "directory not empty" or "directory does not exist" during cleanup.
                 pass
         
         # Remove from dossier
