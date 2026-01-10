@@ -110,3 +110,30 @@ class PerplexityClient:
             "answer": response["choices"][0]["message"]["content"],
             "citations": response.get("citations", []),
         }
+
+    async def session_review(self, session_hands: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Research-backed review of a full session's hands."""
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    "You are a poker strategy analyst with access to current meta analysis. "
+                    "Given a batch of hands from one session, identify recurring strategic issues "
+                    "and provide evidence-based improvements."
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    "Review the following session hands. Provide: Session Summary, 3-7 Key Leaks, "
+                    "and concrete drills to fix them.\n\n"
+                    f"Hands:\n{session_hands}\n\nContext: {context}"
+                ),
+            },
+        ]
+
+        response = await self.chat(messages, temperature=0.3)
+        return {
+            "analysis": response["choices"][0]["message"]["content"],
+            "citations": response.get("citations", []),
+        }

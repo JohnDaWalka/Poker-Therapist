@@ -133,3 +133,38 @@ class Playbook(BaseModel):
     personal_rules: List[str]
     created_at: datetime
     updated_at: datetime
+
+
+class CoinPokerImportTextRequest(BaseModel):
+    """Import CoinPoker hand history text exported from PT4 or CoinPoker client."""
+
+    user_id: str
+    session_id: Optional[str] = None
+    hand_history_text: str
+    rpc_url: Optional[str] = Field(
+        default=None,
+        description="Optional EVM JSON-RPC URL used to verify tx hashes if present",
+    )
+    verify_onchain: bool = Field(
+        default=False,
+        description="If true and rpc_url provided, attempt to verify any tx hashes in the export",
+    )
+
+
+class CoinPokerImportResponse(BaseModel):
+    imported_hands: int
+    verified_hands: int
+    skipped_hands: int
+
+
+class CoinPokerSessionReviewRequest(BaseModel):
+    user_id: str
+    session_id: str
+    max_hands: int = Field(default=50, ge=1, le=500)
+
+
+class CoinPokerSessionReviewResponse(BaseModel):
+    strategy_review: str
+    therapy_review: str
+    citations: List[str] = []
+    models: List[str]

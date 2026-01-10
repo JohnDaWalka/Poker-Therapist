@@ -104,3 +104,33 @@ class OpenAIClient:
 
         response = await self.chat(messages, temperature=0.5)
         return response["content"]
+
+    async def session_review(self, session_hands: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Review a post-session batch of hands.
+
+        This is used when the user wants "Therapist" to review an entire session
+        rather than a single hand.
+        """
+        system_prompt = (
+            "You are an elite poker coach and mental-game therapist. Given a batch of hands "
+            "from one session, identify strategic leaks, recurring decision patterns, and "
+            "mental-game triggers. Provide a concise session summary, then actionable next steps."
+        )
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {
+                "role": "user",
+                "content": (
+                    "Review my session hands below.\n\n"
+                    "Return sections: Session Summary, Strategic Leaks, Mental Game Notes, Action Items.\n\n"
+                    f"Hands:\n{session_hands}\n\nContext: {context}"
+                ),
+            },
+        ]
+
+        response = await self.chat(messages, temperature=0.3, max_tokens=2048)
+        return {
+            "session_review": response["content"],
+            "usage": response["usage"],
+        }

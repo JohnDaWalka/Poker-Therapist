@@ -72,6 +72,21 @@ class AIOrchestrator:
             responses = await asyncio.gather(*tasks)
             return self._synthesize_hand_analysis(responses, has_image=bool(context.get("image_data")))
 
+        elif query_type == "session_review":
+            # Post-session multi-hand review
+            session_hands = context.get("session_hands", "")
+            tasks = [
+                self.perplexity.session_review(session_hands, context),
+                self.openai.session_review(session_hands, context),
+            ]
+            responses = await asyncio.gather(*tasks)
+            return {
+                "strategy_review": responses[0].get("analysis", ""),
+                "therapy_review": responses[1].get("session_review", ""),
+                "citations": responses[0].get("citations", []),
+                "models": ["perplexity", "openai"],
+            }
+
         elif query_type == "voice_rant":
             # Gemini transcription + Claude therapy
             transcript = await self.gemini.transcribe_audio(
