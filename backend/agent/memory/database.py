@@ -117,3 +117,48 @@ class Playbook(Base):
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class HandHistory(Base):
+    """Stored poker hand history, optionally linked to on-chain proof.
+
+    This is designed for post-session review flows where Therapy Rex can fetch
+    a session's hands from the DB instead of relying on pasted hand histories.
+    """
+
+    __tablename__ = "hand_histories"
+
+    id = Column(Integer, primary_key=True)
+
+    # Ownership / grouping
+    user_id = Column(String, nullable=False, index=True)
+    session_id = Column(String, nullable=True, index=True)
+
+    # Poker metadata
+    site = Column(String, default="CoinPoker")
+    hand_id = Column(String, nullable=True, index=True)
+    date_played = Column(DateTime, nullable=True)
+    game_variant = Column(String, nullable=True)
+    stakes = Column(String, nullable=True)
+
+    # Parsed details (best-effort)
+    player_name = Column(String, nullable=True)
+    position = Column(String, nullable=True)
+    hole_cards = Column(String, nullable=True)
+    board = Column(String, nullable=True)
+    actions = Column(Text, nullable=True)
+    won_amount = Column(Float, nullable=True)
+    pot_size = Column(Float, nullable=True)
+
+    # Raw / traceability
+    raw_text = Column(Text, nullable=False)
+    source = Column(String, default="coinpoker_export")
+
+    # Optional blockchain linkage (CoinPoker often exposes tx/hash references)
+    tx_hash = Column(String, nullable=True, index=True)
+    chain_id = Column(String, nullable=True)
+    block_number = Column(Integer, nullable=True)
+    tx_status = Column(Integer, nullable=True)  # 1 success, 0 fail
+    verified = Column(Boolean, default=False)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
