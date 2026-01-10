@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.agent.memory.db_session import init_db
-from backend.api.routes import analyze, coinpoker, deep_session, tracking, triage, wpn
+from backend.api.routes import analyze, coinpoker, deep_session, pt4, tracking, triage, wpn
 
 
 @asynccontextmanager
@@ -57,6 +57,7 @@ app.include_router(analyze.router, prefix="/api", tags=["Analysis"])
 app.include_router(tracking.router, prefix="/api", tags=["Tracking"])
 app.include_router(coinpoker.router, prefix="/api", tags=["CoinPoker"])
 app.include_router(wpn.router, prefix="/api", tags=["WinningPokerNetwork"])
+app.include_router(pt4.router, prefix="/api", tags=["PokerTracker4"])
 
 
 @app.get("/")
