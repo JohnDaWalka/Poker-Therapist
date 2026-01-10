@@ -29,7 +29,7 @@ def user_id() -> int:
 
 def test_init_creates_tables(temp_db: Path) -> None:
     """Test that initialization creates required tables."""
-    storage = PatternStorage(db_path=temp_db)
+    PatternStorage(db_path=temp_db)
     
     with sqlite3.connect(temp_db) as conn:
         cursor = conn.cursor()
