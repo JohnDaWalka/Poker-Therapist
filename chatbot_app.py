@@ -1,4 +1,4 @@
-"""Streamlit chatbot application with persistent memory using SQLite and xAI API."""
+"""Streamlit chatbot application with persistent memory using SQLite and Google Gemini API."""
 
 import os
 import sqlite3
@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 import streamlit as st
-from openai import OpenAI
+import google.generativeai as genai
 
 # Add python_src to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
@@ -170,27 +170,25 @@ def clear_user_history(user_id: int) -> None:
         conn.commit()
 
 
-def get_xai_client() -> OpenAI:
-    """Get xAI API client using Streamlit secrets or environment variables."""
+def get_gemini_client() -> genai.GenerativeModel:
+    """Get Google Gemini API client using Streamlit secrets or environment variables."""
     # Try Streamlit secrets first
     api_key = None
-    if hasattr(st, "secrets") and "XAI_API_KEY" in st.secrets:
-        api_key = st.secrets["XAI_API_KEY"]
+    if hasattr(st, "secrets") and "GOOGLE_API_KEY" in st.secrets:
+        api_key = st.secrets["GOOGLE_API_KEY"]
     else:
         # Fall back to environment variable
-        api_key = os.getenv("XAI_API_KEY")
+        api_key = os.getenv("GOOGLE_API_KEY")
 
     if not api_key:
         st.error(
-            "xAI API key not found. "
-            "Please configure XAI_API_KEY in secrets.toml or environment.",
+            "Google API key not found. "
+            "Please configure GOOGLE_API_KEY in secrets.toml or environment.",
         )
         st.stop()
 
-    return OpenAI(
-        api_key=api_key,
-        base_url="https://api.x.ai/v1",
-    )
+    genai.configure(api_key=api_key)
+    return genai.GenerativeModel("gemini-2.0-flash-001")
 
 
 class ThinksCallback:
@@ -484,13 +482,15 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
             message_placeholder = st.empty()
 
             try:
-                client = get_xai_client()
+                model = get_gemini_client()
 
-                # Prepare conversation history
-                conversation = [
-                    {"role": m["role"], "content": m["content"]}
-                    for m in st.session_state.messages
-                ]
+                # Prepare conversation history for Gemini
+                # Gemini expects alternating user/assistant messages
+                conversation_history = []
+                system_prompt = None
+                
+                # Extract system prompt if present
+                messages_to_process = st.session_state.messages.copy()
                 
                 # Add Rex personality system prompt for authorized users
                 if VOICE_AVAILABLE and st.session_state.get("user_email") in AUTHORIZED_EMAILS:
@@ -509,8 +509,25 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
                             system_prompt += emotion_context
                     else:
                         system_prompt = REX_SYSTEM_PROMPT
-                    
-                    conversation.insert(0, {"role": "system", "content": system_prompt})
+                
+                # Build conversation history for Gemini (alternating user/model roles)
+                for msg in messages_to_process:
+                    if msg["role"] == "user":
+                        conversation_history.append({
+                            "role": "user",
+                            "parts": [msg["content"]]
+                        })
+                    elif msg["role"] == "assistant":
+                        conversation_history.append({
+                            "role": "model",
+                            "parts": [msg["content"]]
+                        })
+
+                # Prepare the final prompt
+                if system_prompt:
+                    # Prepend system prompt to first user message
+                    final_prompt = f"{system_prompt}\n\n{conversation_history[-1]['parts'][0]}"
+                    conversation_history[-1]['parts'][0] = final_prompt
 
                 # Get streaming and thinking settings
                 enable_streaming = True
@@ -520,20 +537,26 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
                     enable_streaming = st.secrets.get("ENABLE_STREAMING", True)
                     enable_thinking = st.secrets.get("ENABLE_THINKING", True)
 
-                # Stream response
+                # Generate response
                 if enable_streaming:
                     callback = ThinksCallback(message_placeholder)
                     full_response = ""
 
-                    stream = client.chat.completions.create(
-                        model="grok-beta",
-                        messages=conversation,
-                        stream=True,
+                    # Start chat with history (excluding last message).
+                    # The system prompt is intentionally only prepended to the latest user turn
+                    # (i.e., not inserted as an initial system message in the history) so that
+                    # it scopes instructions to the current exchange rather than past turns.
+                    chat = model.start_chat(history=conversation_history[:-1] if len(conversation_history) > 1 else [])
+
+                    # Stream the response
+                    stream = chat.send_message(
+                        conversation_history[-1]['parts'][0],
+                        stream=True
                     )
 
                     for chunk in stream:
-                        if chunk.choices[0].delta.content is not None:
-                            chunk_text = chunk.choices[0].delta.content
+                        if chunk.text:
+                            chunk_text = chunk.text
                             full_response += chunk_text
 
                             if enable_thinking:
@@ -556,12 +579,9 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
 
                 else:
                     # Non-streaming response
-                    response_obj = client.chat.completions.create(
-                        model="grok-beta",
-                        messages=conversation,
-                        stream=False,
-                    )
-                    response = response_obj.choices[0].message.content
+                    chat = model.start_chat(history=conversation_history[:-1] if len(conversation_history) > 1 else [])
+                    response_obj = chat.send_message(conversation_history[-1]['parts'][0])
+                    response = response_obj.text
                     message_placeholder.markdown(response)
 
                 # Add assistant response to messages

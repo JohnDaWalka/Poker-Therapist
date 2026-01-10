@@ -4,21 +4,21 @@
 
 1. **Install dependencies**:
    ```bash
-   pip install streamlit openai
+   pip install streamlit openai google-generativeai
    ```
 
-2. **Configure your xAI API key**:
+2. **Configure your Google API key**:
 
    Create `.streamlit/secrets.toml`:
    ```toml
-   XAI_API_KEY = "xai-your-api-key-here"
+   GOOGLE_API_KEY = "your-google-api-key-here"
    ENABLE_STREAMING = true
    ENABLE_THINKING = true
    ```
 
    Or set environment variable:
    ```bash
-   export XAI_API_KEY="xai-your-api-key-here"
+   export GOOGLE_API_KEY="your-google-api-key-here"
    ```
 
 3. **Run the application**:
@@ -36,6 +36,7 @@
 
 - 🧠 **Persistent Memory**: All conversations saved to SQLite database
 - 👥 **Multi-User**: Each user has their own conversation history
+- 🤖 **Google Gemini 2.0**: Powered by latest Gemini 2.0 Flash model
 - 🔄 **Streaming**: Real-time response streaming
 - 💭 **AI Thinking**: View the AI's reasoning process
 - 🔐 **Secure**: API keys in secrets or environment variables
@@ -44,14 +45,14 @@
 
 ### `.streamlit/secrets.toml` (Recommended)
 ```toml
-XAI_API_KEY = "xai-your-key"
+GOOGLE_API_KEY = "your-google-api-key"
 ENABLE_STREAMING = true
 ENABLE_THINKING = true
 ```
 
 ### Environment Variables
 ```bash
-export XAI_API_KEY="xai-your-key"
+export GOOGLE_API_KEY="your-google-api-key"
 ```
 
 ## Documentation
@@ -83,7 +84,7 @@ To clear history:
 
 ### API Key Not Found
 - Check `.streamlit/secrets.toml` exists with correct key
-- Or verify `XAI_API_KEY` environment variable is set
+- Or verify `GOOGLE_API_KEY` environment variable is set
 - Restart the app after setting the key
 
 ### Database Locked
@@ -95,12 +96,14 @@ To clear history:
 - Verify API key is valid
 - Set `ENABLE_STREAMING = false` in secrets.toml
 
-## Get xAI API Key
+## Get Google API Key
 
-1. Visit https://x.ai/api
-2. Sign up or log in
+1. Visit https://makersuite.google.com/app/apikey
+2. Sign up or log in with your Google account
 3. Generate API key
 4. Copy to configuration
+
+Note: Requires Google account with API access. Google Pro subscription provides enhanced features.
 
 ## Support
 
