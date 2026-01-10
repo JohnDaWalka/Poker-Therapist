@@ -142,9 +142,8 @@ def test_signed_upload_without_prefix(mock_gcs_storage):
     assert response.status_code == 200
     data = response.json()
     assert "blob_name" in data
-    # Should have UUID but no prefix (no "/" in the path except within UUID)
-    # The blob_name should be like "uuid_test.pdf" with no directory separator
-    assert data["blob_name"].count("/") == 0
+    # Should have UUID but no directory prefix (no "/" separator)
+    assert "/" not in data["blob_name"]
 
 
 @pytest.mark.skipif(

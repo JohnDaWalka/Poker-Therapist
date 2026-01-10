@@ -1,7 +1,7 @@
 """Storage endpoints for Google Cloud Storage integration."""
 
 import uuid
-from typing import Optional
+from typing import Dict, Optional
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel, Field
@@ -24,7 +24,7 @@ class SignedUploadResponse(BaseModel):
     blob_name: str = Field(..., description="Full path of blob in bucket")
     url: str = Field(..., description="Signed URL for PUT upload")
     method: str = Field("PUT", description="HTTP method to use")
-    headers: dict[str, str] = Field(..., description="Required headers for upload")
+    headers: Dict[str, str] = Field(..., description="Required headers for upload")
 
 
 class SignedDownloadResponse(BaseModel):
