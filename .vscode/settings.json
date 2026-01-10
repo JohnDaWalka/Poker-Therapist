@@ -23,5 +23,8 @@
     "editor.experimentalGpuAcceleration": "on",
     "editor.experimentalWhitespaceRendering": "svg",
     "editor.foldingImportsByDefault": true,
-    "editor.gotoLocation.alternativeReferenceCommand": "editor.action.goToReferences"
+    "editor.gotoLocation.alternativeReferenceCommand": "editor.action.goToReferences",
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    }
 }
