@@ -1,12 +1,18 @@
-"""n8n webhook integration routes."""
+"""n8n webhook integration routes.
+
+This module provides webhook endpoints for n8n workflow automation.
+The endpoints accept webhook payloads from n8n and integrate with the
+Poker Therapist backend services.
+
+Note: Full integration with AIOrchestrator and SessionManager requires
+the complete backend dependencies to be available. The current implementation
+provides webhook handlers that can be extended once dependencies are loaded.
+"""
 
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, HTTPException, Header, Request, status
 from pydantic import BaseModel, Field
-
-from backend.agent.ai_orchestrator import AIOrchestrator
-from backend.agent.memory.database import SessionManager
 
 
 router = APIRouter()
@@ -87,15 +93,20 @@ async def handle_poker_analysis(payload: N8nWebhookPayload) -> N8nResponse:
     hand_data = payload.data.get("hand_data", {})
     user_id = payload.user_id or "n8n_user"
     
-    # Initialize AI orchestrator
-    orchestrator = AIOrchestrator(user_id=user_id)
+    # TODO: Initialize AI orchestrator when dependencies are available
+    # orchestrator = AIOrchestrator(user_id=user_id)
+    # result = await orchestrator.analyze_hand(hand_data)
     
-    # Perform analysis
-    result = await orchestrator.analyze_hand(hand_data)
+    # For now, return a mock response
+    result = {
+        "hand": hand_data,
+        "recommendation": "Analysis functionality will be available when AI orchestrator is initialized",
+        "status": "pending"
+    }
     
     return N8nResponse(
         success=True,
-        message="Poker hand analyzed successfully",
+        message="Poker hand analysis request received",
         data={"analysis": result}
     )
 
@@ -105,20 +116,17 @@ async def handle_triage_session(payload: N8nWebhookPayload) -> N8nResponse:
     user_id = payload.user_id or "n8n_user"
     session_data = payload.data.get("session_data", {})
     
-    # Initialize session manager
-    session_manager = SessionManager()
+    # TODO: Initialize session manager when dependencies are available
+    # session_manager = SessionManager()
+    # session_id = await session_manager.create_session(...)
     
-    # Create triage session
-    session_id = await session_manager.create_session(
-        user_id=user_id,
-        session_type="triage",
-        initial_data=session_data
-    )
+    # For now, return a mock response
+    session_id = f"triage_session_{user_id}"
     
     return N8nResponse(
         success=True,
-        message="Triage session created successfully",
-        data={"session_id": session_id}
+        message="Triage session request received",
+        data={"session_id": session_id, "session_data": session_data}
     )
 
 
@@ -127,20 +135,17 @@ async def handle_deep_session(payload: N8nWebhookPayload) -> N8nResponse:
     user_id = payload.user_id or "n8n_user"
     session_data = payload.data.get("session_data", {})
     
-    # Initialize session manager
-    session_manager = SessionManager()
+    # TODO: Initialize session manager when dependencies are available
+    # session_manager = SessionManager()
+    # session_id = await session_manager.create_session(...)
     
-    # Create deep session
-    session_id = await session_manager.create_session(
-        user_id=user_id,
-        session_type="deep",
-        initial_data=session_data
-    )
+    # For now, return a mock response
+    session_id = f"deep_session_{user_id}"
     
     return N8nResponse(
         success=True,
-        message="Deep session created successfully",
-        data={"session_id": session_id}
+        message="Deep session request received",
+        data={"session_id": session_id, "session_data": session_data}
     )
 
 
