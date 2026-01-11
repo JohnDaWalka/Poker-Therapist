@@ -23,6 +23,32 @@ Meet Rex, your elite poker coach with advanced voice capabilities:
 - 🌍 **Multi-Language Support** - Rex speaks 8+ languages authentically
 - 🎭 **Voice Cloning** - Create custom Rex voice profiles
 
+### 🎯 PokerTracker 4 Integration (NEW!)
+Seamless integration with PokerTracker 4 on Windows:
+- **Direct PT4 Database Access** - Connect to your PostgreSQL PT4 database
+- **Real-time Hand Import** - Import hands directly from PT4 for instant analysis
+- **Session Tracking** - Automatically track and review complete poker sessions
+- **Multi-Site Support** - Works with all poker sites in your PT4 database
+- **HUD Integration Ready** - Easy workflow from PT4 HUD to Therapy Rex
+- **Windows Sync Tool** - Command-line tool for easy hand synchronization
+
+See [PT4_INTEGRATION.md](docs/PT4_INTEGRATION.md) for setup instructions.
+
+### 🃏 Hand History Tracking
+Import and analyze hand histories from multiple poker networks:
+- **WinningPokerNetwork (WPN)** - BetACR, Americas Cardroom, Black Chip Poker, True Poker
+- **CoinPoker** - With blockchain verification and RNG proof validation
+- **PokerTracker 4** - Direct database import for any site in PT4
+
+**Features:**
+- Session-based hand organization
+- Multi-hand AI analysis with Therapy Rex
+- Post-session reviews for strategy and mental game
+- Support for cash games, tournaments, and SNGs
+- Complete hand history parsing and storage
+
+See [WPN_HAND_HISTORY.md](docs/WPN_HAND_HISTORY.md) for WPN setup.
+
 👥 **Authorized VIP Users**: Full voice features enabled for:
 - m.fanelli1@icloud.com
 - johndawalka@icloud.com
