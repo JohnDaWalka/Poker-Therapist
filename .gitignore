@@ -196,6 +196,9 @@ backend/therapy_rex.db-journal
 # Dossier storage (user session data)
 dossiers/
 
+# Voice profiles (user voice samples)
+voice_profiles/
+
 # Node modules (for Windows/Electron app)
 node_modules/
 package-lock.json

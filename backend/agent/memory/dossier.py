@@ -1,6 +1,7 @@
 """Dossier class for patient session data management."""
 
 import json
+import logging
 import os
 import sys
 import tempfile
@@ -8,7 +9,18 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
+
+# Optional GCS support
+try:
+    from python_src.services.gcs_storage_service import GCSStorageService
+    GCS_AVAILABLE = True
+except ImportError:
+    GCS_AVAILABLE = False
+    GCSStorageService = None
+
+# Set up logger
+logger = logging.getLogger(__name__)
 
 
 class Dossier:
@@ -21,15 +33,17 @@ class Dossier:
     Thread-safe and multi-process safe through file locking and atomic writes.
     """
 
-    def __init__(self, user_id: str) -> None:
+    def __init__(self, user_id: str, gcs_service: Optional[Any] = None) -> None:
         """
         Initialize dossier for a user.
 
         Args:
             user_id: Unique identifier for the user
+            gcs_service: Optional GCS storage service for large binary data
 
         """
         self.user_id = user_id
+        self.gcs_service = gcs_service
         self.data: dict[str, Any] = self.load()
 
     @contextmanager
@@ -246,3 +260,193 @@ class Dossier:
         # Store dossiers in a dedicated directory
         storage_dir = Path("dossiers")
         return storage_dir / f"{self.user_id}.json"
+    
+    def store_voice_profile(
+        self,
+        profile_id: str,
+        voice_samples: list[bytes],
+        metadata: Optional[dict[str, Any]] = None,
+    ) -> None:
+        """
+        Store voice profile samples.
+        
+        Uses GCS if available, falls back to local storage.
+        
+        Args:
+            profile_id: Unique profile identifier
+            voice_samples: List of audio samples as bytes
+            metadata: Optional metadata about the profile
+        """
+        if self.gcs_service and GCS_AVAILABLE:
+            # Store in GCS
+            try:
+                blob_names = self.gcs_service.upload_voice_profile(
+                    profile_id=profile_id,
+                    user_id=self.user_id,
+                    voice_samples=voice_samples,
+                )
+                
+                # Store GCS references in dossier
+                voice_profiles = self.data.get("voice_profiles", {})
+                voice_profiles[profile_id] = {
+                    "storage": "gcs",
+                    "blob_names": blob_names,
+                    "metadata": metadata or {},
+                    "created_at": datetime.now(UTC).isoformat(),
+                }
+                self.update("voice_profiles", voice_profiles)
+                return
+            except Exception as e:
+                logger.warning(
+                    f"Failed to store voice profile in GCS for user {self.user_id}, "
+                    f"profile {profile_id}: {e}. Falling back to local storage."
+                )
+                # Fall through to local storage on GCS failure
+        
+        # Fall back to local storage
+        profile_dir = Path("voice_profiles") / self.user_id / profile_id
+        profile_dir.mkdir(parents=True, exist_ok=True)
+        
+        sample_paths = []
+        for i, sample_data in enumerate(voice_samples):
+            sample_path = profile_dir / f"sample_{i}.wav"
+            sample_path.write_bytes(sample_data)
+            sample_paths.append(str(sample_path))
+        
+        # Store local references in dossier
+        voice_profiles = self.data.get("voice_profiles", {})
+        voice_profiles[profile_id] = {
+            "storage": "local",
+            "sample_paths": sample_paths,
+            "metadata": metadata or {},
+            "created_at": datetime.now(UTC).isoformat(),
+        }
+        self.update("voice_profiles", voice_profiles)
+    
+    def retrieve_voice_profile(self, profile_id: str) -> Optional[dict[str, Any]]:
+        """
+        Retrieve voice profile samples.
+        
+        Args:
+            profile_id: Profile identifier
+            
+        Returns:
+            Dictionary with voice_samples (list of bytes) and metadata, or None if not found
+        """
+        voice_profiles = self.data.get("voice_profiles", {})
+        profile_info = voice_profiles.get(profile_id)
+        
+        if not profile_info:
+            return None
+        
+        storage_type = profile_info.get("storage", "local")
+        
+        if storage_type == "gcs" and self.gcs_service and GCS_AVAILABLE:
+            # Retrieve from GCS
+            try:
+                blob_names = profile_info["blob_names"]
+                voice_samples = self.gcs_service.download_voice_profile(blob_names)
+                
+                return {
+                    "voice_samples": voice_samples,
+                    "metadata": profile_info.get("metadata", {}),
+                    "created_at": profile_info.get("created_at"),
+                }
+            except Exception as e:
+                logger.error(
+                    f"Failed to retrieve voice profile from GCS for user {self.user_id}, "
+                    f"profile {profile_id}: {e}. Attempting local fallback."
+                )
+                # Fall through to local if GCS fails
+        
+        # Retrieve from local storage
+        sample_paths = profile_info.get("sample_paths", [])
+        voice_samples = []
+        
+        for path_str in sample_paths:
+            path = Path(path_str)
+            if path.exists():
+                voice_samples.append(path.read_bytes())
+        
+        if not voice_samples:
+            return None
+        
+        return {
+            "voice_samples": voice_samples,
+            "metadata": profile_info.get("metadata", {}),
+            "created_at": profile_info.get("created_at"),
+        }
+    
+    def delete_voice_profile(self, profile_id: str) -> bool:
+        """
+        Delete voice profile.
+        
+        Args:
+            profile_id: Profile identifier
+            
+        Returns:
+            True if deleted, False if not found
+        """
+        voice_profiles = self.data.get("voice_profiles", {})
+        profile_info = voice_profiles.get(profile_id)
+        
+        if not profile_info:
+            return False
+        
+        storage_type = profile_info.get("storage", "local")
+        
+        if storage_type == "gcs" and self.gcs_service and GCS_AVAILABLE:
+            # Delete from GCS
+            try:
+                blob_names = profile_info["blob_names"]
+                self.gcs_service.delete_voice_profile(blob_names)
+            except Exception as e:
+                logger.warning(
+                    f"Failed to delete voice profile from GCS for user {self.user_id}, "
+                    f"profile {profile_id}: {e}. Profile metadata will still be removed."
+                )
+        else:
+            # Delete from local storage
+            sample_paths = profile_info.get("sample_paths", [])
+            for path_str in sample_paths:
+                path = Path(path_str)
+                path.unlink(missing_ok=True)
+            
+            # Try to remove profile directory if empty
+            profile_dir = Path("voice_profiles") / self.user_id / profile_id
+            try:
+                profile_dir.rmdir()
+            except OSError:
+                # Directory removal is best-effort; it's safe to ignore errors such as
+                # "directory not empty" or "directory does not exist" during cleanup.
+                pass
+        
+        # Remove from dossier
+        del voice_profiles[profile_id]
+        self.update("voice_profiles", voice_profiles)
+        return True
+    
+    def list_voice_profiles(self) -> list[dict[str, Any]]:
+        """
+        List all voice profiles for this user.
+        
+        Returns:
+            List of profile information dictionaries
+        """
+        voice_profiles = self.data.get("voice_profiles", {})
+        
+        profiles = []
+        for profile_id, info in voice_profiles.items():
+            profiles.append({
+                "profile_id": profile_id,
+                "storage": info.get("storage", "local"),
+                "metadata": info.get("metadata", {}),
+                "created_at": info.get("created_at"),
+                "sample_count": (
+                    len(info.get("blob_names", []))
+                    if info.get("storage") == "gcs"
+                    else len(info.get("sample_paths", []))
+                ),
+            })
+        
+        return profiles
