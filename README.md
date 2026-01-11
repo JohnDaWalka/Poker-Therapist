@@ -60,6 +60,14 @@ streamlit run chatbot_app.py
 
 See [CHATBOT_QUICKSTART.md](CHATBOT_QUICKSTART.md) for details.
 
+### 🎲 Poker Network Integrations
+Import and analyze your poker sessions from multiple networks:
+- **CoinPoker** - Blockchain-verified hands with provably-fair RNG verification
+- **🆕 Winning Poker Network (WPN)** - America's Cardroom, BlackChip Poker, YaPoker
+  - Import hand histories from BEtAcr.exe client
+  - Full session analysis and AI-powered reviews
+  - See [WPN_INTEGRATION.md](WPN_INTEGRATION.md) for details
+
 ### 📊 Hand Analysis
 - Interactive poker hand analysis dashboard
 - Visual charts and tables
