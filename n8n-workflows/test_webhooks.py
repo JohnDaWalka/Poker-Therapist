@@ -29,7 +29,13 @@ def test_endpoint(url: str, method: str = "GET", data: Dict[str, Any] = None) ->
             return
         
         print(f"\nStatus Code: {response.status_code}")
-        print(f"Response:\n{json.dumps(response.json(), indent=2)}")
+        
+        # Try to parse JSON response
+        try:
+            json_response = response.json()
+            print(f"Response:\n{json.dumps(json_response, indent=2)}")
+        except json.JSONDecodeError:
+            print(f"Response (non-JSON):\n{response.text}")
         
         if response.status_code < 400:
             print("✅ SUCCESS")

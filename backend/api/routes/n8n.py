@@ -193,10 +193,12 @@ async def test_n8n_webhook() -> N8nResponse:
     Returns:
         Success response
     """
+    from datetime import datetime
+    
     return N8nResponse(
         success=True,
         message="n8n webhook integration is working",
-        data={"timestamp": "2026-01-11T03:41:39.289Z"}
+        data={"timestamp": datetime.utcnow().isoformat() + "Z"}
     )
 
 

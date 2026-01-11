@@ -187,6 +187,8 @@ XAI_API_KEY=xai-your-key-here
 4. **Monitoring**: Set up monitoring and alerting for critical workflows
 5. **Version Control**: Keep workflow JSON files in version control
 6. **Documentation**: Document custom workflows and their purpose
+7. **Simplify Complex Logic**: For complex transformations, consider moving logic to the backend API instead of embedding large code blocks in workflows
+8. **Template Management**: For large email templates, consider using external template services or files rather than embedding HTML in workflow JSON
 
 ## Example Workflow Structure
 
