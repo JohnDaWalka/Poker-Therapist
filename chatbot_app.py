@@ -53,6 +53,19 @@ except ImportError as e:
     VOICE_AVAILABLE = False
     ENHANCED_FEATURES_AVAILABLE = False
 
+# Import storage services
+try:
+    from python_src.services.gcs_storage_service import get_gcs_service
+    GCS_STORAGE_AVAILABLE = True
+except ImportError:
+    GCS_STORAGE_AVAILABLE = False
+
+try:
+    from python_src.services.pattern_storage import get_pattern_storage
+    PATTERN_STORAGE_AVAILABLE = True
+except ImportError:
+    PATTERN_STORAGE_AVAILABLE = False
+
 # Database configuration
 DB_PATH = Path("RexVoice.db")
 
@@ -240,6 +253,39 @@ class ThinksCallback:
             self.container.markdown(self.response_text)
 
 
+def init_storage_services() -> tuple[Any, Any]:
+    """
+    Initialize storage services (GCS and pattern storage).
+    
+    Returns:
+        Tuple of (gcs_service, pattern_storage)
+    """
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    gcs_service = None
+    pattern_storage = None
+    
+    # Initialize GCS if available and configured
+    if GCS_STORAGE_AVAILABLE and os.getenv("ENABLE_GCS_STORAGE", "").lower() == "true":
+        try:
+            gcs_service = get_gcs_service(fallback_to_local=True)
+            if gcs_service:
+                st.sidebar.info("☁️ Google Cloud Storage: Enabled")
+        except Exception as e:
+            logger.warning(f"Failed to initialize GCS storage: {e}")
+            # Fall back to local storage
+    
+    # Initialize pattern storage (independent of GCS)
+    if PATTERN_STORAGE_AVAILABLE:
+        try:
+            pattern_storage = get_pattern_storage(DB_PATH)
+        except Exception as e:
+            logger.error(f"Failed to initialize pattern storage: {e}")
+    
+    return gcs_service, pattern_storage
+
+
 def main() -> None:  # noqa: C901, PLR0912, PLR0915
     """Run the main Streamlit chatbot application."""
     st.set_page_config(
@@ -250,6 +296,12 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
 
     # Initialize database
     init_database()
+    
+    # Initialize storage services
+    if "gcs_service" not in st.session_state:
+        gcs_service, pattern_storage = init_storage_services()
+        st.session_state.gcs_service = gcs_service
+        st.session_state.pattern_storage = pattern_storage
 
     # Sidebar for user configuration
     with st.sidebar:
