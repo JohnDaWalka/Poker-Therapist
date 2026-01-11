@@ -79,7 +79,7 @@ def _parse_dt(dt_raw: str) -> Optional[datetime]:
     ):
         try:
             return datetime.strptime(dt_raw, fmt)
-        except Exception:
+        except ValueError:
             continue
     return None
 
