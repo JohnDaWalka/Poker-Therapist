@@ -17,7 +17,9 @@ on:
   pull_request:
     branches: [ "main", "master" ]
   schedule:
+    # Weekly CodeQL scan early Saturday (weekend window)
     - cron: '31 0 * * 6'
+    # Mid-week CodeQL scan on Thursday evening to catch recent changes
     - cron: '25 23 * * 4'
 
 jobs:
