@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # n8n workflow automation server
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: poker-therapist-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      # Basic Authentication
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=changeme123
+      
+      # Webhook Configuration
+      - WEBHOOK_URL=http://localhost:5678/
+      
+      # Timezone
+      - GENERIC_TIMEZONE=America/New_York
+      
+      # Execution Settings
+      - EXECUTIONS_TIMEOUT=3600
+      - EXECUTIONS_TIMEOUT_MAX=7200
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+      
+      # Poker Therapist API Configuration
+      - API_BASE_URL=http://host.docker.internal:8000
+      
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n-workflows:/workflows:ro
+    
+    networks:
+      - poker-therapist-network
+    
+    # Allow n8n to access host machine (for local API)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  
+  # PostgreSQL database (optional, for production n8n)
+  postgres:
+    image: postgres:15-alpine
+    container_name: poker-therapist-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=n8n
+      - POSTGRES_USER=n8n
+      - POSTGRES_PASSWORD=n8n_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - poker-therapist-network
+    ports:
+      - "5432:5432"
+    profiles:
+      - production
+
+volumes:
+  n8n_data:
+    name: poker-therapist-n8n-data
+  postgres_data:
+    name: poker-therapist-postgres-data
+
+networks:
+  poker-therapist-network:
+    name: poker-therapist-network
+    driver: bridge

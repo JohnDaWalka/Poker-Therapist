@@ -1,0 +1,151 @@
+{
+  "name": "Daily Coaching Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 20 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Daily at 8 PM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.API_BASE_URL}}/api/tracking/daily-summary?date={{$now.format('YYYY-MM-DD')}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {}
+      },
+      "name": "Fetch Daily Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transform session data into report format\nconst data = $input.first().json;\n\nconst report = {\n  date: new Date().toLocaleDateString(),\n  user_id: data.user_id,\n  email: data.email,\n  stats: {\n    sessions_played: data.sessions_count || 0,\n    hands_played: data.hands_count || 0,\n    total_time: data.total_minutes || 0,\n    win_rate: data.win_rate || 0,\n    vpip: data.vpip || 0,\n    pfr: data.pfr || 0,\n    tilt_incidents: data.tilt_count || 0\n  },\n  highlights: [],\n  recommendations: []\n};\n\n// Add highlights\nif (data.win_rate > 0) {\n  report.highlights.push(`✅ Positive win rate: ${data.win_rate.toFixed(2)} BB/100`);\n}\nif (data.tilt_count === 0) {\n  report.highlights.push('🎯 No tilt incidents - excellent mental game!');\n}\nif (data.hands_count > 500) {\n  report.highlights.push(`🔥 High volume day: ${data.hands_count} hands`);\n}\n\n// Add recommendations\nif (data.vpip > 28) {\n  report.recommendations.push('💡 VPIP is high - consider tightening range');\n}\nif (data.pfr < data.vpip * 0.7) {\n  report.recommendations.push('💡 Low aggression - consider raising more preflop');\n}\nif (data.tilt_count > 0) {\n  report.recommendations.push('💡 Work on tilt management - schedule a triage session');\n}\n\nreturn { json: report };"
+      },
+      "name": "Generate Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "htmlToText",
+        "sourceData": "={{$json}}",
+        "options": {}
+      },
+      "name": "Format as HTML",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "reports@pokertherapist.com",
+        "toEmail": "={{$json[\"email\"]}}",
+        "subject": "📊 Your Daily Poker Report - {{$json[\"date\"]}}",
+        "emailType": "html",
+        "text": "=<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }\n    .container { max-width: 600px; margin: 0 auto; padding: 20px; }\n    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; }\n    .stats { background: #f4f4f4; padding: 15px; border-radius: 8px; margin: 20px 0; }\n    .stat-row { display: flex; justify-content: space-between; margin: 10px 0; }\n    .highlight { background: #d4edda; padding: 10px; border-left: 4px solid #28a745; margin: 10px 0; }\n    .recommendation { background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin: 10px 0; }\n    .footer { text-align: center; margin-top: 30px; color: #666; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1>🎰 Daily Poker Report</h1>\n      <p>{{$json[\"date\"]}}</p>\n    </div>\n    \n    <h2>📈 Performance Stats</h2>\n    <div class=\"stats\">\n      <div class=\"stat-row\">\n        <strong>Sessions Played:</strong>\n        <span>{{$json[\"stats\"][\"sessions_played\"]}}</span>\n      </div>\n      <div class=\"stat-row\">\n        <strong>Hands Played:</strong>\n        <span>{{$json[\"stats\"][\"hands_played\"]}}</span>\n      </div>\n      <div class=\"stat-row\">\n        <strong>Total Time:</strong>\n        <span>{{$json[\"stats\"][\"total_time\"]}} minutes</span>\n      </div>\n      <div class=\"stat-row\">\n        <strong>Win Rate:</strong>\n        <span>{{$json[\"stats\"][\"win_rate\"]}} BB/100</span>\n      </div>\n      <div class=\"stat-row\">\n        <strong>VPIP:</strong>\n        <span>{{$json[\"stats\"][\"vpip\"]}}%</span>\n      </div>\n      <div class=\"stat-row\">\n        <strong>PFR:</strong>\n        <span>{{$json[\"stats\"][\"pfr\"]}}%</span>\n      </div>\n      <div class=\"stat-row\">\n        <strong>Tilt Incidents:</strong>\n        <span>{{$json[\"stats\"][\"tilt_incidents\"]}}</span>\n      </div>\n    </div>\n    \n    {{#if $json[\"highlights\"].length}}\n    <h2>✨ Highlights</h2>\n    {{#each $json[\"highlights\"]}}\n    <div class=\"highlight\">{{this}}</div>\n    {{/each}}\n    {{/if}}\n    \n    {{#if $json[\"recommendations\"].length}}\n    <h2>💡 Recommendations</h2>\n    {{#each $json[\"recommendations\"]}}\n    <div class=\"recommendation\">{{this}}</div>\n    {{/each}}\n    {{/if}}\n    \n    <div class=\"footer\">\n      <p>Keep grinding! 🚀</p>\n      <p><em>- Rex, Your Poker Coach</em></p>\n    </div>\n  </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "name": "Send Email Report",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "resource": "sheet",
+        "operation": "appendOrUpdate",
+        "documentId": "={{$env.GOOGLE_SHEET_ID}}",
+        "sheetName": "Daily Reports",
+        "dataMode": "autoMapInputData",
+        "options": {}
+      },
+      "name": "Save to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1050, 500]
+    }
+  ],
+  "connections": {
+    "Daily at 8 PM": {
+      "main": [
+        [
+          {
+            "node": "Fetch Daily Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Daily Data": {
+      "main": [
+        [
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Report": {
+      "main": [
+        [
+          {
+            "node": "Format as HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format as HTML": {
+      "main": [
+        [
+          {
+            "node": "Send Email Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Save to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "reporting",
+      "id": "reporting-tag"
+    },
+    {
+      "name": "daily",
+      "id": "daily-tag"
+    }
+  ],
+  "meta": {
+    "instanceId": "poker-therapist"
+  }
+}
