@@ -85,7 +85,7 @@ async def _import_text(
                 rng_combined_seed_hash=h.rng_combined_seed_hash,
                 rng_verified=False,
                 rng_verification=None,
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(datetime.UTC),
             )
 
             if verify_onchain and rpc_url and h.tx_hash:
