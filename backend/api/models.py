@@ -133,3 +133,85 @@ class Playbook(BaseModel):
     personal_rules: List[str]
     created_at: datetime
     updated_at: datetime
+
+
+class CoinPokerImportTextRequest(BaseModel):
+    """Import CoinPoker hand history text exported from PT4 or CoinPoker client."""
+
+    user_id: str
+    session_id: Optional[str] = None
+    hand_history_text: str
+    rpc_url: Optional[str] = Field(
+        default=None,
+        description="Optional EVM JSON-RPC URL used to verify tx hashes if present",
+    )
+    verify_onchain: bool = Field(
+        default=False,
+        description="If true and rpc_url provided, attempt to verify any tx hashes in the export",
+    )
+
+    verify_rng: bool = Field(
+        default=True,
+        description="If true, verify CoinPoker provably-fair RNG proofs when present (no RPC needed)",
+    )
+
+
+class CoinPokerImportResponse(BaseModel):
+    session_id: Optional[str] = None
+    imported_hands: int
+    verified_hands: int
+    skipped_hands: int
+    rng_verified_hands: int = 0
+
+
+class CoinPokerSessionReviewRequest(BaseModel):
+    user_id: str
+    session_id: str
+    max_hands: int = Field(default=50, ge=1, le=500)
+
+
+class CoinPokerSessionReviewResponse(BaseModel):
+    strategy_review: str
+    therapy_review: str
+    citations: List[str] = []
+    models: List[str]
+
+
+class CoinPokerSessionSummary(BaseModel):
+    session_id: str
+    hands: int
+    rng_verified_hands: int
+    last_played: Optional[datetime] = None
+
+
+class CoinPokerSessionListResponse(BaseModel):
+    user_id: str
+    sessions: List[CoinPokerSessionSummary]
+
+
+class CoinPokerSessionHandsResponse(BaseModel):
+    user_id: str
+    session_id: str
+    hands: List[dict[str, Any]]
+
+
+class CoinPokerRngHandSummary(BaseModel):
+    hand_id: Optional[str] = None
+    rng_verified: bool
+    rng_phrase: Optional[str] = None
+    rng_combined_seed_hash: Optional[str] = None
+    verifiable_lines: int = 0
+    verified_lines: int = 0
+    mismatch_count: int = 0
+
+
+class CoinPokerRngReportResponse(BaseModel):
+    user_id: str
+    session_id: str
+    hands_total: int
+    rng_verified_hands: int
+    verifiable_lines_total: int
+    verified_lines_total: int
+    mismatch_total: int
+    mismatch_samples: List[Dict[str, Any]] = []
+    hands: List[CoinPokerRngHandSummary] = []

@@ -71,7 +71,7 @@ See [CHATBOT_QUICKSTART.md](CHATBOT_QUICKSTART.md) for details.
 - Upload hand screenshots for AI analysis
 - Text + image combined analysis
 - Real-time coaching feedback
-
+[![Sourcery](https://img.shields.io/badge/Sourcery-enabled-brightgreen)](https://sourcery.ai)
 ## Quick Start
 
 ### Vue.js Application
