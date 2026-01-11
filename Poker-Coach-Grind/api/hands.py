@@ -139,22 +139,34 @@ async def query_hands(request: HandQueryRequest) -> List[Dict[str, Any]]:
     - Read-only access
     """
     try:
-        # Basic SQL injection protection
-        dangerous_keywords = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE"]
+        # Enhanced SQL injection protection
+        # Note: For production, consider implementing a query builder or using stored procedures
+        dangerous_patterns = [
+            "DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE",
+            "EXEC", "EXECUTE", "GRANT", "REVOKE", "--", "/*", "*/", ";",
+            "UNION", "INTO OUTFILE", "INTO DUMPFILE", "LOAD_FILE"
+        ]
         query_upper = request.sql_query.upper()
         
-        for keyword in dangerous_keywords:
-            if keyword in query_upper:
+        for pattern in dangerous_patterns:
+            if pattern in query_upper:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Query contains forbidden keyword: {keyword}"
+                    detail=f"Query contains forbidden pattern: {pattern}. For security, only SELECT queries with user_id filter are allowed."
                 )
+        
+        # Ensure it's a SELECT query
+        if not query_upper.strip().startswith("SELECT"):
+            raise HTTPException(
+                status_code=400,
+                detail="Only SELECT queries are allowed"
+            )
         
         # Ensure user_id filter is in query for security
         if "user_id" not in request.sql_query.lower():
             raise HTTPException(
                 status_code=400,
-                detail="Query must include user_id filter"
+                detail="Query must include user_id filter for security"
             )
         
         # Apply limit

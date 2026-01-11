@@ -264,6 +264,12 @@ curl -X POST http://localhost:5678/webhook/test-hand-import \
 4. **Validate Payloads**: Always validate incoming webhook data
 5. **Rate Limiting**: Implement rate limits on webhook endpoints
 6. **Secrets Management**: Use n8n's credential system for sensitive data
+7. **CORS Configuration**: Set `ALLOWED_ORIGINS` environment variable for production
+8. **SQL Queries**: The SQL query feature is powerful but requires trust. In production:
+   - Consider disabling public SQL query access
+   - Implement a query builder interface instead
+   - Use read-only database user with limited permissions
+   - Log all queries for audit purposes
 
 ## Troubleshooting
 
