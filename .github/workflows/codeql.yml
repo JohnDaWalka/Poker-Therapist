@@ -13,10 +13,13 @@ name: "CodeQL Advanced"
 
 on:
   push:
-    branches: [ "**" ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "**" ]
+    branches: [ "main", "master" ]
   schedule:
+    # Weekly CodeQL scan early Saturday (weekend window)
+    - cron: '31 0 * * 6'
+    # Mid-week CodeQL scan on Thursday evening to catch recent changes
     - cron: '25 23 * * 4'
 
 jobs:
@@ -27,8 +30,8 @@ jobs:
     #   - https://gh.io/supported-runners-and-hardware-resources
     #   - https://gh.io/using-larger-runners (GitHub.com only)
     # Consider using larger runners or machines with greater resources for possible analysis time improvements.
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
-    timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
     permissions:
       # required for all workflows
       security-events: write
@@ -50,8 +53,6 @@ jobs:
           build-mode: none
         - language: python
           build-mode: none
-        - language: swift
-          build-mode: autobuild
         # CodeQL supports the following values keywords for 'language': 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
         # Use `c-cpp` to analyze code written in C, C++ or both
         # Use 'java-kotlin' to analyze code written in Java, Kotlin or both

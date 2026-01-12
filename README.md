@@ -71,7 +71,18 @@ See [CHATBOT_QUICKSTART.md](CHATBOT_QUICKSTART.md) for details.
 - Upload hand screenshots for AI analysis
 - Text + image combined analysis
 - Real-time coaching feedback
-[![Sourcery (https://img.shields.io/badge/Sourcery-enabled-brightgreen)](https://sourcery.ai)
+
+### 🔄 n8n Workflow Automation (NEW!)
+Automate your poker coaching workflows with n8n:
+- **Automated Hand Analysis** - Batch analyze poker hands
+- **Tilt Detection Alerts** - Real-time monitoring and notifications
+- **Daily Coaching Reports** - Automated performance summaries
+- **Multi-Platform Bots** - Discord, Slack, Telegram integration
+- **Custom Workflows** - Create your own automation flows
+
+See [n8n-workflows/README.md](n8n-workflows/README.md) and [n8n-workflows/SETUP_GUIDE.md](n8n-workflows/SETUP_GUIDE.md) for setup instructions.
+
+[![Sourcery](https://img.shields.io/badge/Sourcery-enabled-brightgreen)](https://sourcery.ai)
 ## Quick Start
 
 ### Vue.js Application
