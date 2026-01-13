@@ -23,7 +23,9 @@ passed=0
 # Check if .env.local exists
 if [ -f ".env.local" ]; then
     echo "✅ .env.local file found"
-    # Load variables safely without exposing to entire shell
+    # Load variables safely using set -a to export all variables temporarily
+    # This is safe for a test script context where we need to check all env vars
+    # In production code, use more targeted loading
     set -a
     source .env.local 2>/dev/null
     set +a
@@ -147,7 +149,7 @@ credential_files=(
 
 found_creds=false
 for pattern in "${credential_files[@]}"; do
-    if git ls-files | grep -q "$pattern" 2>/dev/null; then
+    if git ls-files 2>/dev/null | grep -q "$pattern"; then
         echo -e "${RED}❌ SECURITY RISK: Found credential files matching pattern: $pattern${NC}"
         errors=$((errors + 1))
         found_creds=true
