@@ -63,6 +63,8 @@ export OPENAI_API_KEY=sk-your-openai-key-here
 streamlit run chatbot_app.py
 ```
 
+See [MULTI_PROVIDER_QUICKSTART.md](MULTI_PROVIDER_QUICKSTART.md) for detailed setup guide.
+
 See [CHATBOT_QUICKSTART.md](CHATBOT_QUICKSTART.md) for details.
 
 ### 📊 Hand Analysis
