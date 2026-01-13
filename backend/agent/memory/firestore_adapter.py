@@ -80,6 +80,7 @@ class FirestoreAdapter:
         
         session_data["created_at"] = firestore.SERVER_TIMESTAMP
         doc_ref = await self.client.collection("sessions").add(session_data)
+        # doc_ref is a tuple: (WriteResult, DocumentReference)
         return doc_ref[1].id
     
     async def get_user_sessions(

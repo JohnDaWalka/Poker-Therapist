@@ -138,16 +138,13 @@ def get_or_create_user(email: str) -> int:
                 import asyncio
                 
                 try:
-                    loop = asyncio.new_event_loop()
-                    asyncio.set_event_loop(loop)
-                    loop.run_until_complete(
+                    asyncio.run(
                         firestore_adapter.create_user(str(user_id), email)
                     )
-                    loop.close()
-                except Exception:
-                    pass  # Firestore sync failed, continue with local storage
-            except ImportError:
-                pass  # Firestore not available
+                except RuntimeError:
+                    pass  # Event loop already running, skip Firestore sync
+            except Exception:
+                pass  # Firestore sync failed or not available
         
         return user_id
 
@@ -177,16 +174,13 @@ def save_message(user_id: int, role: str, content: str) -> None:
             import asyncio
             
             try:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                loop.run_until_complete(
+                asyncio.run(
                     firestore_adapter.save_message(str(user_id), role, content)
                 )
-                loop.close()
-            except Exception:
-                pass  # Firestore sync failed, continue
-        except ImportError:
-            pass  # Firestore not available
+            except RuntimeError:
+                pass  # Event loop already running, skip Firestore sync
+        except Exception:
+            pass  # Firestore sync failed or not available
 
 
 def load_messages(user_id: int, limit: int = 50) -> list[dict[str, Any]]:

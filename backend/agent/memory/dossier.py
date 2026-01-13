@@ -92,20 +92,16 @@ class Dossier:
         if self.use_firestore and self.firestore_adapter:
             try:
                 import asyncio
-                # Check if we're in an async context
+                # Try to use asyncio.run() to avoid event loop issues
                 try:
-                    loop = asyncio.get_event_loop()
-                    if loop.is_running():
-                        # Can't run async in sync context, fall back to file storage
-                        pass
-                    else:
-                        data = loop.run_until_complete(
-                            self.firestore_adapter.get_user(self.user_id)
-                        )
-                        if data:
-                            return data
+                    data = asyncio.run(
+                        self.firestore_adapter.get_user(self.user_id)
+                    )
+                    if data:
+                        return data
                 except RuntimeError:
-                    # No event loop, fall back to file storage
+                    # Event loop already running or other runtime issue
+                    # Fall back to file storage
                     pass
             except Exception:
                 # If Firestore fails, fall back to local storage
@@ -175,15 +171,14 @@ class Dossier:
             try:
                 import asyncio
                 try:
-                    loop = asyncio.get_event_loop()
-                    if not loop.is_running():
-                        loop.run_until_complete(
-                            self.firestore_adapter.create_user(
-                                self.user_id,
-                                self.data.get("email", "")
-                            )
+                    asyncio.run(
+                        self.firestore_adapter.create_user(
+                            self.user_id,
+                            self.data.get("email", "")
                         )
+                    )
                 except RuntimeError:
+                    # Event loop already running, skip Firestore sync
                     pass
             except Exception:
                 # If Firestore fails, continue with local storage

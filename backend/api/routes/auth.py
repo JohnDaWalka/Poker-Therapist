@@ -2,10 +2,10 @@
 
 from typing import Dict
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse
 
-from backend.api.auth import auth_config, oauth
+from backend.api.auth import auth_config, get_current_user, oauth
 from backend.agent.memory.firestore_adapter import firestore_adapter
 
 
@@ -155,21 +155,18 @@ async def logout() -> Dict:
 
 
 @router.get("/auth/me")
-async def get_current_user_info(request: Request) -> Dict:
+async def get_current_user_info(
+    user: Dict = Depends(get_current_user)
+) -> Dict:
     """Get current user information.
     
     Args:
-        request: FastAPI request object
+        user: Current authenticated user from JWT token
         
     Returns:
         Current user information
     """
-    from backend.api.auth import get_current_user
-    from fastapi import Depends
-    
-    # This would be used with dependency injection in the actual route
-    # For now, return placeholder
     return {
-        "message": "Use bearer token to authenticate",
-        "example": "Authorization: Bearer <your-token>"
+        "user": user,
+        "authenticated": True
     }
