@@ -5,11 +5,17 @@ Electron + Vue.js desktop application for Windows.
 ## Requirements
 
 - Node.js 18+
-- npm or yarn
+- pnpm (recommended) or npm
 
 ## Setup
 
 1. Install dependencies:
+```bash
+cd windows
+pnpm install
+```
+
+Or if using npm:
 ```bash
 cd windows
 npm install
@@ -19,12 +25,12 @@ npm install
 
 3. Run in development mode:
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 4. Build for production:
 ```bash
-npm run build
+pnpm run build
 ```
 
 ### Local path mapping (Windows)
@@ -60,13 +66,13 @@ windows/
 
 ```bash
 # Development
-npm run dev
+pnpm run dev
 
 # Production build
-npm run build
+pnpm run build
 
 # Package for Windows
-npm run package
+pnpm run package
 ```
 
 ## Tracker Integration
