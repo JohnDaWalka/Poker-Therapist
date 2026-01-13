@@ -88,7 +88,7 @@ class AuthService {
       }
       
       return this.currentUser
-    } catch (error) {
+    } catch {
       // If silent sign-in fails, fall back to interactive
       return await this.signInWithMicrosoft()
     }
