@@ -198,7 +198,7 @@ dossiers/
 
 # Node modules (for Windows/Electron app)
 node_modules/
-package-lock.json
+windows/package-lock.json
 
 # iOS build artifacts
 ios/build/
@@ -212,3 +212,16 @@ windows/build/
 
 # Temporary files
 /tmp/
+
+# Authentication & Credentials (SECURITY - DO NOT COMMIT)
+*.p8
+*.pem
+*.key
+*.crt
+*-key.json
+service-account*.json
+credentials.json
+client_secret*.json
+.env.production
+.env.staging
+.env.development
