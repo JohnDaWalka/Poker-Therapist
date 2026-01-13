@@ -6,7 +6,7 @@ This is a Streamlit-based chatbot application with the following features:
 
 - **Persistent Memory**: Uses SQLite database to store conversation history
 - **Multi-User Support**: Identifies users by email address
-- **xAI Integration**: Powered by xAI's Grok model with streaming support
+- **Multi-Provider AI Integration**: Powered by multiple AI models - OpenAI ChatGPT, Anthropic Claude, Google Gemini, x.ai Grok, or Perplexity AI
 - **Thinking Display**: Shows AI's reasoning process in expandable sections
 - **Secure Configuration**: API keys stored in Streamlit secrets or environment variables
 
@@ -139,11 +139,20 @@ Alternatively, set these environment variables:
 
 ### Model Configuration
 
-The application uses the `grok-beta` model from xAI. This model:
-- Supports conversational interactions
-- Can explain its reasoning using `<thinking>` tags
-- Provides streaming responses
-- Has a large context window
+The application supports multiple AI providers:
+- **OpenAI ChatGPT** (GPT-4, GPT-3.5) - Advanced reasoning and general purpose
+- **Anthropic Claude** - Deep analytical capabilities
+- **Google Gemini** - Fast multimodal processing
+- **x.ai Grok** - Real-time information and conversational
+- **Perplexity AI** - Research-backed responses with citations
+
+Set your preferred provider with `CHATBOT_PROVIDER` environment variable or in secrets.toml.
+All providers support:
+- Conversational interactions
+- Streaming responses
+- Large context windows
+
+Some providers (like Grok) can explain reasoning using `<thinking>` tags.
 
 ## Database Schema
 
@@ -179,10 +188,10 @@ CREATE TABLE messages (
    - Handles user creation and retrieval
    - Stores and loads conversation history
 
-2. **API Client** (`get_xai_client`):
-   - Creates OpenAI-compatible client for xAI
+2. **API Client** (`get_chatbot_client`):
+   - Creates unified client for multiple AI providers
    - Retrieves API key from secrets or environment
-   - Configures base URL for xAI API
+   - Supports OpenAI, Anthropic, Google, x.ai, and Perplexity
 
 3. **Streaming Handler** (`ThinksCallback`):
    - Processes streaming response chunks
@@ -201,7 +210,7 @@ User Input
     ↓
 Save to Database (user message)
     ↓
-Send to xAI API (with conversation history)
+Send to AI Provider (with conversation history)
     ↓
 Stream Response (via ThinksCallback)
     ↓
@@ -234,8 +243,10 @@ Save to Database (assistant message)
 
 ## Troubleshooting
 
-### "xAI API key not found" Error
-- Ensure you've configured `XAI_API_KEY` in `.streamlit/secrets.toml` or as environment variable
+### "API key not found" Error
+- Ensure you've configured the appropriate API key in `.streamlit/secrets.toml` or as environment variable
+- Required keys: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_AI_API_KEY`, `XAI_API_KEY`, or `PERPLEXITY_API_KEY`
+- At least one provider API key must be configured
 - Check for typos in the key name
 - Restart the Streamlit app after adding the key
 
@@ -311,7 +322,7 @@ CMD ["streamlit", "run", "chatbot_app.py"]
 ## Future Enhancements
 
 - [ ] Export conversation history to file
-- [ ] Support for multiple AI models
+- [x] Support for multiple AI models ✅
 - [ ] User profile management
 - [ ] Message search and filtering
 - [ ] Conversation branching
@@ -330,12 +341,17 @@ See LICENSE file in the repository root.
 For issues and questions:
 - Open an issue on GitHub
 - Check existing documentation
-- Review xAI API documentation: https://docs.x.ai/
+- Review AI provider documentation:
+  - OpenAI: https://platform.openai.com/docs
+  - Anthropic: https://docs.anthropic.com/
+  - Google AI: https://ai.google.dev/docs
+  - x.ai: https://docs.x.ai/
+  - Perplexity: https://docs.perplexity.ai/
 
 ## Credits
 
 Built with:
 - [Streamlit](https://streamlit.io/) - Web application framework
-- [xAI](https://x.ai/) - AI model provider
+- [OpenAI](https://openai.com/), [Anthropic](https://anthropic.com/), [Google AI](https://ai.google.dev/), [x.ai](https://x.ai/), [Perplexity](https://perplexity.ai/) - AI model providers
 - [OpenAI Python Client](https://github.com/openai/openai-python) - API client library
 - [SQLite](https://www.sqlite.org/) - Database engine

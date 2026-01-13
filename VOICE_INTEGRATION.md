@@ -2,7 +2,7 @@
 
 ## Overview
 
-Rex is your elite poker coach with voice capabilities, powered by x.ai's Grok API with OpenAI fallback for TTS/STR features.
+Rex is your elite poker coach with voice capabilities, powered by multiple AI models (OpenAI ChatGPT, Anthropic Claude, Google Gemini, x.ai Grok, or Perplexity AI) with OpenAI for TTS/STR features.
 
 ## Features
 

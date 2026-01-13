@@ -1,4 +1,4 @@
-"""Streamlit chatbot application with persistent memory using SQLite and xAI API."""
+"""Streamlit chatbot application with persistent memory using multiple AI providers."""
 
 import os
 import sqlite3
@@ -7,10 +7,20 @@ from pathlib import Path
 from typing import Any
 
 import streamlit as st
-from openai import OpenAI
 
 # Add python_src to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
+
+# Import chatbot factory
+try:
+    from python_src.services.chatbot_factory import (
+        get_chatbot_client,
+        get_available_providers,
+        ChatbotProvider,
+    )
+    CHATBOT_FACTORY_AVAILABLE = True
+except ImportError:
+    CHATBOT_FACTORY_AVAILABLE = False
 
 # Import voice and UI components
 try:
@@ -170,27 +180,43 @@ def clear_user_history(user_id: int) -> None:
         conn.commit()
 
 
-def get_xai_client() -> OpenAI:
-    """Get xAI API client using Streamlit secrets or environment variables."""
+def get_chatbot_provider() -> str:
+    """Get configured chatbot provider from Streamlit secrets or environment variables."""
     # Try Streamlit secrets first
-    api_key = None
-    if hasattr(st, "secrets") and "XAI_API_KEY" in st.secrets:
-        api_key = st.secrets["XAI_API_KEY"]
-    else:
-        # Fall back to environment variable
-        api_key = os.getenv("XAI_API_KEY")
+    if hasattr(st, "secrets") and "CHATBOT_PROVIDER" in st.secrets:
+        return st.secrets["CHATBOT_PROVIDER"]
+    
+    # Fall back to environment variable
+    return os.getenv("CHATBOT_PROVIDER", "openai")
 
-    if not api_key:
-        st.error(
-            "xAI API key not found. "
-            "Please configure XAI_API_KEY in secrets.toml or environment.",
-        )
-        st.stop()
 
-    return OpenAI(
-        api_key=api_key,
-        base_url="https://api.x.ai/v1",
-    )
+def get_api_key_for_provider(provider: str) -> str:
+    """Get API key for specified provider from secrets or environment.
+    
+    Args:
+        provider: Provider name (openai, anthropic, google, xai, perplexity)
+        
+    Returns:
+        API key string
+    """
+    env_var_map = {
+        "openai": "OPENAI_API_KEY",
+        "anthropic": "ANTHROPIC_API_KEY",
+        "google": "GOOGLE_AI_API_KEY",
+        "xai": "XAI_API_KEY",
+        "perplexity": "PERPLEXITY_API_KEY",
+    }
+    
+    env_var = env_var_map.get(provider.lower())
+    if not env_var:
+        return ""
+    
+    # Try Streamlit secrets first
+    if hasattr(st, "secrets") and env_var in st.secrets:
+        return st.secrets[env_var]
+    
+    # Fall back to environment variable
+    return os.getenv(env_var, "")
 
 
 class ThinksCallback:
@@ -315,7 +341,59 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
 
         # Model configuration
         st.divider()
-        st.subheader("Model Settings")
+        st.subheader("🤖 AI Model Settings")
+        
+        # Chatbot provider selection
+        if CHATBOT_FACTORY_AVAILABLE:
+            available_providers = get_available_providers()
+            
+            if available_providers:
+                # Get current provider
+                default_provider = get_chatbot_provider()
+                
+                # Create provider options
+                provider_options = {p["name"]: p["id"] for p in available_providers}
+                
+                # Find default in options
+                default_index = 0
+                for idx, (name, provider_id) in enumerate(provider_options.items()):
+                    if provider_id == default_provider:
+                        default_index = idx
+                        break
+                
+                # Provider selection dropdown
+                selected_provider_name = st.selectbox(
+                    "🤖 AI Provider",
+                    options=list(provider_options.keys()),
+                    index=default_index,
+                    help="Select which AI provider to use for chatbot responses"
+                )
+                
+                selected_provider = provider_options[selected_provider_name]
+                st.session_state.chatbot_provider = selected_provider
+                
+                # Show model info
+                try:
+                    client = get_chatbot_client(selected_provider)
+                    info = client.get_provider_info()
+                    st.caption(f"📊 Model: {info['model']}")
+                except Exception as e:
+                    st.error(f"❌ Error initializing {selected_provider_name}: {str(e)}")
+            else:
+                st.warning(
+                    "⚠️ No AI providers configured. "
+                    "Please add at least one API key to .env or secrets.toml"
+                )
+                st.info(
+                    "Required environment variables:\n"
+                    "- OPENAI_API_KEY (for ChatGPT)\n"
+                    "- ANTHROPIC_API_KEY (for Claude)\n"
+                    "- GOOGLE_AI_API_KEY (for Gemini)\n"
+                    "- XAI_API_KEY (for Grok)\n"
+                    "- PERPLEXITY_API_KEY (for Perplexity)"
+                )
+        else:
+            st.warning("⚠️ Chatbot factory not available. Using default provider.")
 
         # Get streaming and thinking settings from secrets or defaults
         enable_streaming = True
@@ -484,7 +562,14 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
             message_placeholder = st.empty()
 
             try:
-                client = get_xai_client()
+                # Get chatbot client based on selected provider
+                if CHATBOT_FACTORY_AVAILABLE:
+                    provider = st.session_state.get("chatbot_provider", get_chatbot_provider())
+                    client = get_chatbot_client(provider)
+                else:
+                    # Fallback to default provider if factory not available
+                    st.error("Chatbot factory not available. Please check installation.")
+                    return
 
                 # Prepare conversation history
                 conversation = [
@@ -525,8 +610,7 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
                     callback = ThinksCallback(message_placeholder)
                     full_response = ""
 
-                    stream = client.chat.completions.create(
-                        model="grok-beta",
+                    stream = client.chat_completion(
                         messages=conversation,
                         stream=True,
                     )
@@ -556,8 +640,7 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
 
                 else:
                     # Non-streaming response
-                    response_obj = client.chat.completions.create(
-                        model="grok-beta",
+                    response_obj = client.chat_completion(
                         messages=conversation,
                         stream=False,
                     )
