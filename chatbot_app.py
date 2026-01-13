@@ -106,7 +106,16 @@ def init_database() -> None:
 
 
 def get_or_create_user(email: str) -> int:
-    """Get user ID by email or create new user."""
+    """Get user ID by email or create new user.
+    
+    Also syncs with Firestore if GCP is configured.
+    
+    Args:
+        email: User email address
+        
+    Returns:
+        User ID
+    """
     with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
 
@@ -115,16 +124,39 @@ def get_or_create_user(email: str) -> int:
         result = cursor.fetchone()
 
         if result:
-            return result[0]
-
-        # Create new user
-        cursor.execute("INSERT INTO users (email) VALUES (?)", (email,))
-        conn.commit()
-        return cursor.lastrowid
+            user_id = result[0]
+        else:
+            # Create new user
+            cursor.execute("INSERT INTO users (email) VALUES (?)", (email,))
+            conn.commit()
+            user_id = cursor.lastrowid
+        
+        # Sync with Firestore if enabled
+        if os.getenv("GCP_PROJECT_ID"):
+            try:
+                from backend.agent.memory.firestore_adapter import firestore_adapter
+                import asyncio
+                
+                try:
+                    asyncio.run(
+                        firestore_adapter.create_user(str(user_id), email)
+                    )
+                except RuntimeError:
+                    pass  # Event loop already running, skip Firestore sync
+            except Exception:
+                pass  # Firestore sync failed or not available
+        
+        return user_id
 
 
 def save_message(user_id: int, role: str, content: str) -> None:
-    """Save message to database."""
+    """Save message to database and Firestore.
+    
+    Args:
+        user_id: User ID
+        role: Message role (user, assistant, system)
+        content: Message content
+    """
     with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
 
@@ -134,6 +166,21 @@ def save_message(user_id: int, role: str, content: str) -> None:
         )
 
         conn.commit()
+    
+    # Sync with Firestore if enabled
+    if os.getenv("GCP_PROJECT_ID"):
+        try:
+            from backend.agent.memory.firestore_adapter import firestore_adapter
+            import asyncio
+            
+            try:
+                asyncio.run(
+                    firestore_adapter.save_message(str(user_id), role, content)
+                )
+            except RuntimeError:
+                pass  # Event loop already running, skip Firestore sync
+        except Exception:
+            pass  # Firestore sync failed or not available
 
 
 def load_messages(user_id: int, limit: int = 50) -> list[dict[str, Any]]:
