@@ -99,7 +99,6 @@ def check_migration_status(db_path: Path | str = "RexVoice.db") -> dict[str, boo
 
 
 if __name__ == "__main__":
-    import sys
     
     # Default database path
     db_path = "RexVoice.db"
