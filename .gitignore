@@ -212,3 +212,9 @@ windows/build/
 
 # Temporary files
 /tmp/
+
+# GCP Credentials (do not commit)
+gcp-credentials.json
+*-credentials.json
+service-account*.json
+google-credentials.json

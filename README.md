@@ -4,6 +4,23 @@ An AI-powered poker coaching application with advanced multimodal chatbot integr
 
 ## Features
 
+### 🔐 Authentication & SSO (NEW!)
+Secure authentication with enterprise-grade SSO:
+- **Microsoft Azure AD** - Windows account integration for institutional users
+- **Google OAuth 2.0** - Seamless Google account login with GCP API access
+- **Institutional SSO** - Support for university/organization email domains (e.g., ctstate.edu)
+- **JWT Tokens** - Secure session management
+- See [AUTHENTICATION_SETUP.md](AUTHENTICATION_SETUP.md) for setup instructions
+
+### ☁️ GCP Persistent Memory (NEW!)
+Enterprise-scale persistent storage with Google Cloud Platform:
+- **Firestore Database** - NoSQL database for user data and session history
+- **Cloud Storage** - File storage for audio files and hand histories
+- **Real-time Sync** - Live updates across all devices
+- **Automatic Backups** - Point-in-time recovery
+- **Hybrid Mode** - Works with both SQLite (local) and Firestore (production)
+- See [GCP_SETUP.md](GCP_SETUP.md) for setup instructions
+
 ### 🎙️ Rex - Voice-Enabled Poker Coach (ENHANCED!)
 Meet Rex, your elite poker coach with advanced voice capabilities:
 
