@@ -114,9 +114,13 @@ async def get_current_user(
 ) -> Optional[User]:
     """Get current authenticated user from JWT token or email header.
     
-    This function supports multiple authentication methods:
-    1. OAuth/JWT: Bearer token in Authorization header
-    2. Legacy: X-User-Email header for backward compatibility
+    This function supports multiple authentication methods for backward compatibility:
+    1. OAuth/JWT: Bearer token in Authorization header (preferred, more secure)
+    2. Legacy: X-User-Email header for backward compatibility (less secure)
+    
+    Note: When REQUIRE_AUTH is true, both methods are accepted. For OAuth-only
+    deployments, consider disabling legacy authentication or implementing separate
+    endpoints for OAuth vs legacy authentication.
     
     Args:
         credentials: HTTP Bearer credentials from Authorization header
@@ -128,7 +132,7 @@ async def get_current_user(
     Raises:
         HTTPException: If authentication is required but invalid
     """
-    # Try OAuth/JWT authentication first
+    # Try OAuth/JWT authentication first (preferred)
     if credentials and credentials.credentials:
         payload = verify_jwt_token(credentials.credentials)
         if payload:
@@ -139,7 +143,8 @@ async def get_current_user(
                 user_id=payload.get("user_id"),
             )
     
-    # Fall back to legacy email header authentication
+    # Fall back to legacy email header authentication for backward compatibility
+    # TODO: Consider deprecating this in favor of OAuth-only authentication
     if x_user_email:
         return User(email=x_user_email)
     

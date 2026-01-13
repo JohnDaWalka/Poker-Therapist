@@ -53,6 +53,17 @@ class AuthConfig:
     @classmethod
     def from_env(cls) -> "AuthConfig":
         """Load authentication configuration from environment variables."""
+        jwt_secret = os.getenv("JWT_SECRET_KEY")
+        
+        # Warn if JWT secret is not configured (will use auto-generated, session won't persist)
+        if not jwt_secret:
+            logger.warning(
+                "JWT_SECRET_KEY not configured - using auto-generated secret. "
+                "Sessions will not persist across application restarts. "
+                "Set JWT_SECRET_KEY environment variable for production."
+            )
+            jwt_secret = secrets.token_urlsafe(32)
+        
         return cls(
             # Microsoft
             microsoft_client_id=os.getenv("MICROSOFT_CLIENT_ID"),
@@ -73,7 +84,7 @@ class AuthConfig:
             apple_redirect_uri=os.getenv("APPLE_REDIRECT_URI"),
             
             # Session
-            jwt_secret=os.getenv("JWT_SECRET_KEY", secrets.token_urlsafe(32)),
+            jwt_secret=jwt_secret,
             session_timeout_minutes=int(os.getenv("SESSION_TIMEOUT_MINUTES", "60")),
         )
 
