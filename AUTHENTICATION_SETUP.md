@@ -452,8 +452,6 @@ This script will:
 
 Example output:
 
-Example output:
-
 ```
 ==================================
 Authentication Configuration Test

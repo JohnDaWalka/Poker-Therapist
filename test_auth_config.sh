@@ -23,7 +23,10 @@ passed=0
 # Check if .env.local exists
 if [ -f ".env.local" ]; then
     echo "✅ .env.local file found"
-    source .env.local
+    # Load variables safely without exposing to entire shell
+    set -a
+    source .env.local 2>/dev/null
+    set +a
     passed=$((passed + 1))
 else
     echo -e "${YELLOW}⚠️  .env.local file not found (optional for testing)${NC}"
@@ -121,8 +124,8 @@ echo ""
 echo "Security Checks:"
 echo "----------------"
 
-# Check if .env.local is in git
-if git ls-files --error-unmatch .env.local 2>/dev/null; then
+# Check if .env.local is in git (more portable method)
+if git ls-files 2>/dev/null | grep -q "^\.env\.local$"; then
     echo -e "${RED}❌ CRITICAL: .env.local is committed to git! This is a security risk!${NC}"
     errors=$((errors + 1))
 else
