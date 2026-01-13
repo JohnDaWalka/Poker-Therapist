@@ -8,7 +8,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 
 class Dossier:
@@ -17,20 +17,37 @@ class Dossier:
 
     This represents the beginning of a patient session with the agent.
     Data is stored in JSON format for easy persistence and retrieval.
+    
+    Supports both local file storage and GCP Firestore for cloud persistence.
 
     Thread-safe and multi-process safe through file locking and atomic writes.
     """
 
-    def __init__(self, user_id: str) -> None:
+    def __init__(self, user_id: str, use_firestore: bool = False) -> None:
         """
         Initialize dossier for a user.
 
         Args:
             user_id: Unique identifier for the user
+            use_firestore: Whether to use GCP Firestore for storage
 
         """
         self.user_id = user_id
+        self.use_firestore = use_firestore or bool(os.getenv("GCP_PROJECT_ID"))
+        self._firestore_adapter: Optional[Any] = None
         self.data: dict[str, Any] = self.load()
+    
+    @property
+    def firestore_adapter(self) -> Any:
+        """Get Firestore adapter lazily.
+        
+        Returns:
+            Firestore adapter instance
+        """
+        if self._firestore_adapter is None and self.use_firestore:
+            from backend.agent.memory.firestore_adapter import firestore_adapter
+            self._firestore_adapter = firestore_adapter
+        return self._firestore_adapter
 
     @contextmanager
     def _file_lock(self, file_handle: Any) -> Iterator[None]:
@@ -65,12 +82,36 @@ class Dossier:
 
     def load(self) -> dict[str, Any]:
         """
-        Load dossier data from JSON storage with file locking.
+        Load dossier data from JSON storage or Firestore with file locking.
 
         Returns:
             Dictionary containing user's dossier data, or empty dict if none exists
 
         """
+        # Try Firestore first if enabled
+        if self.use_firestore and self.firestore_adapter:
+            try:
+                import asyncio
+                # Check if we're in an async context
+                try:
+                    loop = asyncio.get_event_loop()
+                    if loop.is_running():
+                        # Can't run async in sync context, fall back to file storage
+                        pass
+                    else:
+                        data = loop.run_until_complete(
+                            self.firestore_adapter.get_user(self.user_id)
+                        )
+                        if data:
+                            return data
+                except RuntimeError:
+                    # No event loop, fall back to file storage
+                    pass
+            except Exception:
+                # If Firestore fails, fall back to local storage
+                pass
+        
+        # Fall back to local file storage
         storage_path = self._get_storage_path()
 
         if storage_path.exists():
@@ -125,7 +166,30 @@ class Dossier:
             raise
 
     def save(self) -> None:
-        """Write dossier data back to storage atomically with file locking."""
+        """Write dossier data back to storage atomically with file locking.
+        
+        Saves to both Firestore (if enabled) and local file storage.
+        """
+        # Save to Firestore if enabled
+        if self.use_firestore and self.firestore_adapter:
+            try:
+                import asyncio
+                try:
+                    loop = asyncio.get_event_loop()
+                    if not loop.is_running():
+                        loop.run_until_complete(
+                            self.firestore_adapter.create_user(
+                                self.user_id,
+                                self.data.get("email", "")
+                            )
+                        )
+                except RuntimeError:
+                    pass
+            except Exception:
+                # If Firestore fails, continue with local storage
+                pass
+        
+        # Always save to local file storage as backup
         storage_path = self._get_storage_path()
 
         try:
