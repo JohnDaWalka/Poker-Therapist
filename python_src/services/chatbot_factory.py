@@ -28,6 +28,7 @@ class UnifiedChatbotClient:
         self.provider = provider.lower()
         self.client = None
         self.model = None
+        self._anthropic_client = None  # For Anthropic native API
         self._initialize_client()
     
     def _initialize_client(self) -> None:
@@ -49,12 +50,17 @@ class UnifiedChatbotClient:
                     "ANTHROPIC_API_KEY not found. "
                     "Please configure in secrets.toml or environment."
                 )
-            # Use OpenAI-compatible interface for Anthropic
-            self.client = OpenAI(
-                api_key=api_key,
-                base_url="https://api.anthropic.com/v1"
-            )
-            self.model = "claude-3-5-sonnet-20241022"
+            # Anthropic uses its own client, wrap it for unified interface
+            try:
+                import anthropic
+                self._anthropic_client = anthropic.Anthropic(api_key=api_key)
+                self.client = None  # We'll handle this differently
+                self.model = "claude-3-5-sonnet-20241022"
+            except ImportError:
+                raise RuntimeError(
+                    "Anthropic package not installed. "
+                    "Install with: pip install anthropic"
+                )
             
         elif self.provider == ChatbotProvider.GOOGLE:
             api_key = os.getenv("GOOGLE_AI_API_KEY")
@@ -120,6 +126,61 @@ class UnifiedChatbotClient:
         Returns:
             Completion response (streaming or non-streaming)
         """
+        # Special handling for Anthropic which uses different API
+        if self.provider == ChatbotProvider.ANTHROPIC:
+            # Separate system messages from conversation
+            system_message = None
+            conversation_messages = []
+            
+            for msg in messages:
+                if msg["role"] == "system":
+                    system_message = msg["content"]
+                else:
+                    conversation_messages.append(msg)
+            
+            # Use Anthropic's native API
+            kwargs = {
+                "model": self.model,
+                "messages": conversation_messages,
+                "temperature": temperature,
+                "max_tokens": max_tokens or 4096,
+                "stream": stream,
+            }
+            
+            if system_message:
+                kwargs["system"] = system_message
+            
+            response = self._anthropic_client.messages.create(**kwargs)
+            
+            # Convert Anthropic response to OpenAI-compatible format
+            if not stream:
+                # Convert non-streaming response
+                class AnthropicResponse:
+                    def __init__(self, anthropic_resp):
+                        self.choices = [type('obj', (), {
+                            'message': type('obj', (), {
+                                'content': anthropic_resp.content[0].text
+                            })()
+                        })()]
+                
+                return AnthropicResponse(response)
+            else:
+                # For streaming, we'll need to convert each chunk
+                def anthropic_stream_wrapper():
+                    for chunk in response:
+                        if hasattr(chunk, 'delta') and hasattr(chunk.delta, 'text'):
+                            # Convert to OpenAI-compatible format
+                            yield type('obj', (), {
+                                'choices': [type('obj', (), {
+                                    'delta': type('obj', (), {
+                                        'content': chunk.delta.text
+                                    })()
+                                })()]
+                            })()
+                
+                return anthropic_stream_wrapper()
+        
+        # For other providers, use OpenAI-compatible interface
         kwargs = {
             "model": self.model,
             "messages": messages,
