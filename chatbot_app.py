@@ -53,6 +53,18 @@ except ImportError as e:
     VOICE_AVAILABLE = False
     ENHANCED_FEATURES_AVAILABLE = False
 
+# Import OAuth/SSO authentication
+try:
+    from python_src.services.auth_service import AuthenticationService
+    from python_src.ui.auth_components import (
+        init_oauth_authentication,
+        render_oauth_login_buttons,
+        render_user_profile,
+    )
+    OAUTH_AVAILABLE = True
+except ImportError:
+    OAUTH_AVAILABLE = False
+
 # Database configuration
 DB_PATH = Path("RexVoice.db")
 
@@ -250,53 +262,87 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
 
     # Initialize database
     init_database()
+    
+    # Initialize OAuth authentication if available
+    auth_service = None
+    oauth_user = None
+    if OAUTH_AVAILABLE:
+        try:
+            auth_service = AuthenticationService()
+            oauth_user = init_oauth_authentication(auth_service)
+            
+            # If OAuth user is authenticated, set session state
+            if oauth_user:
+                st.session_state.user_email = oauth_user.email
+                st.session_state.user_id = get_or_create_user(oauth_user.email)
+        except Exception as e:
+            st.sidebar.warning(f"⚠️ OAuth initialization error: {e}")
 
     # Sidebar for user configuration
     with st.sidebar:
         st.title("⚙️ Configuration")
 
-        # User email input with authorized accounts
+        # User authentication section
         st.subheader("👤 Account Login")
         
-        # Show dropdown for authorized emails or custom input
-        email_option = st.radio(
-            "Select or enter your email:",
-            options=["Select from authorized", "Enter custom email"],
-            help="Choose an authorized account or enter your own email",
-        )
-        
-        if email_option == "Select from authorized":
-            email = st.selectbox(
-                "Authorized Accounts",
-                options=[""] + AUTHORIZED_EMAILS,
-                format_func=lambda x: "Select an account..." if x == "" else x,
-                help="Select your authorized email address",
-            )
-        else:
-            email = st.text_input(
-                "Your Email",
-                value=st.session_state.get("user_email", ""),
-                placeholder="user@example.com",
-                help="Enter your email to access your conversation history",
-            )
-
-        if email and email != st.session_state.get("user_email", ""):
-            # Validate email format
-            if "@" in email and "." in email.split("@")[1]:
-                st.session_state.user_email = email
-                st.session_state.user_id = get_or_create_user(email)
+        # OAuth/SSO Authentication (if available and configured)
+        if OAUTH_AVAILABLE and auth_service and auth_service.get_available_providers():
+            if oauth_user:
+                # User is authenticated via OAuth
+                render_user_profile(oauth_user, show_logout=True)
                 
-                # Show special badge for authorized users
-                if email in AUTHORIZED_EMAILS:
-                    st.success(f"✅ Logged in as: {email} 🎰 (Authorized User)")
-                else:
-                    st.success(f"✅ Logged in as: {email}")
-                st.rerun()
+                # Show VIP status
+                if oauth_user.email in AUTHORIZED_EMAILS:
+                    st.info("🎰 **VIP Access**: Full voice and Rex personality features enabled")
             else:
-                st.error("❌ Please enter a valid email address")
+                # Show OAuth login buttons
+                with st.expander("🔐 Sign in with OAuth/SSO", expanded=True):
+                    render_oauth_login_buttons(auth_service)
+                
+                st.divider()
+                st.caption("Or use legacy email login:")
+        
+        # Legacy email-based login (fallback or alternative)
+        if not oauth_user:
+            # Show dropdown for authorized emails or custom input
+            email_option = st.radio(
+                "Select or enter your email:",
+                options=["Select from authorized", "Enter custom email"],
+                help="Choose an authorized account or enter your own email",
+            )
+            
+            if email_option == "Select from authorized":
+                email = st.selectbox(
+                    "Authorized Accounts",
+                    options=[""] + AUTHORIZED_EMAILS,
+                    format_func=lambda x: "Select an account..." if x == "" else x,
+                    help="Select your authorized email address",
+                )
+            else:
+                email = st.text_input(
+                    "Your Email",
+                    value=st.session_state.get("user_email", ""),
+                    placeholder="user@example.com",
+                    help="Enter your email to access your conversation history",
+                )
 
-        # Show user info if logged in
-        if "user_id" in st.session_state and "user_email" in st.session_state:
+            if email and email != st.session_state.get("user_email", ""):
+                # Validate email format
+                if "@" in email and "." in email.split("@")[1]:
+                    st.session_state.user_email = email
+                    st.session_state.user_id = get_or_create_user(email)
+                    
+                    # Show special badge for authorized users
+                    if email in AUTHORIZED_EMAILS:
+                        st.success(f"✅ Logged in as: {email} 🎰 (Authorized User)")
+                    else:
+                        st.success(f"✅ Logged in as: {email}")
+                    st.rerun()
+                else:
+                    st.error("❌ Please enter a valid email address")
+
+        # Show user info if logged in (legacy method)
+        if "user_id" in st.session_state and "user_email" in st.session_state and not oauth_user:
             if st.session_state.user_email in AUTHORIZED_EMAILS:
                 st.info("🎰 **VIP Access**: Full voice and Rex personality features enabled")
             

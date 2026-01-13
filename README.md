@@ -2,6 +2,18 @@
 
 An AI-powered poker coaching application with advanced multimodal chatbot integration and voice capabilities.
 
+## 🔐 Authentication
+
+Poker Therapist now supports **OAuth 2.0 / SSO authentication** for secure access:
+
+- **Microsoft Azure AD / Windows Accounts** - Institutional SSO (e.g., ctstate.edu)
+- **Google OAuth 2.0** - Google account authentication & GCP API integration
+- **Apple Sign In** - Apple ID authentication (optional)
+
+**Quick Setup**: See [OAUTH_QUICKSTART.md](OAUTH_QUICKSTART.md) for 5-minute setup guide.
+
+**Full Documentation**: See [OAUTH_SETUP.md](OAUTH_SETUP.md) for complete OAuth configuration.
+
 ## Features
 
 ### 🎙️ Rex - Voice-Enabled Poker Coach (ENHANCED!)
