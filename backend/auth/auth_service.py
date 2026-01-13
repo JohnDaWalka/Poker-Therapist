@@ -116,7 +116,6 @@ class AuthService:
         )
         
         provider_access_token = token_response["access_token"]
-        provider_refresh_token = token_response.get("refresh_token", "")
         
         # Get user info from provider
         if provider == "apple":
