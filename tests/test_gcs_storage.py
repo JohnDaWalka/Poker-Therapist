@@ -3,11 +3,12 @@
 import os
 from unittest.mock import MagicMock, patch
 
+import importlib.util
 import pytest
 
-# Mock google-cloud-storage if not available
+# Detect whether google-cloud-storage is available without importing it
 try:
-    GCS_AVAILABLE = True
+    GCS_AVAILABLE = importlib.util.find_spec("google.cloud.storage") is not None
 except ImportError:
     GCS_AVAILABLE = False
 
