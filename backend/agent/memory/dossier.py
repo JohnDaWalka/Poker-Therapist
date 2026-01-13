@@ -408,10 +408,33 @@ class Dossier:
         else:
             # Delete from local storage
             sample_paths = profile_info.get("sample_paths", [])
+            profile_dir = Path("voice_profiles") / self.user_id / profile_id
+            try:
+                profile_dir_resolved = profile_dir.resolve()
+            except FileNotFoundError:
+                # If the profile directory does not exist, we still attempt to delete
+                # any sample paths that resolve within the expected location.
+                profile_dir_resolved = profile_dir
+
             for path_str in sample_paths:
                 path = Path(path_str)
-                path.unlink(missing_ok=True)
-            
+                try:
+                    resolved_path = path.resolve()
+                except FileNotFoundError:
+                    # If the file does not exist, there's nothing to delete.
+                    continue
+
+                # Ensure the resolved path is within the expected voice_profiles directory
+                if (
+                    resolved_path == profile_dir_resolved
+                    or profile_dir_resolved in resolved_path.parents
+                ):
+                    resolved_path.unlink(missing_ok=True)
+                else:
+                    logger.warning(
+                        "Skipping deletion of path outside voice_profiles directory: "
+                        f"{resolved_path} for user {self.user_id}, profile {profile_id}"
+                    )
             # Try to remove profile directory if empty
             profile_dir = Path("voice_profiles") / self.user_id / profile_id
             try:
