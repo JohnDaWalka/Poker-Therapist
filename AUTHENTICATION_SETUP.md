@@ -436,52 +436,47 @@ git push origin main
 
 ### Automated Test Script
 
-Create a test script to verify configuration:
+A comprehensive test script is provided in the repository to verify your authentication configuration:
 
 ```bash
-#!/bin/bash
-# test_auth_config.sh
-
-echo "Testing Authentication Configuration..."
-
-# Check required environment variables
-REQUIRED_VARS=(
-    "AZURE_AD_TENANT_ID"
-    "AZURE_AD_CLIENT_ID"
-    "AZURE_AD_CLIENT_SECRET"
-    "GOOGLE_CLIENT_ID"
-    "GOOGLE_CLIENT_SECRET"
-    "SESSION_SECRET_KEY"
-    "JWT_SECRET_KEY"
-)
-
-for var in "${REQUIRED_VARS[@]}"; do
-    if [ -z "${!var}" ]; then
-        echo "❌ Missing required variable: $var"
-    else
-        echo "✅ $var is set"
-    fi
-done
-
-# Check secret key length
-if [ ${#SESSION_SECRET_KEY} -lt 32 ]; then
-    echo "⚠️  WARNING: SESSION_SECRET_KEY should be at least 32 characters"
-fi
-
-if [ ${#JWT_SECRET_KEY} -lt 32 ]; then
-    echo "⚠️  WARNING: JWT_SECRET_KEY should be at least 32 characters"
-fi
-
-# Check .env.local is not committed
-if git ls-files --error-unmatch .env.local 2>/dev/null; then
-    echo "❌ SECURITY RISK: .env.local is committed to git!"
-else
-    echo "✅ .env.local not in source control"
-fi
-
-echo ""
-echo "Testing complete. Review warnings and errors above."
+# Run the authentication configuration test
+./test_auth_config.sh
 ```
+
+This script will:
+- Check for required environment variables
+- Validate credential file security
+- Verify secret key lengths
+- Ensure credentials are not committed to git
+- Test .gitignore configuration
+
+Example output:
+
+Example output:
+
+```
+==================================
+Authentication Configuration Test
+==================================
+
+Checking Authentication Environment Variables...
+✅ AZURE_AD_TENANT_ID is configured
+✅ GOOGLE_CLIENT_ID is configured
+...
+
+Security Checks:
+✅ .env.local is not in version control
+✅ No credential files found in repository
+
+Test Summary
+Passed:   15
+Warnings: 2
+Errors:   0
+
+✅ All authentication configuration checks passed!
+```
+
+For the complete test script source code, see `test_auth_config.sh` in the repository root.
 
 ### Monitoring & Debugging
 

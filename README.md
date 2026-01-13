@@ -82,6 +82,16 @@ Automate your poker coaching workflows with n8n:
 
 See [n8n-workflows/README.md](n8n-workflows/README.md) and [n8n-workflows/SETUP_GUIDE.md](n8n-workflows/SETUP_GUIDE.md) for setup instructions.
 
+### 🔐 Authentication & Security (NEW!)
+Configure enterprise-grade authentication for institutional deployments:
+- **Microsoft Azure AD** - Organization-managed Windows accounts
+- **Institutional SSO** - .edu and enterprise single sign-on (e.g., ctstate.edu)
+- **Google OAuth 2.0** - GCP API integration and Google authentication
+- **Apple Sign In** - iOS/macOS native authentication
+- **Multi-Factor Authentication** - Enhanced security for sensitive deployments
+
+See [AUTHENTICATION_SETUP.md](AUTHENTICATION_SETUP.md) for complete configuration guide.
+
 [![Sourcery](https://img.shields.io/badge/Sourcery-enabled-brightgreen)](https://sourcery.ai)
 ## Quick Start
 
