@@ -11,7 +11,7 @@ import secrets
 import logging
 from typing import Optional, Dict, Any
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode, parse_qs, urlparse
 
 import jwt
@@ -317,10 +317,11 @@ class AppleAuthService:
             "alg": "ES256",
         }
         
+        now = datetime.now(timezone.utc)
         payload = {
             "iss": self.config.apple_team_id,
-            "iat": datetime.utcnow(),
-            "exp": datetime.utcnow() + timedelta(days=180),
+            "iat": now,
+            "exp": now + timedelta(days=180),
             "aud": "https://appleid.apple.com",
             "sub": self.config.apple_client_id,
         }
@@ -365,7 +366,11 @@ class AppleAuthService:
                 logger.error("Failed to get ID token from Apple")
                 return None
             
-            # Decode without verification for now (in production, verify signature)
+            # TODO: Implement proper JWT signature verification for production use
+            # This requires fetching Apple's public keys from https://appleid.apple.com/auth/keys
+            # and verifying the signature using those keys. For now, we decode without verification
+            # which is acceptable for development but should be fixed before production deployment.
+            # Security implications: Without verification, a malicious actor could forge tokens.
             decoded = jwt.decode(id_token, options={"verify_signature": False})
             
             # Extract name from user_data if provided (only on first sign in)
@@ -439,13 +444,14 @@ class AuthenticationService:
         Returns:
             JWT session token
         """
+        now = datetime.now(timezone.utc)
         payload = {
             "provider": user_info.provider,
             "email": user_info.email,
             "name": user_info.name,
             "user_id": user_info.user_id,
-            "iat": datetime.utcnow(),
-            "exp": datetime.utcnow() + timedelta(minutes=self.config.session_timeout_minutes),
+            "iat": now,
+            "exp": now + timedelta(minutes=self.config.session_timeout_minutes),
         }
         
         return jwt.encode(

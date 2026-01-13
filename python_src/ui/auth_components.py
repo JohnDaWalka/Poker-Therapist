@@ -133,6 +133,10 @@ def handle_oauth_callback(auth_service: AuthenticationService) -> Optional[UserI
             user_info = auth_service.google.get_user_info(auth_code)
         elif provider == "apple":
             # Apple passes user data in the form post
+            # NOTE: Apple uses response_mode=form_post, so in a production Streamlit app,
+            # user data would come via POST body, not query parameters. This is a limitation
+            # of Streamlit's current architecture. For production, consider using a separate
+            # callback endpoint to handle Apple's POST data before redirecting to Streamlit.
             user_data = query_params.get("user")
             user_info = auth_service.apple.get_user_info(auth_code, user_data)
         

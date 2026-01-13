@@ -131,6 +131,8 @@ GOOGLE_REDIRECT_URI=http://localhost:8501/
 
 This enables sign-in with Apple ID.
 
+**⚠️ PRODUCTION WARNING**: The current implementation decodes Apple ID tokens without signature verification. This is acceptable for development and testing but **must be enhanced** for production use by implementing proper JWT signature verification using Apple's public keys. See the TODO comment in `python_src/services/auth_service.py` for details.
+
 #### Step 1: Configure App ID and Service ID
 
 1. Go to [Apple Developer Portal](https://developer.apple.com)
