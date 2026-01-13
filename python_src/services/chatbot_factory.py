@@ -1,9 +1,35 @@
 """Unified chatbot client factory for multiple AI providers."""
 
 import os
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Iterator
+from dataclasses import dataclass
 
 from openai import OpenAI
+
+
+@dataclass
+class ChatMessage:
+    """Represents a chat message in OpenAI format."""
+    content: str
+
+
+@dataclass
+class ChatDelta:
+    """Represents a delta in streaming response."""
+    content: Optional[str] = None
+
+
+@dataclass
+class ChatChoice:
+    """Represents a choice in OpenAI format."""
+    message: Optional[ChatMessage] = None
+    delta: Optional[ChatDelta] = None
+
+
+@dataclass
+class ChatCompletion:
+    """Represents a chat completion response in OpenAI format."""
+    choices: List[ChatChoice]
 
 
 class ChatbotProvider:
@@ -155,28 +181,30 @@ class UnifiedChatbotClient:
             # Convert Anthropic response to OpenAI-compatible format
             if not stream:
                 # Convert non-streaming response
-                class AnthropicResponse:
-                    def __init__(self, anthropic_resp):
-                        self.choices = [type('obj', (), {
-                            'message': type('obj', (), {
-                                'content': anthropic_resp.content[0].text
-                            })()
-                        })()]
-                
-                return AnthropicResponse(response)
+                return ChatCompletion(
+                    choices=[
+                        ChatChoice(
+                            message=ChatMessage(
+                                content=response.content[0].text
+                            )
+                        )
+                    ]
+                )
             else:
                 # For streaming, we'll need to convert each chunk
                 def anthropic_stream_wrapper():
                     for chunk in response:
                         if hasattr(chunk, 'delta') and hasattr(chunk.delta, 'text'):
                             # Convert to OpenAI-compatible format
-                            yield type('obj', (), {
-                                'choices': [type('obj', (), {
-                                    'delta': type('obj', (), {
-                                        'content': chunk.delta.text
-                                    })()
-                                })()]
-                            })()
+                            yield ChatCompletion(
+                                choices=[
+                                    ChatChoice(
+                                        delta=ChatDelta(
+                                            content=chunk.delta.text
+                                        )
+                                    )
+                                ]
+                            )
                 
                 return anthropic_stream_wrapper()
         
