@@ -6,13 +6,47 @@ class APIClient {
     private let baseURL = "http://localhost:8000"
     private let userId = "default"
     
+    // Make baseURL public for authentication service
+    var publicBaseURL: String {
+        return baseURL
+    }
+    
     private init() {}
+    
+    // MARK: - Authentication Headers
+    
+    private func getAuthHeaders() -> [String: String] {
+        var headers = [
+            "Content-Type": "application/json"
+        ]
+        
+        // Add authentication token if available
+        if let token = KeychainService.shared.getToken(for: "access_token") {
+            headers["Authorization"] = "Bearer \(token)"
+        }
+        
+        return headers
+    }
+    
+    private func createRequest(url: URL, method: String = "POST", body: [String: Any]? = nil) throws -> URLRequest {
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        
+        // Set headers
+        for (key, value) in getAuthHeaders() {
+            request.setValue(value, forHTTPHeaderField: key)
+        }
+        
+        // Set body if provided
+        if let body = body {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        }
+        
+        return request
+    }
     
     func analyzeTriage(situation: String, emotion: String, intensity: Int, bodySensation: String, stillPlaying: Bool) async throws -> TriageResult {
         let url = URL(string: "\(baseURL)/api/triage")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let body = [
             "situation": situation,
@@ -23,7 +57,7 @@ class APIClient {
             "user_id": userId
         ] as [String : Any]
         
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        let request = try createRequest(url: url, body: body)
         
         let (data, _) = try await URLSession.shared.data(for: request)
         return try JSONDecoder().decode(TriageResult.self, from: data)
@@ -31,9 +65,6 @@ class APIClient {
     
     func startDeepSession(stress: Int, confidence: Int, motivation: Int, recentResults: String, lifeContext: String) async throws -> DeepSessionResult {
         let url = URL(string: "\(baseURL)/api/deep-session")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let body = [
             "emotional_state": ["stress": stress, "confidence": confidence, "motivation": motivation],
@@ -43,7 +74,7 @@ class APIClient {
             "user_id": userId
         ] as [String : Any]
         
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        let request = try createRequest(url: url, body: body)
         
         let (data, _) = try await URLSession.shared.data(for: request)
         return try JSONDecoder().decode(DeepSessionResult.self, from: data)
