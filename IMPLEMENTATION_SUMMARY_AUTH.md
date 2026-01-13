@@ -397,7 +397,7 @@ For issues or questions:
 - `AUTHENTICATION_SETUP.md` (new)
 - `GOOGLE_CLOUD_SETUP.md` (new)
 - `DEPLOYMENT_VERIFICATION.md` (new)
-- `IMPLEMENTATION_SUMMARY.md` (this file)
+- `IMPLEMENTATION_SUMMARY_AUTH.md` (this file)
 - `scripts/setup-gcp.sh` (new)
 
 ## Conclusion
