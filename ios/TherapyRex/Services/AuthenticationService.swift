@@ -140,18 +140,73 @@ class AuthenticationService: NSObject, ObservableObject {
     
     // MARK: - User Info
     
+    /// Decode the payload section of a JWT into a dictionary of claims.
+    /// This is a minimal implementation; in production, prefer a dedicated JWT library.
+    private func decodeJWTPayload(_ token: String) -> [String: Any]? {
+        let segments = token.split(separator: ".")
+        guard segments.count >= 2 else {
+            return nil
+        }
+        
+        var payloadSegment = String(segments[1])
+        // Convert from base64url to base64
+        payloadSegment = payloadSegment
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        
+        // Pad with '=' to make length a multiple of 4
+        while payloadSegment.count % 4 != 0 {
+            payloadSegment.append("=")
+        }
+        
+        guard let data = Data(base64Encoded: payloadSegment) else {
+            return nil
+        }
+        
+        guard let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []),
+              let claims = jsonObject as? [String: Any] else {
+            return nil
+        }
+        
+        return claims
+    }
+    
     private func loadUserInfo() {
         // In production, fetch user info from backend API using the token
         // For now, decode token to get basic info (if JWT)
-        if let token = authToken {
-            // Decode JWT token (simplified - use proper JWT library in production)
-            self.currentUser = User(
-                id: "user_id",
-                email: "user@example.com",
-                name: "User Name",
-                provider: "microsoft"
-            )
+        guard let token = authToken,
+              let claims = decodeJWTPayload(token) else {
+            return
         }
+        
+        // Map common JWT claims to User properties
+        let id = (claims["sub"] as? String) ??
+                 (claims["oid"] as? String) ??
+                 UUID().uuidString
+        
+        let email = (claims["email"] as? String) ??
+                    (claims["preferred_username"] as? String) ??
+                    ""
+        
+        var name = (claims["name"] as? String) ?? ""
+        if name.isEmpty {
+            let givenName = claims["given_name"] as? String
+            let familyName = claims["family_name"] as? String
+            let combined = [givenName, familyName].compactMap { $0 }.joined(separator: " ")
+            name = combined.trimmingCharacters(in: .whitespaces)
+        }
+        if name.isEmpty {
+            name = email
+        }
+        
+        let provider = (claims["iss"] as? String) ?? "unknown"
+        
+        self.currentUser = User(
+            id: id,
+            email: email,
+            name: name,
+            provider: provider
+        )
     }
 }
 
