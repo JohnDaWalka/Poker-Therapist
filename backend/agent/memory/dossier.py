@@ -10,14 +10,14 @@ from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Optional
+import importlib
 
 # Optional GCS support
 try:
-    from python_src.services.gcs_storage_service import GCSStorageService
+    importlib.import_module("python_src.services.gcs_storage_service")
     GCS_AVAILABLE = True
 except ImportError:
     GCS_AVAILABLE = False
-    GCSStorageService = None
 
 # Set up logger
 logger = logging.getLogger(__name__)
