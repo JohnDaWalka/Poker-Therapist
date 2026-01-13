@@ -4,7 +4,7 @@ import os
 import time
 from typing import Any, Dict, Optional
 
-import jwt
+import jwt as pyjwt
 import requests
 
 
@@ -80,7 +80,7 @@ class AppleAuthProvider:
             "sub": self.services_id,
         }
         
-        return jwt.encode(payload, self.private_key, algorithm="ES256", headers=headers)
+        return pyjwt.encode(payload, self.private_key, algorithm="ES256", headers=headers)
 
     def exchange_code_for_token(
         self, 
@@ -128,7 +128,7 @@ class AppleAuthProvider:
             Decoded token claims including sub (user ID), email, etc.
             
         Raises:
-            jwt.InvalidTokenError: If token verification fails
+            pyjwt.InvalidTokenError: If token verification fails
         """
         # Get Apple's public keys
         response = requests.get(self.keys_uri)
@@ -136,21 +136,21 @@ class AppleAuthProvider:
         keys = response.json()["keys"]
         
         # Decode header to get key ID
-        unverified_header = jwt.get_unverified_header(id_token)
+        unverified_header = pyjwt.get_unverified_header(id_token)
         key_id = unverified_header["kid"]
         
         # Find the matching public key
         public_key = None
         for key in keys:
             if key["kid"] == key_id:
-                public_key = jwt.algorithms.RSAAlgorithm.from_jwk(key)
+                public_key = pyjwt.algorithms.RSAAlgorithm.from_jwk(key)
                 break
         
         if not public_key:
             raise ValueError("Public key not found for token")
         
         # Verify and decode token
-        decoded = jwt.decode(
+        decoded = pyjwt.decode(
             id_token,
             public_key,
             algorithms=["RS256"],

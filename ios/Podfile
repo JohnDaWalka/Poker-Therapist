@@ -10,7 +10,7 @@ target 'TherapyRex' do
   
   # Microsoft Authentication Library (MSAL) for Azure AD / Windows accounts
   # https://github.com/AzureAD/microsoft-authentication-library-for-objc
-  pod 'MSAL', '~> 1.3'
+  pod 'MSAL', '~> 1.4'
   
   # Google Sign-In SDK
   # https://github.com/google/GoogleSignIn-iOS
