@@ -240,7 +240,7 @@ extension AuthenticationService: ASAuthorizationControllerDelegate {
     
     private func exchangeAppleToken(_ token: String) async throws {
         // Call backend API to exchange Apple token for our JWT
-        let url = URL(string: "\(APIClient.shared.baseURL)/auth/apple/callback")!
+        let url = URL(string: "\(APIClient.shared.publicBaseURL)/auth/apple/callback")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")

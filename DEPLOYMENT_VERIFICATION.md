@@ -148,10 +148,7 @@ uvicorn api.main:app --reload
 
 ### Google Cloud Storage Test
 
-Run test script:
-```bash
-python scripts/test-gcp-connection.py
-```
+Perform the following checks (for example, using a small test script or the `gsutil`/cloud SDK CLI):
 
 - [ ] Connection to GCS succeeds
 - [ ] Bucket is accessible

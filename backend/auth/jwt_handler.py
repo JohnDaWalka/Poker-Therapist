@@ -4,7 +4,8 @@ import os
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 
-from jose import JWTError, jwt
+from jose import JWTError
+from jose import jwt as jose_jwt
 
 
 class JWTHandler:
@@ -52,7 +53,7 @@ class JWTHandler:
         if additional_claims:
             payload.update(additional_claims)
         
-        return jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
+        return jose_jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
 
     def create_refresh_token(self, user_id: str) -> str:
         """Create a new refresh token.
@@ -72,7 +73,7 @@ class JWTHandler:
             "type": "refresh",
         }
         
-        return jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
+        return jose_jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
 
     def verify_token(self, token: str, token_type: str = "access") -> Dict[str, Any]:
         """Verify and decode a JWT token.
@@ -89,7 +90,7 @@ class JWTHandler:
             ValueError: If token type doesn't match expected type
         """
         try:
-            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            payload = jose_jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
             
             # Verify token type
             if payload.get("type") != token_type:
@@ -108,7 +109,7 @@ class JWTHandler:
         Returns:
             Decoded token payload (unverified)
         """
-        return jwt.decode(token, options={"verify_signature": False})
+        return jose_jwt.decode(token, options={"verify_signature": False})
 
     def extract_user_id(self, token: str) -> Optional[str]:
         """Extract user ID from token.
