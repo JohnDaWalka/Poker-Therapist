@@ -13,7 +13,7 @@ Meet Rex, your elite poker coach with advanced voice capabilities:
 - **Rex Personality** - Direct, no-nonsense poker expert with decades of experience
 - **CFR Analysis** - Advanced Counterfactual Regret Minimization
 - **Psychological Coaching** - Mental game and wellness support
-- **x.ai Powered** - Grok @ x.ai for intelligent responses
+- **Multiple AI Models** - Choose from OpenAI ChatGPT, Anthropic Claude, Google Gemini, x.ai Grok, or Perplexity AI
 
 **🆕 NEW Enhanced Voice Features:**
 - 🔴 **Real-time Voice Streaming** - WebRTC streaming for instant interaction
@@ -41,22 +41,29 @@ Get expert poker strategy advice from multiple AI providers:
 - **Google Gemini** - Fast multimodal hand analysis
 
 ### 💬 Streamlit Chatbot
-A standalone Streamlit chatbot with persistent memory:
+A standalone Streamlit chatbot with persistent memory and multiple AI provider support:
 - **Persistent Memory** - SQLite database stores conversation history
 - **Multi-User Support** - Email-based user identification
-- **xAI Integration** - Powered by xAI's Grok model
+- **Multiple AI Providers** - Choose from OpenAI ChatGPT, Anthropic Claude, Google Gemini, x.ai Grok, or Perplexity AI
 - **Streaming Responses** - Real-time AI responses
-- **Thinking Display** - See the AI's reasoning process
+- **Thinking Display** - See the AI's reasoning process (with supported providers)
 - **Voice Mode** - Enable Rex's voice for immersive coaching
 
 Quick start for Streamlit chatbot:
 ```bash
 pip install streamlit openai sounddevice pydub scipy
-# Set your API keys
-export XAI_API_KEY=xai-your-key-here
-export OPENAI_API_KEY=sk-your-openai-key-here  # For voice fallback
+# Set your preferred AI provider API key (at least one required)
+export CHATBOT_PROVIDER=openai  # Options: openai, anthropic, google, xai, perplexity
+export OPENAI_API_KEY=sk-your-openai-key-here
+# Or use other providers:
+# export ANTHROPIC_API_KEY=your-anthropic-key-here
+# export GOOGLE_AI_API_KEY=your-google-key-here
+# export XAI_API_KEY=xai-your-key-here
+# export PERPLEXITY_API_KEY=your-perplexity-key-here
 streamlit run chatbot_app.py
 ```
+
+See [MULTI_PROVIDER_QUICKSTART.md](MULTI_PROVIDER_QUICKSTART.md) for detailed setup guide.
 
 See [CHATBOT_QUICKSTART.md](CHATBOT_QUICKSTART.md) for details.
 
@@ -116,10 +123,12 @@ For detailed setup and API key configuration, see [docs/CHATBOT_INTEGRATION.md](
    pip install streamlit openai
    ```
 
-2. **Configure xAI API key**
+2. **Configure AI Provider API key**
    ```bash
    cp .streamlit/secrets.toml.example .streamlit/secrets.toml
-   # Edit .streamlit/secrets.toml and add your xAI API key
+   # Edit .streamlit/secrets.toml and add your API key(s)
+   # Add at least one: OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_AI_API_KEY, XAI_API_KEY, or PERPLEXITY_API_KEY
+   # Optionally set CHATBOT_PROVIDER (defaults to openai)
    ```
 
 3. **Run the chatbot**

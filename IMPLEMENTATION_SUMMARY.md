@@ -212,7 +212,7 @@ export XAI_API_KEY="xai-your-api-key-here"
 |---------|--------|-------------|
 | Persistent Memory | ✅ | SQLite database stores all conversations |
 | Multi-User Support | ✅ | Email-based user identification |
-| xAI Integration | ✅ | Grok-beta model with streaming |
+| Multi-Provider AI | ✅ | OpenAI, Anthropic, Google, x.ai, Perplexity with streaming |
 | Streaming Responses | ✅ | Real-time response display |
 | Thinking Display | ✅ | Shows AI reasoning process |
 | Secure Config | ✅ | API keys in secrets or env vars |
