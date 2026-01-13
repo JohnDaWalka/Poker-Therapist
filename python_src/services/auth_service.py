@@ -476,3 +476,6 @@ class AuthenticationService:
         except jwt.InvalidTokenError as e:
             logger.warning(f"Invalid session token: {e}")
             return None
+        except Exception as e:
+            logger.error(f"Error verifying token: {e}")
+            return None
