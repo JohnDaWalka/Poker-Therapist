@@ -9,6 +9,7 @@ the complete backend dependencies to be available. The current implementation
 provides webhook handlers that can be extended once dependencies are loaded.
 """
 
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, HTTPException, Header, Request, status
@@ -193,12 +194,10 @@ async def test_n8n_webhook() -> N8nResponse:
     Returns:
         Success response
     """
-    from datetime import datetime
-    
     return N8nResponse(
         success=True,
         message="n8n webhook integration is working",
-        data={"timestamp": datetime.utcnow().isoformat() + "Z"}
+        data={"timestamp": datetime.now(timezone.utc).isoformat()}
     )
 
 
