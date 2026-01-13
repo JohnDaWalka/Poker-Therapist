@@ -1,0 +1,26 @@
+{
+  "name": "poker-therapist",
+  "version": "1.0.0",
+  "description": "AI-powered poker coaching application",
+  "private": true,
+  "scripts": {
+    "install:windows": "cd windows && npm install",
+    "build:windows": "cd windows && npm run build",
+    "postinstall": "npm run install:windows"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnDaWalka/Poker-Therapist.git"
+  },
+  "keywords": [
+    "poker",
+    "ai",
+    "coaching",
+    "therapy"
+  ],
+  "author": "JohnDaWalka",
+  "license": "SEE LICENSE IN LICENSE",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
