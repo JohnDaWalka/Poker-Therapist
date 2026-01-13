@@ -1,0 +1,54 @@
+# Podfile for Therapy Rex iOS App
+# Uncomment the next line to define a global platform for your project
+platform :ios, '16.0'
+
+target 'TherapyRex' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Authentication SDKs
+  
+  # Microsoft Authentication Library (MSAL) for Azure AD / Windows accounts
+  # https://github.com/AzureAD/microsoft-authentication-library-for-objc
+  pod 'MSAL', '~> 1.3'
+  
+  # Google Sign-In SDK
+  # https://github.com/google/GoogleSignIn-iOS
+  pod 'GoogleSignIn', '~> 7.0'
+  
+  # Google Cloud Storage (optional, for direct iOS -> GCS uploads)
+  pod 'GoogleCloudStorage', '~> 0.4'
+  
+  # Networking
+  pod 'Alamofire', '~> 5.8'
+  
+  # JSON parsing helper
+  pod 'SwiftyJSON', '~> 5.0'
+
+  target 'TherapyRexTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'TherapyRexUITests' do
+    # Pods for testing
+  end
+
+end
+
+# watchOS target
+target 'TherapyRexWatch WatchKit Extension' do
+  platform :watchos, '9.0'
+  use_frameworks!
+  
+  # Share authentication with iPhone via WatchConnectivity
+  # Minimal dependencies for watchOS
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+    end
+  end
+end
