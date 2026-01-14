@@ -10,9 +10,10 @@ Deploy Poker Therapist to Vercel in **15 minutes** with full authentication supp
 # Import: JohnDaWalka/Poker-Therapist
 
 # 2. Add minimum environment variables in Vercel dashboard:
+# (Run "openssl rand -base64 32" locally first to generate JWT_SECRET_KEY)
 XAI_API_KEY=xai-your-key
 OPENAI_API_KEY=sk-your-key
-JWT_SECRET_KEY=$(openssl rand -base64 32)
+JWT_SECRET_KEY=<paste-generated-key-here>
 AUTHORIZED_EMAILS=you@example.com
 
 # 3. Deploy and test
@@ -47,7 +48,7 @@ XAI_API_KEY=xai-your-key-here                    # Get from: https://x.ai/api
 OPENAI_API_KEY=sk-your-key-here                   # Get from: https://platform.openai.com/api-keys
 
 # Security
-JWT_SECRET_KEY=<run: openssl rand -base64 32>    # Generate a secure random key
+JWT_SECRET_KEY=<generate-locally-then-paste>     # Run locally: openssl rand -base64 32
 AUTHORIZED_EMAILS=email1@example.com,email2@example.com  # Comma-separated, no spaces
 ```
 
