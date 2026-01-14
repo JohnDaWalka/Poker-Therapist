@@ -36,12 +36,30 @@ jobs:
 
       - name: Push changes to target repository
         run: |
-          # Detect the default branch (main or master) with fallback
-          DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || git remote show origin | grep 'HEAD branch' | awk '{print $NF}')
+          # Detect the default branch (main or master) with multiple fallbacks
+          DEFAULT_BRANCH=""
           
-          # If detection fails, try to use the current branch
+          # Try method 1: symbolic-ref
           if [ -z "$DEFAULT_BRANCH" ]; then
-            DEFAULT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+            DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+          fi
+          
+          # Try method 2: remote show
+          if [ -z "$DEFAULT_BRANCH" ]; then
+            DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}')
+          fi
+          
+          # Try method 3: current branch (if not detached)
+          if [ -z "$DEFAULT_BRANCH" ]; then
+            CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+            if [ "$CURRENT_BRANCH" != "HEAD" ]; then
+              DEFAULT_BRANCH=$CURRENT_BRANCH
+            fi
+          fi
+          
+          # Final fallback: use main
+          if [ -z "$DEFAULT_BRANCH" ]; then
+            DEFAULT_BRANCH="main"
           fi
           
           echo "Pushing to branch: $DEFAULT_BRANCH"
