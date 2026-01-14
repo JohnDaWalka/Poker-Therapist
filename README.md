@@ -140,24 +140,67 @@ For detailed documentation, see [docs/STREAMLIT_CHATBOT.md](docs/STREAMLIT_CHATB
 
 ### ☁️ Vercel Deployment
 
-Deploy the FastAPI backend to Vercel for serverless hosting:
+Deploy the FastAPI backend to Vercel for serverless hosting with full authentication support:
 
+**Quick Deploy:**
 1. **Connect your repository to Vercel**
    - Visit https://vercel.com/new
-   - Import the repository
+   - Import the `JohnDaWalka/Poker-Therapist` repository
    - Vercel will auto-detect the `vercel.json` configuration
 
 2. **Configure environment variables in Vercel dashboard**
-   - `XAI_API_KEY`
-   - `OPENAI_API_KEY`
-   - `ANTHROPIC_API_KEY` (optional)
-   - `GOOGLE_API_KEY` (optional)
-   - `AUTHORIZED_EMAILS`
+   
+   **Essential Variables:**
+   - `XAI_API_KEY` - xAI API key for Grok
+   - `OPENAI_API_KEY` - OpenAI API key for ChatGPT
+   - `JWT_SECRET_KEY` - Secure random secret (generate with: `openssl rand -base64 32`)
+   - `AUTHORIZED_EMAILS` - Comma-separated list of authorized users
+   
+   **Microsoft Authentication (for institutional SSO like @ctstate.edu):**
+   - `AZURE_TENANT_ID` - Azure AD tenant ID
+   - `AZURE_CLIENT_ID` - Azure AD application ID
+   - `AZURE_CLIENT_SECRET` - Azure AD client secret
+   - `AZURE_AUTHORITY` - Authority URL (e.g., `https://login.microsoftonline.com/common`)
+   - `INSTITUTIONAL_EMAIL_DOMAIN` - Your institution domain (e.g., `ctstate.edu`)
+   
+   **Google Cloud Platform (for OAuth & Cloud Storage):**
+   - `GOOGLE_CLOUD_PROJECT_ID` - GCP project ID
+   - `GOOGLE_CLIENT_ID` - OAuth 2.0 client ID
+   - `GOOGLE_CLIENT_SECRET` - OAuth 2.0 client secret
+   - `GOOGLE_STORAGE_BUCKET_NAME` - Cloud Storage bucket name
+   - `GOOGLE_APPLICATION_CREDENTIALS` - Base64-encoded service account JSON
+   
+   **Apple Sign-In (optional, for iOS):**
+   - `APPLE_TEAM_ID`, `APPLE_SERVICES_ID`, `APPLE_KEY_ID`, `APPLE_PRIVATE_KEY_PATH`
+   
+   **See [VERCEL_ENV_SETUP.md](VERCEL_ENV_SETUP.md) for detailed variable setup instructions**
 
 3. **Deploy**
-   - Click "Deploy" and your API will be live!
+   - Click "Deploy" and your API will be live at `https://your-app.vercel.app`!
 
-For detailed deployment instructions, see [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)
+**Complete Documentation:**
+- [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md) - Comprehensive deployment guide with authentication setup
+- [VERCEL_DEPLOYMENT_CHECKLIST.md](VERCEL_DEPLOYMENT_CHECKLIST.md) - Step-by-step deployment checklist
+- [VERCEL_ENV_SETUP.md](VERCEL_ENV_SETUP.md) - Environment variables setup guide
+- [AUTHENTICATION_SETUP.md](AUTHENTICATION_SETUP.md) - Complete authentication provider setup
+- [AUTH_QUICKSTART.md](AUTH_QUICKSTART.md) - Quick authentication setup
+
+**What's Supported:**
+✅ Full FastAPI backend with all API routes  
+✅ Microsoft Azure AD authentication (Windows accounts, institutional SSO)  
+✅ Google OAuth 2.0 authentication  
+✅ Apple Sign-In authentication (iOS/macOS/watchOS)  
+✅ JWT token-based authorization  
+✅ Google Cloud Storage integration  
+✅ Serverless deployment (auto-scaling)  
+✅ Automatic HTTPS  
+✅ Environment-based configuration  
+
+**Limitations:**
+- Serverless functions have execution time limits (10s Hobby, 60s Pro)
+- No persistent file system (use Cloud Storage instead)
+- Cold start latency on first request (~2-3s)
+- Not suitable for long-running processes or WebSockets
 
 ---
 
