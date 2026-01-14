@@ -138,7 +138,35 @@ For detailed setup and API key configuration, see [docs/CHATBOT_INTEGRATION.md](
 
 For detailed documentation, see [docs/STREAMLIT_CHATBOT.md](docs/STREAMLIT_CHATBOT.md)
 
-### ☁️ Vercel Deployment
+---
+
+## ☁️ Deploy to Vercel (Recommended)
+
+**🚀 Quick Deploy (15 minutes):** [VERCEL_QUICKSTART.md](VERCEL_QUICKSTART.md)
+
+Deploy your Poker Therapist API to Vercel with full authentication:
+
+1. **Import to Vercel:** https://vercel.com/new → Import `JohnDaWalka/Poker-Therapist`
+2. **Add environment variables** (Settings → Environment Variables)
+3. **Deploy!**
+
+**Minimum required variables:**
+```bash
+XAI_API_KEY=xai-your-key
+OPENAI_API_KEY=sk-your-key
+JWT_SECRET_KEY=$(openssl rand -base64 32)
+AUTHORIZED_EMAILS=you@example.com
+```
+
+**Full guides:**
+- ⚡ **[VERCEL_QUICKSTART.md](VERCEL_QUICKSTART.md)** - Deploy in 15 minutes
+- 📖 **[VERCEL_DEPLOYMENT_COMPLETE.md](VERCEL_DEPLOYMENT_COMPLETE.md)** - Complete guide
+- ✅ **[VERCEL_DEPLOYMENT_CHECKLIST.md](VERCEL_DEPLOYMENT_CHECKLIST.md)** - Step-by-step checklist
+- 🔧 **[VERCEL_ENV_SETUP.md](VERCEL_ENV_SETUP.md)** - Environment variables reference
+
+---
+
+### ☁️ Vercel Deployment (Legacy - See Above for Quick Deploy)
 
 Deploy the FastAPI backend to Vercel for serverless hosting with full authentication support:
 
