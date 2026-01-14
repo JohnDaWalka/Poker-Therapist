@@ -23,16 +23,16 @@ jobs:
           git fetch source
           
           # Detect source branch (main or master)
-          if git ls-remote --heads source main | grep -q main; then
+          if git ls-remote --heads source main > /dev/null 2>&1; then
             SOURCE_BRANCH="main"
-          elif git ls-remote --heads source master | grep -q master; then
+          elif git ls-remote --heads source master > /dev/null 2>&1; then
             SOURCE_BRANCH="master"
           else
             SOURCE_BRANCH="main"
           fi
           
           echo "Merging from source branch: $SOURCE_BRANCH"
-          git merge source/$SOURCE_BRANCH --allow-unrelated-histories
+          git merge "source/$SOURCE_BRANCH" --allow-unrelated-histories
 
       - name: Push changes to target repository
         run: |
@@ -63,4 +63,4 @@ jobs:
           fi
           
           echo "Pushing to branch: $DEFAULT_BRANCH"
-          git push origin $DEFAULT_BRANCH
+          git push origin "$DEFAULT_BRANCH"
