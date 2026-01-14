@@ -21,8 +21,26 @@ jobs:
         run: |
           git remote add source https://github.com/${{ github.event.client_payload.source_repo }}.git
           git fetch source
-          git merge source/main --allow-unrelated-histories
+          
+          # Detect the default branch (main or master)
+          DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+          echo "Default branch detected: $DEFAULT_BRANCH"
+          
+          # Try to merge from main first, fallback to master
+          if git ls-remote --heads source main | grep -q main; then
+            SOURCE_BRANCH="main"
+          elif git ls-remote --heads source master | grep -q master; then
+            SOURCE_BRANCH="master"
+          else
+            SOURCE_BRANCH="main"
+          fi
+          
+          echo "Merging from source branch: $SOURCE_BRANCH"
+          git merge source/$SOURCE_BRANCH --allow-unrelated-histories
 
       - name: Push changes to target repository
         run: |
-          git push origin main
+          # Detect the default branch (main or master)
+          DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+          echo "Pushing to branch: $DEFAULT_BRANCH"
+          git push origin $DEFAULT_BRANCH
