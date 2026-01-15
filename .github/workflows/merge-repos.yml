@@ -21,8 +21,46 @@ jobs:
         run: |
           git remote add source https://github.com/${{ github.event.client_payload.source_repo }}.git
           git fetch source
-          git merge source/main --allow-unrelated-histories
+          
+          # Detect source branch (main or master)
+          if git ls-remote --heads source main > /dev/null 2>&1; then
+            SOURCE_BRANCH="main"
+          elif git ls-remote --heads source master > /dev/null 2>&1; then
+            SOURCE_BRANCH="master"
+          else
+            SOURCE_BRANCH="main"
+          fi
+          
+          echo "Merging from source branch: $SOURCE_BRANCH"
+          git merge "source/$SOURCE_BRANCH" --allow-unrelated-histories
 
       - name: Push changes to target repository
         run: |
-          git push origin main
+          # Detect the default branch (main or master) with multiple fallbacks
+          DEFAULT_BRANCH=""
+          
+          # Try method 1: symbolic-ref
+          if [ -z "$DEFAULT_BRANCH" ]; then
+            DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+          fi
+          
+          # Try method 2: remote show
+          if [ -z "$DEFAULT_BRANCH" ]; then
+            DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}')
+          fi
+          
+          # Try method 3: current branch (if not detached)
+          if [ -z "$DEFAULT_BRANCH" ]; then
+            CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+            if [ "$CURRENT_BRANCH" != "HEAD" ]; then
+              DEFAULT_BRANCH=$CURRENT_BRANCH
+            fi
+          fi
+          
+          # Final fallback: use main
+          if [ -z "$DEFAULT_BRANCH" ]; then
+            DEFAULT_BRANCH="main"
+          fi
+          
+          echo "Pushing to branch: $DEFAULT_BRANCH"
+          git push origin "$DEFAULT_BRANCH"
