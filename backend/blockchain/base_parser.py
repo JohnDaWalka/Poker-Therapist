@@ -12,6 +12,7 @@ The cross-policy design ensures:
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
@@ -250,5 +251,4 @@ def normalize_cards(cards: str) -> str:
     Returns:
         Normalized card string (e.g., "AhKh")
     """
-    import re
     return re.sub(r"\s+", "", cards) if cards else ""

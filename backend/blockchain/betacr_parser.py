@@ -224,9 +224,20 @@ def _extract_actions(text: str) -> list[str]:
     """Extract action lines from hand text."""
     actions = []
     # Look for lines with common action keywords
-    # Note: We need to match full lines, not just partial words
+    # Pattern matches: Player: <action>
+    # Actions include: folds, checks, calls (possibly with "and is all-in"),
+    #                  raises (possibly with "and is all-in"), bets,
+    #                  posts (small blind, big blind, ante, straddle),
+    #                  collected, wins
     action_re = re.compile(
-        r"^.+?:\s+(?:folds?|checks?|calls?[^:]*(?:and\s+is\s+all-in)?|raises?[^:]*(?:and\s+is\s+all-in)?|bets?|posts?\s+(?:small\s+blind|big\s+blind|ante|straddle)|collected|wins?)",
+        r"^.+?:\s+(?:"  # Player name followed by colon and space
+        r"folds?|checks?|"  # Fold or check actions
+        r"calls?[^:]*(?:and\s+is\s+all-in)?|"  # Call, possibly with all-in
+        r"raises?[^:]*(?:and\s+is\s+all-in)?|"  # Raise, possibly with all-in
+        r"bets?|"  # Bet action
+        r"posts?\s+(?:small\s+blind|big\s+blind|ante|straddle)|"  # Blind/ante/straddle posts
+        r"collected|wins?"  # Pot collection
+        r")",
         re.IGNORECASE | re.MULTILINE,
     )
     for m in action_re.finditer(text):
