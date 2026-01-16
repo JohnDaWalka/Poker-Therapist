@@ -78,6 +78,18 @@ _WIN_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Player stack sizes: "Seat 1: Player1 ($100.00 in chips)" or "Seat 1: Player1 (1500 in chips)"
+_SEAT_RE = re.compile(
+    r"Seat\s+(?P<seat>\d+):\s+(?P<player>\S+)\s+\((?:\$|€|₮)?(?P<stack>[\d,.]+)\s+in\s+chips\)",
+    re.IGNORECASE,
+)
+
+# Straddle detection: "Player: posts straddle $4"
+_STRADDLE_RE = re.compile(
+    r"(?P<player>\w+):\s+posts\s+straddle",
+    re.IGNORECASE,
+)
+
 
 @dataclass
 class BetacrHand:
@@ -95,6 +107,8 @@ class BetacrHand:
     tournament_id: Optional[str] = None
     game_type: Optional[str] = None
     buyin: Optional[str] = None
+    player_stacks: Optional[dict[str, float]] = None  # {player_name: stack_size}
+    has_straddle: bool = False
 
 
 def _normalize_cards(cards: str) -> str:
@@ -188,6 +202,24 @@ def _extract_won_amount(text: str, player_name: Optional[str]) -> Optional[float
     return None
 
 
+def _extract_player_stacks(text: str) -> dict[str, float]:
+    """Extract player stack sizes from seat information."""
+    stacks = {}
+    for m in _SEAT_RE.finditer(text):
+        player = m.group("player")
+        stack_str = m.group("stack").replace(",", "")
+        try:
+            stacks[player] = float(stack_str)
+        except ValueError:
+            pass
+    return stacks
+
+
+def _has_straddle(text: str) -> bool:
+    """Check if hand includes a straddle."""
+    return bool(_STRADDLE_RE.search(text))
+
+
 def _extract_actions(text: str) -> list[str]:
     """Extract action lines from hand text."""
     actions = []
@@ -248,6 +280,12 @@ def parse_single(text: str) -> Optional[BetacrHand]:
     # Extract actions
     actions = _extract_actions(text)
     
+    # Extract player stacks
+    player_stacks = _extract_player_stacks(text)
+    
+    # Check for straddle
+    has_straddle = _has_straddle(text)
+    
     return BetacrHand(
         hand_id=hand_id,
         date_played=date_played,
@@ -261,6 +299,8 @@ def parse_single(text: str) -> Optional[BetacrHand]:
         tournament_id=tournament_id,
         game_type=game_type,
         buyin=buyin,
+        player_stacks=player_stacks,
+        has_straddle=has_straddle,
     )
 
 

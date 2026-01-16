@@ -425,3 +425,63 @@ Hero collected $100.00 from pot
     # Should have all-in actions
     all_in_actions = [a for a in hand.actions if a.action == NormalizedAction.ALL_IN]
     assert len(all_in_actions) > 0
+
+
+def test_parse_with_player_stacks() -> None:
+    """Test parsing hand with player stack information."""
+    text = """
+Poker Hand #STK1: Hold'em No Limit ($1/$2) - 2026-01-15 22:00:00 UTC
+Table 'Test' 6-max Seat #1 is the button
+Seat 1: Player1 ($200.00 in chips)
+Seat 2: Hero ($300.50 in chips)
+Seat 3: Player3 ($150.00 in chips)
+Player1: posts small blind $1
+Hero: posts big blind $2
+*** HOLE CARDS ***
+Dealt to Hero [As Ks]
+Player3: raises $6 to $8
+Player1: folds
+Hero: raises $18 to $26
+Player3: folds
+Hero collected $17.00 from pot
+""".strip()
+    
+    hands = parse_hand_history(text)
+    assert len(hands) == 1
+    
+    hand = hands[0]
+    # Check player stacks were extracted
+    assert hand.players is not None
+    assert len(hand.players) > 0
+    
+    # Find Hero's stack
+    hero_player = next((p for p in hand.players if p.name == "Hero"), None)
+    assert hero_player is not None
+    assert hero_player.stack_size == 300.50
+    
+    # Find Player1's stack
+    player1 = next((p for p in hand.players if p.name == "Player1"), None)
+    assert player1 is not None
+    assert player1.stack_size == 200.00
+
+
+def test_chroma_stream_includes_player_count() -> None:
+    """Test that chroma stream includes player count."""
+    text = """
+Poker Hand #CS2: Hold'em No Limit ($1/$2) - 2026-01-15 23:00:00 UTC
+Table 'Test' 6-max Seat #1 is the button
+Seat 1: Player1 ($200.00 in chips)
+Seat 2: Hero ($300.00 in chips)
+Seat 3: Player3 ($150.00 in chips)
+Dealt to Hero [Ah Kh]
+*** FLOP *** [Qh Jh Th]
+Hero collected $10.00 from pot
+""".strip()
+    
+    streams = parse_many_to_chroma_stream(text)
+    assert len(streams) == 1
+    
+    stream = streams[0]
+    assert "num_players" in stream
+    assert stream["num_players"] == 3
+

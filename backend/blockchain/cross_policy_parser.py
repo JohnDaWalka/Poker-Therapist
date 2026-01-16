@@ -247,8 +247,11 @@ def betacr_to_normalized(betacr_hand: BetacrHand) -> NormalizedHandHistory:
             cards = board_obj.cards_list
             board_obj.variant = detect_board_variant(cards)
     
-    # Check for straddle
-    has_straddle = any("straddle" in action.lower() for action in betacr_hand.actions)
+    # Convert player stacks to PlayerInfo objects
+    players = []
+    if betacr_hand.player_stacks:
+        for player_name, stack in betacr_hand.player_stacks.items():
+            players.append(PlayerInfo(name=player_name, stack_size=stack))
     
     return NormalizedHandHistory(
         hand_id=betacr_hand.hand_id,
@@ -261,10 +264,11 @@ def betacr_to_normalized(betacr_hand: BetacrHand) -> NormalizedHandHistory:
         buyin=betacr_hand.buyin,
         hero_name=betacr_hand.player_name,
         hole_cards=betacr_hand.hole_cards,
+        players=players,
         board=board_obj,
         actions=normalize_betacr_actions(betacr_hand),
         won_amount=betacr_hand.won_amount,
-        has_straddle=has_straddle,
+        has_straddle=betacr_hand.has_straddle,
         raw_text=betacr_hand.raw_text,
         platform_specific={
             "game_type": betacr_hand.game_type,
@@ -288,10 +292,11 @@ def coinpoker_to_normalized(coinpoker_hand: ParsedHand) -> NormalizedHandHistory
             cards = board_obj.cards_list
             board_obj.variant = detect_board_variant(cards)
     
-    # Check for straddle
-    has_straddle = False
-    if coinpoker_hand.actions:
-        has_straddle = "straddle" in coinpoker_hand.actions.lower()
+    # Convert player stacks to PlayerInfo objects
+    players = []
+    if coinpoker_hand.player_stacks:
+        for player_name, stack in coinpoker_hand.player_stacks.items():
+            players.append(PlayerInfo(name=player_name, stack_size=stack))
     
     return NormalizedHandHistory(
         hand_id=coinpoker_hand.hand_id or "unknown",
@@ -302,10 +307,11 @@ def coinpoker_to_normalized(coinpoker_hand: ParsedHand) -> NormalizedHandHistory
         stakes=coinpoker_hand.stakes,
         hero_name=coinpoker_hand.player_name,
         hole_cards=coinpoker_hand.hole_cards,
+        players=players,
         board=board_obj,
         actions=normalize_coinpoker_actions(coinpoker_hand),
         won_amount=coinpoker_hand.won_amount,
-        has_straddle=has_straddle,
+        has_straddle=coinpoker_hand.has_straddle,
         raw_text=coinpoker_hand.raw_text,
         platform_specific={
             "tx_hash": coinpoker_hand.tx_hash,

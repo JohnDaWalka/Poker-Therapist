@@ -68,6 +68,18 @@ _WON_RE = re.compile(
 _RNG_PHRASE_RE = re.compile(r"^\s*phrase:\s*(?P<phrase>.+?)\s*$", re.IGNORECASE | re.MULTILINE)
 _COMBINED_SEED_RE = re.compile(r"^\s*(?P<hex>[a-f0-9]{64})\s*\(combined\)\s*$", re.IGNORECASE | re.MULTILINE)
 
+# Player stack sizes for CoinPoker: "Seat 1: pollaloka (20707 in chips)"
+_CP_SEAT_RE = re.compile(
+    r"Seat\s+(?P<seat>\d+):\s+(?P<player>\S+)\s+\((?P<stack>[\d,.]+)\s+in\s+chips\)",
+    re.IGNORECASE,
+)
+
+# Straddle detection
+_CP_STRADDLE_RE = re.compile(
+    r"(?P<player>\w+):\s+posts\s+straddle",
+    re.IGNORECASE,
+)
+
 
 def _parse_dt(dt_raw: str) -> Optional[datetime]:
     # Store naive UTC (the rest of the app uses datetime.utcnow without tzinfo)
@@ -98,6 +110,8 @@ class ParsedHand:
     rng_phrase: Optional[str]
     rng_combined_seed_hash: Optional[str]
     raw_text: str
+    player_stacks: Optional[dict[str, float]] = None
+    has_straddle: bool = False
 
 
 def split_hands(text: str) -> list[str]:
@@ -185,6 +199,19 @@ def parse_hand(text: str) -> ParsedHand:
         ]
     actions = "; ".join(actions_lines) if actions_lines else None
 
+    # Extract player stacks
+    player_stacks = {}
+    for m in _CP_SEAT_RE.finditer(text):
+        player = m.group("player")
+        stack_str = m.group("stack").replace(",", "")
+        try:
+            player_stacks[player] = float(stack_str)
+        except ValueError:
+            pass
+    
+    # Check for straddle
+    has_straddle = bool(_CP_STRADDLE_RE.search(text))
+
     return ParsedHand(
         hand_id=hand_id,
         date_played=date_played,
@@ -198,6 +225,8 @@ def parse_hand(text: str) -> ParsedHand:
         rng_phrase=rng_phrase,
         rng_combined_seed_hash=rng_combined_seed_hash,
         raw_text=text.strip(),
+        player_stacks=player_stacks if player_stacks else None,
+        has_straddle=has_straddle,
     )
 
 
