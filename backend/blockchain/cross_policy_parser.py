@@ -71,20 +71,23 @@ def normalize_betacr_actions(betacr_hand: BetacrHand) -> list[NormalizedPlayerAc
         action = None
         amount = None
         
-        if "fold" in action_part:
-            action = NormalizedAction.FOLD
-        elif "check" in action_part:
-            action = NormalizedAction.CHECK
-        elif "all-in" in action_part or "all in" in action_part:
+        # Check for all-in first (most specific)
+        if "all-in" in action_part or "all in" in action_part or "is all-in" in action_part:
             action = NormalizedAction.ALL_IN
             # Extract amount
             amount_match = re.search(r"(\$|€|₮)?([\d,.]+)", action_part)
             if amount_match:
                 amount = float(amount_match.group(2).replace(",", ""))
+        elif "fold" in action_part:
+            action = NormalizedAction.FOLD
+        elif "check" in action_part:
+            action = NormalizedAction.CHECK
         elif "raise" in action_part:
             action = NormalizedAction.RAISE
-            # Extract amount
-            amount_match = re.search(r"(\$|€|₮)?([\d,.]+)", action_part)
+            # Extract amount - look for "to X" pattern
+            amount_match = re.search(r"to\s+(\$|€|₮)?([\d,.]+)", action_part)
+            if not amount_match:
+                amount_match = re.search(r"(\$|€|₮)?([\d,.]+)", action_part)
             if amount_match:
                 amount = float(amount_match.group(2).replace(",", ""))
         elif "bet" in action_part:
@@ -156,8 +159,15 @@ def normalize_coinpoker_actions(coinpoker_hand: ParsedHand) -> list[NormalizedPl
         if not action_text:
             continue
         
-        # Extract player name and action
-        parts = action_text.split(":")
+        # Skip lines that are just section headers
+        if "***" in action_text or action_text.upper() in ["HOLE CARDS", "FLOP", "TURN", "RIVER"]:
+            continue
+        
+        # Try to parse player: action format
+        if ":" not in action_text:
+            continue
+        
+        parts = action_text.split(":", 1)
         if len(parts) < 2:
             continue
         
@@ -179,7 +189,10 @@ def normalize_coinpoker_actions(coinpoker_hand: ParsedHand) -> list[NormalizedPl
                 amount = float(amount_match.group(1).replace(",", ""))
         elif "raise" in action_part:
             action = NormalizedAction.RAISE
-            amount_match = re.search(r"([\d,.]+)", action_part)
+            # Extract the final amount from "raises X to Y" format
+            amount_match = re.search(r"to\s+([\d,.]+)", action_part)
+            if not amount_match:
+                amount_match = re.search(r"([\d,.]+)", action_part)
             if amount_match:
                 amount = float(amount_match.group(1).replace(",", ""))
         elif "bet" in action_part:

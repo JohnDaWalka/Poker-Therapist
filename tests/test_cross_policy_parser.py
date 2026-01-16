@@ -173,6 +173,7 @@ Player1: calls 36
 *** FLOP *** [Ac 7h 3d]
 Hero: bets 60
 Player1: folds
+*** SUMMARY ***
 Hero wins 104
 """.strip()
     
@@ -201,6 +202,7 @@ Hero: checks
 Player2: bets 3.00
 Hero: raises 9.00 to 12.00
 Player2: folds
+*** SUMMARY ***
 Hero wins 10.00
 """.strip()
     
@@ -236,6 +238,7 @@ Player1: calls 6
 *** FLOP *** [Qh Jh Th]
 Hero: bets 12
 Player1: folds
+*** SUMMARY ***
 Hero wins 18
 """.strip()
     
