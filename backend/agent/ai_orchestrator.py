@@ -22,6 +22,24 @@ class AIOrchestrator:
         self.claude = ClaudeClient()
         self.openai = OpenAIClient()
         self.gemini = GeminiClient()
+    
+    def _get_available_triage_client(self) -> tuple[Any, str]:
+        """Get available client for triage (Grok first, OpenAI fallback).
+        
+        Returns:
+            Tuple of (client, model_name)
+            
+        Raises:
+            RuntimeError: If no triage client is available
+        """
+        if self.grok.is_available():
+            return (self.grok, "grok")
+        elif self.openai.is_available():
+            return (self.openai, "openai")
+        else:
+            raise RuntimeError(
+                "No triage client available. Configure XAI_API_KEY or OPENAI_API_KEY."
+            )
 
     async def route_query(self, query_type: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Route request to appropriate AI model(s).
@@ -34,15 +52,21 @@ class AIOrchestrator:
             Response dict from AI model(s)
         """
         if query_type == "quick_triage":
-            # Fast response - Grok
-            response = await self.grok.quick_triage(context)
-            return {"response": response, "model": "grok"}
+            # Fast response - Grok preferred, OpenAI fallback
+            client, model = self._get_available_triage_client()
+            response = await client.quick_triage(context)
+            return {"response": response, "model": model}
 
         elif query_type == "deep_therapy":
             # Claude primary + optional Perplexity research
+            if not self.claude.is_available():
+                raise RuntimeError(
+                    "Deep therapy requires Claude. Configure ANTHROPIC_API_KEY."
+                )
+            
             claude_response = await self.claude.deep_therapy(context)
             
-            if context.get("needs_research"):
+            if context.get("needs_research") and self.perplexity.is_available():
                 research = await self.perplexity.research_topic(
                     context.get("research_query", "")
                 )
@@ -52,43 +76,89 @@ class AIOrchestrator:
 
         elif query_type == "hand_analysis":
             # Parallel: Perplexity + OpenAI + optional Gemini (if image)
-            tasks: List[Any] = [
-                self.perplexity.analyze_hand(
-                    context.get("hand_history", ""), context
-                ),
-                self.openai.gto_analysis(
-                    context.get("hand_history", ""), context
-                ),
-            ]
+            tasks: List[Any] = []
+            available_models = []
             
-            if context.get("image_data"):
+            if self.perplexity.is_available():
+                tasks.append(
+                    self.perplexity.analyze_hand(
+                        context.get("hand_history", ""), context
+                    )
+                )
+                available_models.append("perplexity")
+            
+            if self.openai.is_available():
+                tasks.append(
+                    self.openai.gto_analysis(
+                        context.get("hand_history", ""), context
+                    )
+                )
+                available_models.append("openai")
+            
+            if not tasks:
+                raise RuntimeError(
+                    "Hand analysis requires Perplexity or OpenAI. Configure PERPLEXITY_API_KEY or OPENAI_API_KEY."
+                )
+            
+            if context.get("image_data") and self.gemini.is_available():
                 tasks.append(
                     self.gemini.analyze_image(
                         context["image_data"],
                         "Analyze this poker HUD screenshot. Identify key stats and patterns.",
                     )
                 )
+                available_models.append("gemini")
             
             responses = await asyncio.gather(*tasks)
-            return self._synthesize_hand_analysis(responses, has_image=bool(context.get("image_data")))
+            return self._synthesize_hand_analysis(
+                responses, 
+                has_image=bool(context.get("image_data") and self.gemini.is_available()),
+                models=available_models
+            )
 
         elif query_type == "session_review":
             # Post-session multi-hand review
             session_hands = context.get("session_hands", "")
-            tasks = [
-                self.perplexity.session_review(session_hands, context),
-                self.openai.session_review(session_hands, context),
-            ]
+            tasks = []
+            available_models = []
+            
+            if self.perplexity.is_available():
+                tasks.append(self.perplexity.session_review(session_hands, context))
+                available_models.append("perplexity")
+            
+            if self.openai.is_available():
+                tasks.append(self.openai.session_review(session_hands, context))
+                available_models.append("openai")
+            
+            if not tasks:
+                raise RuntimeError(
+                    "Session review requires Perplexity or OpenAI. Configure PERPLEXITY_API_KEY or OPENAI_API_KEY."
+                )
+            
             responses = await asyncio.gather(*tasks)
-            return {
-                "strategy_review": responses[0].get("analysis", ""),
-                "therapy_review": responses[1].get("session_review", ""),
-                "citations": responses[0].get("citations", []),
-                "models": ["perplexity", "openai"],
-            }
+            
+            # Build response based on available models
+            result = {"models": available_models}
+            for idx, model in enumerate(available_models):
+                if model == "perplexity":
+                    result["strategy_review"] = responses[idx].get("analysis", "")
+                    result["citations"] = responses[idx].get("citations", [])
+                elif model == "openai":
+                    result["therapy_review"] = responses[idx].get("session_review", "")
+            
+            return result
 
         elif query_type == "voice_rant":
             # Gemini transcription + Claude therapy
+            if not self.gemini.is_available():
+                raise RuntimeError(
+                    "Voice rant requires Gemini for transcription. Configure GOOGLE_AI_API_KEY."
+                )
+            if not self.claude.is_available():
+                raise RuntimeError(
+                    "Voice rant requires Claude for therapy. Configure ANTHROPIC_API_KEY."
+                )
+            
             transcript = await self.gemini.transcribe_audio(
                 context["audio_data"],
                 context.get("mime_type", "audio/wav"),
@@ -110,6 +180,15 @@ class AIOrchestrator:
 
         elif query_type == "session_video":
             # Gemini video analysis + Claude interpretation
+            if not self.gemini.is_available():
+                raise RuntimeError(
+                    "Session video requires Gemini for video analysis. Configure GOOGLE_AI_API_KEY."
+                )
+            if not self.claude.is_available():
+                raise RuntimeError(
+                    "Session video requires Claude for interpretation. Configure ANTHROPIC_API_KEY."
+                )
+            
             video_insights = await self.gemini.analyze_video(
                 context["video_data"],
                 context.get("mime_type", "video/mp4"),
@@ -149,25 +228,30 @@ class AIOrchestrator:
         }
 
     def _synthesize_hand_analysis(
-        self, responses: List[Dict[str, Any]], has_image: bool = False
+        self, responses: List[Dict[str, Any]], has_image: bool = False, models: List[str] = None
     ) -> Dict[str, Any]:
         """Synthesize multi-model hand analysis.
         
         Args:
             responses: List of model responses
             has_image: Whether image analysis was included
+            models: List of available model names
             
         Returns:
             Synthesized analysis
         """
-        result: Dict[str, Any] = {
-            "meta_context": responses[0].get("analysis", ""),
-            "gto_analysis": responses[1].get("gto_analysis", ""),
-            "models": ["perplexity", "openai"],
-        }
+        if models is None:
+            models = []
         
-        if has_image and len(responses) > 2:
-            result["hud_insights"] = responses[2].get("analysis", "")
-            result["models"].append("gemini")
+        result: Dict[str, Any] = {"models": models}
+        
+        # Add responses based on which models are available
+        for idx, model in enumerate(models):
+            if model == "perplexity" and idx < len(responses):
+                result["meta_context"] = responses[idx].get("analysis", "")
+            elif model == "openai" and idx < len(responses):
+                result["gto_analysis"] = responses[idx].get("gto_analysis", "")
+            elif model == "gemini" and idx < len(responses) and has_image:
+                result["hud_insights"] = responses[idx].get("analysis", "")
         
         return result

@@ -19,10 +19,16 @@ class PerplexityClient:
             model: Model name to use
         """
         self.api_key = api_key or os.getenv("PERPLEXITY_API_KEY")
-        if not self.api_key:
-            raise RuntimeError("Set PERPLEXITY_API_KEY in env or pass api_key parameter")
         self.model = model
         self.base_url = "https://api.perplexity.ai/chat/completions"
+    
+    def is_available(self) -> bool:
+        """Check if client is available (has API key).
+        
+        Returns:
+            True if API key is configured
+        """
+        return bool(self.api_key)
 
     async def chat(
         self,
@@ -39,7 +45,13 @@ class PerplexityClient:
             
         Returns:
             API response dict
+            
+        Raises:
+            RuntimeError: If API key is not configured
         """
+        if not self.api_key:
+            raise RuntimeError("PERPLEXITY_API_KEY not configured")
+        
         payload = {
             "model": self.model,
             "messages": messages,

@@ -19,11 +19,20 @@ class GeminiClient:
             model: Model name to use
         """
         api_key = api_key or os.getenv("GOOGLE_AI_API_KEY")
-        if not api_key:
-            raise RuntimeError("Set GOOGLE_AI_API_KEY in env or pass api_key parameter")
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel(model)
+        if api_key:
+            genai.configure(api_key=api_key)
+            self.model = genai.GenerativeModel(model)
+        else:
+            self.model = None
         self.model_name = model
+    
+    def is_available(self) -> bool:
+        """Check if client is available (has API key).
+        
+        Returns:
+            True if API key is configured
+        """
+        return self.model is not None
 
     async def generate(
         self, prompt: str, temperature: float = 0.7, max_output_tokens: int = 2048
@@ -37,7 +46,13 @@ class GeminiClient:
             
         Returns:
             Generated text
+            
+        Raises:
+            RuntimeError: If API key is not configured
         """
+        if not self.model:
+            raise RuntimeError("GOOGLE_AI_API_KEY not configured")
+        
         generation_config = genai.types.GenerationConfig(
             temperature=temperature,
             max_output_tokens=max_output_tokens,
