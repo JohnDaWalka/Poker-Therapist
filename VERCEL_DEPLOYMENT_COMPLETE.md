@@ -131,7 +131,7 @@ We've created multiple guides for different needs:
    vercel env add INSTITUTIONAL_EMAIL_DOMAIN  # e.g., ctstate.edu
    ```
 
-**Full details:** [AUTHENTICATION_SETUP.md - Microsoft Azure AD](AUTHENTICATION_SETUP.md#microsoft-azure-ad-setup)
+**Full details:** [AUTHENTICATION_SETUP.md - Microsoft Azure AD](AUTHENTICATION_SETUP.md)
 
 ### Google Cloud Platform Quick Setup
 
