@@ -24,7 +24,6 @@ from backend.blockchain.base_parser import (
     NormalizedPlayerAction,
     PlayerInfo,
     detect_board_variant,
-    normalize_cards,
 )
 from backend.blockchain.betacr_parser import BetacrHand, parse_many as parse_betacr
 from backend.blockchain.coinpoker_parser import ParsedHand, parse_many as parse_coinpoker
@@ -249,6 +248,7 @@ def betacr_to_normalized(betacr_hand: BetacrHand) -> NormalizedHandHistory:
     # Parse board cards
     board_obj = None
     if betacr_hand.board:
+        # Board format: "AhKhQh Jh Th" where flop is 6 chars, turn/river are 2 chars each
         parts = betacr_hand.board.split()
         board_obj = BoardCards(
             flop=parts[0] if len(parts) > 0 else None,
@@ -294,6 +294,7 @@ def coinpoker_to_normalized(coinpoker_hand: ParsedHand) -> NormalizedHandHistory
     # Parse board cards
     board_obj = None
     if coinpoker_hand.board:
+        # Board format: "AhKhQh Jh Th" where flop is 6 chars, turn/river are 2 chars each
         parts = coinpoker_hand.board.split()
         board_obj = BoardCards(
             flop=parts[0] if len(parts) > 0 else None,
@@ -311,11 +312,18 @@ def coinpoker_to_normalized(coinpoker_hand: ParsedHand) -> NormalizedHandHistory
         for player_name, stack in coinpoker_hand.player_stacks.items():
             players.append(PlayerInfo(name=player_name, stack_size=stack))
     
+    # Determine game type: Tournament stakes have format "sb/bb ante X" from _TOURNEY_BLINDS_RE
+    # Cash games typically have format "sb/bb" without ante, or may have ante in some variants
+    # Check if stakes string matches tournament blind pattern with ante
+    game_type = "Cash Game"
+    if coinpoker_hand.stakes and re.search(r"\d+/\d+\s+ante\s+\d+", coinpoker_hand.stakes):
+        game_type = "Tournament"
+    
     return NormalizedHandHistory(
         hand_id=coinpoker_hand.hand_id or "unknown",
         platform="CoinPoker",
         date_played=coinpoker_hand.date_played,
-        game_type="Cash Game" if "ante" not in (coinpoker_hand.stakes or "") else "Tournament",
+        game_type=game_type,
         game_variant="NLHE",  # Default
         stakes=coinpoker_hand.stakes,
         hero_name=coinpoker_hand.player_name,

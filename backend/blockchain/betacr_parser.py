@@ -211,6 +211,7 @@ def _extract_player_stacks(text: str) -> dict[str, float]:
         try:
             stacks[player] = float(stack_str)
         except ValueError:
+            # Ignore seats with non-numeric or malformed stack values and continue parsing.
             pass
     return stacks
 
@@ -232,8 +233,8 @@ def _extract_actions(text: str) -> list[str]:
     action_re = re.compile(
         r"^.+?:\s+(?:"  # Player name followed by colon and space
         r"folds?|checks?|"  # Fold or check actions
-        r"calls?[^:]*(?:and\s+is\s+all-in)?|"  # Call, possibly with all-in
-        r"raises?[^:]*(?:and\s+is\s+all-in)?|"  # Raise, possibly with all-in
+        r"calls?(?:\s+(?:\$|€|₮)?[\d,]+(?:\.[\d]+)?(?:\s+to\s+(?:\$|€|₮)?[\d,]+(?:\.[\d]+)?)?)?(?:\s+and\s+is\s+all-in)?|"  # Call, with optional amount/amount-to and optional all-in
+        r"raises?(?:\s+(?:to\s+)?(?:\$|€|₮)?[\d,]+(?:\.[\d]+)?(?:\s+to\s+(?:\$|€|₮)?[\d,]+(?:\.[\d]+)?)?)?(?:\s+and\s+is\s+all-in)?|"  # Raise, with optional amount/amount-to and optional all-in
         r"bets?|"  # Bet action
         r"posts?\s+(?:small\s+blind|big\s+blind|ante|straddle)|"  # Blind/ante/straddle posts
         r"collected|wins?"  # Pot collection

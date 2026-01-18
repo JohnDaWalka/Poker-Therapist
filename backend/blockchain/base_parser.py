@@ -13,7 +13,7 @@ The cross-policy design ensures:
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from typing import Optional
@@ -136,13 +136,13 @@ class NormalizedHandHistory:
     # Player info
     hero_name: Optional[str] = None
     hole_cards: Optional[str] = None  # e.g., "AhKh"
-    players: list[PlayerInfo] = None
+    players: list[PlayerInfo] = field(default_factory=list)
     
     # Board
     board: Optional[BoardCards] = None
     
     # Actions (normalized)
-    actions: list[NormalizedPlayerAction] = None
+    actions: list[NormalizedPlayerAction] = field(default_factory=list)
     
     # Results
     pot_size: Optional[float] = None
@@ -153,19 +153,10 @@ class NormalizedHandHistory:
     dead_cards: Optional[list[str]] = None
     
     # Platform-specific data (preserved for compatibility)
-    platform_specific: Optional[dict] = None
+    platform_specific: Optional[dict] = field(default_factory=dict)
     
     # Raw text (for reference)
     raw_text: str = ""
-    
-    def __post_init__(self) -> None:
-        """Initialize default values for mutable fields."""
-        if self.players is None:
-            self.players = []
-        if self.actions is None:
-            self.actions = []
-        if self.platform_specific is None:
-            self.platform_specific = {}
     
     def to_chroma_stream(self) -> dict:
         """Convert to fixed-length chroma stream format for AI processing.
