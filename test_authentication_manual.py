@@ -10,42 +10,12 @@ import sys
 # Add project root to path
 sys.path.insert(0, os.path.dirname(__file__))
 
-
-def validate_email(email: str) -> bool:
-    """
-    Validate email format - same logic as chatbot_app.py
-    
-    Args:
-        email: Email address to validate
-        
-    Returns:
-        True if valid format, False otherwise
-    """
-    parts = email.split("@")
-    # Explicitly convert to bool to handle empty string case
-    return bool(len(parts) == 2 and parts[0] and parts[1] and "." in parts[1])
-
-
-def load_authorized_emails() -> list[str]:
-    """
-    Load authorized emails from environment or use defaults
-    Same logic as chatbot_app.py lines 71-86
-    """
-    default_emails = [
-        "m.fanelli1@icloud.com",
-        "johndawalka@icloud.com",
-        "mauro.fanelli@ctstate.edu",
-        "maurofanellijr@gmail.com",
-        "cooljack87@icloud.com",
-        "jdwalka@pm.me",
-    ]
-    
-    # Load from environment if available
-    env_emails = os.getenv("AUTHORIZED_EMAILS", "").strip()
-    if env_emails:
-        return [email.strip() for email in env_emails.split(",") if email.strip()]
-    
-    return default_emails
+# Import shared email authentication utilities
+from python_src.utils.email_auth import (
+    validate_email,
+    load_authorized_emails,
+    get_emails_by_provider,
+)
 
 
 def test_authentication():
@@ -60,30 +30,27 @@ def test_authentication():
     print(f"\nLoaded {len(authorized_emails)} authorized emails:")
     print("-" * 70)
     
-    # Group emails by provider
-    icloud_emails = [e for e in authorized_emails if "@icloud.com" in e]
-    gmail_emails = [e for e in authorized_emails if "@gmail.com" in e]
-    ctstate_emails = [e for e in authorized_emails if "@ctstate.edu" in e]
-    other_emails = [e for e in authorized_emails if e not in icloud_emails + gmail_emails + ctstate_emails]
+    # Get emails grouped by provider
+    emails_by_provider = get_emails_by_provider()
     
-    if icloud_emails:
+    if emails_by_provider['icloud']:
         print("\n📱 Apple iCloud accounts:")
-        for email in icloud_emails:
+        for email in emails_by_provider['icloud']:
             print(f"   - {email}")
     
-    if gmail_emails:
+    if emails_by_provider['gmail']:
         print("\n✉️  Google Gmail accounts:")
-        for email in gmail_emails:
+        for email in emails_by_provider['gmail']:
             print(f"   - {email}")
     
-    if ctstate_emails:
+    if emails_by_provider['institutional']:
         print("\n🏫 Institutional Microsoft accounts:")
-        for email in ctstate_emails:
+        for email in emails_by_provider['institutional']:
             print(f"   - {email}")
     
-    if other_emails:
+    if emails_by_provider['other']:
         print("\n📧 Other email providers:")
-        for email in other_emails:
+        for email in emails_by_provider['other']:
             print(f"   - {email}")
     
     # Test validation
@@ -195,10 +162,11 @@ def test_authentication():
     
     print(f"\n📊 Statistics:")
     print(f"   - Total authorized emails: {len(authorized_emails)}")
-    print(f"   - Apple iCloud accounts: {len(icloud_emails)}")
-    print(f"   - Google Gmail accounts: {len(gmail_emails)}")
-    print(f"   - Institutional accounts: {len(ctstate_emails)}")
-    print(f"   - Other providers: {len(other_emails)}")
+    emails_by_provider = get_emails_by_provider()
+    print(f"   - Apple iCloud accounts: {len(emails_by_provider['icloud'])}")
+    print(f"   - Google Gmail accounts: {len(emails_by_provider['gmail'])}")
+    print(f"   - Institutional accounts: {len(emails_by_provider['institutional'])}")
+    print(f"   - Other providers: {len(emails_by_provider['other'])}")
     
     print("\n✅ Email authentication test complete!")
     print("\n📚 For full authentication setup, see:")

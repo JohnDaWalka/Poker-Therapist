@@ -6,22 +6,14 @@ try:
 except ImportError:
     PYTEST_AVAILABLE = False
 
+import sys
+from pathlib import Path
 
-def validate_email(email: str) -> bool:
-    """
-    Validate email format for authentication.
-    
-    This is the same validation logic used in chatbot_app.py.
-    
-    Args:
-        email: Email address to validate
-        
-    Returns:
-        True if email is valid format, False otherwise
-    """
-    parts = email.split("@")
-    # Explicitly convert to bool to handle empty string case
-    return bool(len(parts) == 2 and parts[0] and parts[1] and "." in parts[1])
+# Add project root to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Import shared email validation logic
+from python_src.utils.email_auth import validate_email, get_default_authorized_emails
 
 
 class TestEmailValidation:
@@ -89,14 +81,7 @@ class TestEmailValidation:
     
     def test_all_default_authorized_emails(self):
         """Test that all default authorized emails pass validation"""
-        authorized_emails = [
-            "m.fanelli1@icloud.com",
-            "johndawalka@icloud.com",
-            "mauro.fanelli@ctstate.edu",
-            "maurofanellijr@gmail.com",
-            "cooljack87@icloud.com",
-            "jdwalka@pm.me",
-        ]
+        authorized_emails = get_default_authorized_emails()
         for email in authorized_emails:
             assert validate_email(email), f"Authorized email {email} should be valid"
 
