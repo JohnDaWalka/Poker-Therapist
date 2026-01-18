@@ -211,7 +211,7 @@ We've created multiple guides for different needs:
    vercel env add APPLE_PRIVATE_KEY_PATH  # Base64 from step 3
    ```
 
-**Full details:** [AUTHENTICATION_SETUP.md - Apple Developer](AUTHENTICATION_SETUP.md#apple-developer-setup)
+**Full details:** [AUTHENTICATION_SETUP.md - Apple Developer](AUTHENTICATION_SETUP.md)
 
 ## 🧪 Testing Your Deployment
 
