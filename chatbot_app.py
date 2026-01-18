@@ -11,6 +11,9 @@ import streamlit as st
 # Add python_src to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
+# Import shared email authentication utilities
+from python_src.utils.email_auth import validate_email, load_authorized_emails
+
 # Import chatbot factory
 try:
     from python_src.services.chatbot_factory import (
@@ -67,23 +70,9 @@ except ImportError as e:
 DB_PATH = Path("RexVoice.db")
 
 # Authorized email addresses for Rex Poker Coach
-# Can be overridden via AUTHORIZED_EMAILS environment variable (comma-separated)
-_DEFAULT_AUTHORIZED_EMAILS = [
-    "m.fanelli1@icloud.com",
-    "johndawalka@icloud.com",
-    "mauro.fanelli@ctstate.edu",
-    "maurofanellijr@gmail.com",
-    "cooljack87@icloud.com",
-    "jdwalka@pm.me",
-]
-
-# Load from environment if available
-_env_emails = os.getenv("AUTHORIZED_EMAILS", "").strip()
-AUTHORIZED_EMAILS = (
-    [email.strip() for email in _env_emails.split(",") if email.strip()]
-    if _env_emails
-    else _DEFAULT_AUTHORIZED_EMAILS
-)
+# Load from shared utility which handles environment variable override
+# See python_src/utils/email_auth.py for the list and loading logic
+AUTHORIZED_EMAILS = load_authorized_emails()
 
 
 def init_database() -> None:
@@ -307,8 +296,8 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
             )
 
         if email and email != st.session_state.get("user_email", ""):
-            # Validate email format
-            if "@" in email and "." in email.split("@")[1]:
+            # Validate email format using shared validation utility
+            if validate_email(email):
                 st.session_state.user_email = email
                 st.session_state.user_id = get_or_create_user(email)
                 
