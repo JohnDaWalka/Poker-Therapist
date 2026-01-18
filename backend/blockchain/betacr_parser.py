@@ -230,16 +230,33 @@ def _extract_actions(text: str) -> list[str]:
     #                  raises (possibly with "and is all-in"), bets,
     #                  posts (small blind, big blind, ante, straddle),
     #                  collected, wins
+    
+    # Common pattern components
+    currency = r"(?:\$|€|₮)?"  # Optional currency symbol
+    amount = r"\d+(?:\.\d+)?"  # Amount with optional decimal
+    amount_with_currency = rf"{currency}{amount}"
+    all_in_suffix = r"(?:\s+and\s+is\s+all-in)?"  # Optional all-in indicator
+    
     action_re = re.compile(
-        r"^.+?:\s+(?:"  # Player name followed by colon and space
-        r"folds?|checks?|"  # Fold or check actions
-        r"calls?(?:\s+(?:\$|€|₮)?\d+(?:\.\d+)?(?:\s+to\s+(?:\$|€|₮)?\d+(?:\.\d+)?)?)?(?:\s+and\s+is\s+all-in)?|"  # Call, with optional amount/amount-to and optional all-in
-        r"raises?(?:\s+(?:to\s+)?(?:\$|€|₮)?\d+(?:\.\d+)?(?:\s+to\s+(?:\$|€|₮)?\d+(?:\.\d+)?)?)?(?:\s+and\s+is\s+all-in)?|"  # Raise, with optional amount/amount-to and optional all-in
-        r"bets?|"  # Bet action
-        r"posts?\s+(?:small\s+blind|big\s+blind|ante|straddle)|"  # Blind/ante/straddle posts
-        r"collected|wins?"  # Pot collection
-        r")",
-        re.IGNORECASE | re.MULTILINE,
+        rf"""
+        ^.+?:\s+(?:                           # Player name followed by colon and space
+            folds?|checks?|                   # Fold or check actions
+            calls?                            # Call action
+                (?:\s+{amount_with_currency}  # Optional amount
+                    (?:\s+to\s+{amount_with_currency})?  # Optional "to" amount
+                )?
+                {all_in_suffix}|              # Optional all-in
+            raises?                           # Raise action
+                (?:\s+(?:to\s+)?{amount_with_currency}  # Optional amount (with optional "to")
+                    (?:\s+to\s+{amount_with_currency})?  # Optional second "to" amount
+                )?
+                {all_in_suffix}|              # Optional all-in
+            bets?|                            # Bet action
+            posts?\s+(?:small\s+blind|big\s+blind|ante|straddle)|  # Blind/ante/straddle posts
+            collected|wins?                   # Pot collection
+        )
+        """,
+        re.IGNORECASE | re.MULTILINE | re.VERBOSE,
     )
     for m in action_re.finditer(text):
         actions.append(m.group(0).strip())

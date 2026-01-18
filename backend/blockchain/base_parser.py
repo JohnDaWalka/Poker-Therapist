@@ -153,7 +153,7 @@ class NormalizedHandHistory:
     dead_cards: Optional[list[str]] = None
     
     # Platform-specific data (preserved for compatibility)
-    platform_specific: Optional[dict] = field(default_factory=dict)
+    platform_specific: dict = field(default_factory=dict)
     
     # Raw text (for reference)
     raw_text: str = ""
