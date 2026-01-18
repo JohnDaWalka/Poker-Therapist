@@ -90,6 +90,12 @@ _STRADDLE_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Amount pattern components for action parsing
+_CURRENCY_PATTERN = r"(?:\$|€|₮)?"
+_AMOUNT_PATTERN = rf"{_CURRENCY_PATTERN}[\d,]+(?:\.[\d]+)?"
+_AMOUNT_RANGE_PATTERN = rf"{_AMOUNT_PATTERN}(?:\s+to\s+{_AMOUNT_PATTERN})?"
+_ALLIN_SUFFIX = r"(?:\s+and\s+is\s+all-in)?"
+
 
 @dataclass
 class BetacrHand:
@@ -233,8 +239,8 @@ def _extract_actions(text: str) -> list[str]:
     action_re = re.compile(
         r"^.+?:\s+(?:"  # Player name followed by colon and space
         r"folds?|checks?|"  # Fold or check actions
-        r"calls?(?:\s+(?:\$|€|₮)?[\d,]+(?:\.[\d]+)?(?:\s+to\s+(?:\$|€|₮)?[\d,]+(?:\.[\d]+)?)?)?(?:\s+and\s+is\s+all-in)?|"  # Call, with optional amount/amount-to and optional all-in
-        r"raises?(?:\s+(?:to\s+)?(?:\$|€|₮)?[\d,]+(?:\.[\d]+)?(?:\s+to\s+(?:\$|€|₮)?[\d,]+(?:\.[\d]+)?)?)?(?:\s+and\s+is\s+all-in)?|"  # Raise, with optional amount/amount-to and optional all-in
+        rf"calls?(?:\s+{_AMOUNT_RANGE_PATTERN})?{_ALLIN_SUFFIX}|"  # Call, with optional amount/amount-to and optional all-in
+        rf"raises?(?:\s+(?:to\s+)?{_AMOUNT_RANGE_PATTERN})?{_ALLIN_SUFFIX}|"  # Raise, with optional amount/amount-to and optional all-in
         r"bets?|"  # Bet action
         r"posts?\s+(?:small\s+blind|big\s+blind|ante|straddle)|"  # Blind/ante/straddle posts
         r"collected|wins?"  # Pot collection
