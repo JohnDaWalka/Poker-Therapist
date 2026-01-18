@@ -314,8 +314,9 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
             )
 
         if email and email != st.session_state.get("user_email", ""):
-            # Validate email format
-            if "@" in email and "." in email.split("@")[1]:
+            # Validate email format - check for @ symbol and valid domain with dot
+            parts = email.split("@")
+            if len(parts) == 2 and parts[0] and parts[1] and "." in parts[1]:
                 st.session_state.user_email = email
                 st.session_state.user_id = get_or_create_user(email)
                 
