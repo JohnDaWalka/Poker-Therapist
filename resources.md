@@ -19,6 +19,8 @@ This document provides foundational resources for understanding computational ar
 ### Overview
 Hybrid cloud architectures combine on-premises infrastructure with cloud resources, providing flexibility, scalability, and cost optimization. Azure Virtual Machines (VMs) serve as the foundation for deploying applications in hybrid cloud environments.
 
+**Relevance to Poker Therapist**: While the application currently deploys on Vercel for web hosting, understanding Azure VM-based hybrid cloud architectures provides valuable insights for future scaling scenarios, particularly for compute-intensive AI model inference, voice processing workloads, and situations requiring more granular control over infrastructure. This knowledge is also essential for enterprise deployments where organizations may need to integrate with existing on-premises infrastructure or meet specific regulatory requirements.
+
 ### Azure VM Architecture Patterns
 
 #### Pattern 1: Lift-and-Shift Migration
@@ -138,7 +140,7 @@ This section is reserved for future resources related to iOS system development,
 ### Planned Topics
 
 - [ ] iOS app architecture for Poker Therapist mobile client
-- [ ] Swift UI implementation guides
+- [ ] SwiftUI implementation guides
 - [ ] iOS voice integration with native APIs
 - [ ] Secure authentication on iOS (Keychain, biometrics)
 - [ ] iOS push notification integration
