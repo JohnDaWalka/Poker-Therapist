@@ -19,7 +19,6 @@ class GeminiClient:
             model: Model name to use
         """
         api_key = api_key or os.getenv("GOOGLE_AI_API_KEY")
-        self.api_key = api_key
         if api_key:
             genai.configure(api_key=api_key)
             self.model = genai.GenerativeModel(model)
@@ -33,7 +32,7 @@ class GeminiClient:
         Returns:
             True if API key is configured
         """
-        return bool(self.api_key)
+        return self.model is not None
 
     async def generate(
         self, prompt: str, temperature: float = 0.7, max_output_tokens: int = 2048

@@ -17,7 +17,6 @@ class ClaudeClient:
             model: Model name to use
         """
         api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
-        self.api_key = api_key
         if api_key:
             self.client = anthropic.AsyncAnthropic(api_key=api_key)
         else:
@@ -30,7 +29,7 @@ class ClaudeClient:
         Returns:
             True if API key is configured
         """
-        return bool(self.api_key)
+        return self.client is not None
 
     async def chat(
         self,

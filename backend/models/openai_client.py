@@ -17,7 +17,6 @@ class OpenAIClient:
             model: Model name to use
         """
         api_key = api_key or os.getenv("OPENAI_API_KEY")
-        self.api_key = api_key
         if api_key:
             self.client = openai.AsyncOpenAI(api_key=api_key)
         else:
@@ -30,7 +29,7 @@ class OpenAIClient:
         Returns:
             True if API key is configured
         """
-        return bool(self.api_key)
+        return self.client is not None
 
     async def chat(
         self,

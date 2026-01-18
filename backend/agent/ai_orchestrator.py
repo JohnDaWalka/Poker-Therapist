@@ -139,13 +139,12 @@ class AIOrchestrator:
             
             # Build response based on available models
             result = {"models": available_models}
-            if self.perplexity.is_available():
-                perplexity_idx = available_models.index("perplexity")
-                result["strategy_review"] = responses[perplexity_idx].get("analysis", "")
-                result["citations"] = responses[perplexity_idx].get("citations", [])
-            if self.openai.is_available():
-                openai_idx = available_models.index("openai")
-                result["therapy_review"] = responses[openai_idx].get("session_review", "")
+            for idx, model in enumerate(available_models):
+                if model == "perplexity":
+                    result["strategy_review"] = responses[idx].get("analysis", "")
+                    result["citations"] = responses[idx].get("citations", [])
+                elif model == "openai":
+                    result["therapy_review"] = responses[idx].get("session_review", "")
             
             return result
 
