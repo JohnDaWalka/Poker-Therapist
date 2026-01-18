@@ -18,6 +18,11 @@ def validate_email(email: str) -> bool:
     - Has non-empty domain after @
     - Domain contains at least one dot
     
+    Note: This is intentionally simple validation suitable for the application's
+    needs. It correctly validates all common email formats while remaining fast
+    and dependency-free. For stricter RFC 5322 compliance, consider using the
+    email-validator library, but that's typically unnecessary for this use case.
+    
     Args:
         email: Email address to validate
         
