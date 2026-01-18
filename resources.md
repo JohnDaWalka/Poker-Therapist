@@ -81,7 +81,7 @@ Scale compute resources to Azure during peak demand:
 
 For the Poker Therapist application, a hybrid cloud architecture could include:
 
-- **Frontend**: Azure VM running Streamlit web application
+- **Frontend**: Azure VM running Streamlit web application (or Azure Container Instances/App Service for production)
 - **Backend**: Azure VMs hosting FastAPI services and AI model inference
 - **Database**: Azure Database for PostgreSQL or on-premises database with secure connectivity
 - **Voice Services**: Azure Cognitive Services integrated with custom VMs for voice processing
@@ -89,7 +89,7 @@ For the Poker Therapist application, a hybrid cloud architecture could include:
 - **Storage**: Azure Blob Storage for audio files and conversation history
 
 **Reference Architecture:**
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                     Azure Cloud                             │
 │  ┌─────────────────┐      ┌──────────────────┐            │
@@ -119,10 +119,10 @@ For the Poker Therapist application, a hybrid cloud architecture could include:
 
 ### Additional Resources
 
-- [Azure Virtual Machines Documentation](https://docs.microsoft.com/azure/virtual-machines/)
-- [Azure Hybrid Cloud Architecture Guide](https://docs.microsoft.com/azure/architecture/guide/)
-- [Azure Well-Architected Framework](https://docs.microsoft.com/azure/architecture/framework/)
-- [Azure Networking Best Practices](https://docs.microsoft.com/azure/security/fundamentals/network-best-practices)
+- [Azure Virtual Machines Documentation](https://learn.microsoft.com/azure/virtual-machines/)
+- [Azure Hybrid Cloud Architecture Guide](https://learn.microsoft.com/azure/architecture/guide/)
+- [Azure Well-Architected Framework](https://learn.microsoft.com/azure/architecture/framework/)
+- [Azure Networking Best Practices](https://learn.microsoft.com/azure/security/fundamentals/network-best-practices)
 
 ## iOS System Development and Hosting (Placeholder)
 
