@@ -33,7 +33,7 @@ from backend.blockchain.coinpoker_parser import ParsedHand, parse_many as parse_
 _ACR_PATTERN = re.compile(r"\bPoker\s+Hand\s*#", re.IGNORECASE)
 _COINPOKER_PATTERN = re.compile(r"\bCoinPoker\s+Hand\s*#|\bHand\s*#\s*\d+.*₮", re.IGNORECASE)
 
-# Tournament detection pattern for CoinPoker (matches format from _TOURNEY_BLINDS_RE)
+# Tournament detection pattern for CoinPoker (matches same format as coinpoker_parser._TOURNEY_BLINDS_RE)
 _TOURNAMENT_STAKES_PATTERN = re.compile(r"\d+/\d+\s+ante\s+\d+")
 
 
@@ -315,7 +315,8 @@ def coinpoker_to_normalized(coinpoker_hand: ParsedHand) -> NormalizedHandHistory
         for player_name, stack in coinpoker_hand.player_stacks.items():
             players.append(PlayerInfo(name=player_name, stack_size=stack))
     
-    # Determine game type: Tournament stakes have format "sb/bb ante X" from _TOURNEY_BLINDS_RE
+    # Determine game type: Tournament stakes have format "sb/bb ante X"
+    # (detected by coinpoker_parser._TOURNEY_BLINDS_RE during parsing)
     # Cash games typically have format "sb/bb" without ante, or may have ante in some variants
     # Check if stakes string matches tournament blind pattern with ante
     game_type = "Cash Game"
