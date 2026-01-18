@@ -22,6 +22,24 @@ class AIOrchestrator:
         self.claude = ClaudeClient()
         self.openai = OpenAIClient()
         self.gemini = GeminiClient()
+    
+    def _get_available_triage_client(self) -> tuple[Any, str]:
+        """Get available client for triage (Grok first, OpenAI fallback).
+        
+        Returns:
+            Tuple of (client, model_name)
+            
+        Raises:
+            RuntimeError: If no triage client is available
+        """
+        if self.grok.is_available():
+            return (self.grok, "grok")
+        elif self.openai.is_available():
+            return (self.openai, "openai")
+        else:
+            raise RuntimeError(
+                "No triage client available. Configure XAI_API_KEY or OPENAI_API_KEY."
+            )
 
     async def route_query(self, query_type: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Route request to appropriate AI model(s).
@@ -34,9 +52,10 @@ class AIOrchestrator:
             Response dict from AI model(s)
         """
         if query_type == "quick_triage":
-            # Fast response - Grok
-            response = await self.grok.quick_triage(context)
-            return {"response": response, "model": "grok"}
+            # Fast response - Grok preferred, OpenAI fallback
+            client, model = self._get_available_triage_client()
+            response = await client.quick_triage(context)
+            return {"response": response, "model": model}
 
         elif query_type == "deep_therapy":
             # Claude primary + optional Perplexity research

@@ -17,10 +17,16 @@ class GrokClient:
             model: Model name to use
         """
         self.api_key = api_key or os.getenv("XAI_API_KEY")
-        if not self.api_key:
-            raise RuntimeError("Set XAI_API_KEY in env or pass api_key parameter")
         self.model = model
         self.base_url = "https://api.x.ai/v1/chat/completions"
+    
+    def is_available(self) -> bool:
+        """Check if client is available (has API key).
+        
+        Returns:
+            True if API key is configured
+        """
+        return bool(self.api_key)
 
     async def chat(
         self,
@@ -37,7 +43,13 @@ class GrokClient:
             
         Returns:
             API response dict
+            
+        Raises:
+            RuntimeError: If API key is not configured
         """
+        if not self.api_key:
+            raise RuntimeError("XAI_API_KEY not configured")
+        
         payload = {
             "model": self.model,
             "messages": messages,
