@@ -20,7 +20,8 @@ def validate_email(email: str) -> bool:
         True if email is valid format, False otherwise
     """
     parts = email.split("@")
-    return len(parts) == 2 and parts[0] and parts[1] and "." in parts[1]
+    # Explicitly convert to bool to handle empty string case
+    return bool(len(parts) == 2 and parts[0] and parts[1] and "." in parts[1])
 
 
 class TestEmailValidation:
