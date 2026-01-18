@@ -24,7 +24,6 @@ from backend.blockchain.base_parser import (
     NormalizedPlayerAction,
     PlayerInfo,
     detect_board_variant,
-    normalize_cards,
 )
 from backend.blockchain.betacr_parser import BetacrHand, parse_many as parse_betacr
 from backend.blockchain.coinpoker_parser import ParsedHand, parse_many as parse_coinpoker
@@ -247,6 +246,7 @@ def normalize_coinpoker_actions(coinpoker_hand: ParsedHand) -> list[NormalizedPl
 def betacr_to_normalized(betacr_hand: BetacrHand) -> NormalizedHandHistory:
     """Convert BETAcr/ACR hand to normalized format."""
     # Parse board cards
+    # Board format: "AhKhQh Jh Th" where flop is 6 chars, turn/river are 2 chars each
     board_obj = None
     if betacr_hand.board:
         parts = betacr_hand.board.split()
@@ -292,6 +292,7 @@ def betacr_to_normalized(betacr_hand: BetacrHand) -> NormalizedHandHistory:
 def coinpoker_to_normalized(coinpoker_hand: ParsedHand) -> NormalizedHandHistory:
     """Convert CoinPoker hand to normalized format."""
     # Parse board cards
+    # Board format: "AhKhQh Jh Th" where flop is 6 chars, turn/river are 2 chars each
     board_obj = None
     if coinpoker_hand.board:
         parts = coinpoker_hand.board.split()
@@ -315,6 +316,8 @@ def coinpoker_to_normalized(coinpoker_hand: ParsedHand) -> NormalizedHandHistory
         hand_id=coinpoker_hand.hand_id or "unknown",
         platform="CoinPoker",
         date_played=coinpoker_hand.date_played,
+        # Note: Game type detection is simplified. Cash games can also have antes in some variants.
+        # For more accurate detection, consider parsing tournament ID or other explicit indicators.
         game_type="Cash Game" if "ante" not in (coinpoker_hand.stakes or "") else "Tournament",
         game_variant="NLHE",  # Default
         stakes=coinpoker_hand.stakes,

@@ -207,6 +207,7 @@ def parse_hand(text: str) -> ParsedHand:
         try:
             player_stacks[player] = float(stack_str)
         except ValueError:
+            # If the stack value is malformed, skip recording it for this player.
             pass
     
     # Check for straddle
