@@ -67,7 +67,14 @@ except ImportError as e:
 DB_PATH = Path("RexVoice.db")
 
 # Authorized email addresses for Rex Poker Coach
+# This list grants VIP access with full voice and Rex personality features
 # Can be overridden via AUTHORIZED_EMAILS environment variable (comma-separated)
+# 
+# Includes:
+#   - Apple iCloud accounts (@icloud.com): m.fanelli1@icloud.com, johndawalka@icloud.com, cooljack87@icloud.com
+#   - Google Gmail accounts (@gmail.com): maurofanellijr@gmail.com  
+#   - Institutional Microsoft accounts (@ctstate.edu): mauro.fanelli@ctstate.edu
+#   - Other: jdwalka@pm.me
 _DEFAULT_AUTHORIZED_EMAILS = [
     "m.fanelli1@icloud.com",
     "johndawalka@icloud.com",
