@@ -60,3 +60,11 @@ typer>=0.15.1
 # Utilities
 python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.4
+
+# GCP API Libraries
+google-api-python-client>=2.100.0
+google-auth>=2.23.0
+google-cloud-storage>=2.10.0
+google-cloud-pubsub>=2.18.0
+google-cloud-secret-manager>=2.16.0
+google-cloud-bigquery>=3.11.0
