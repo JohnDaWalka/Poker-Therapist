@@ -177,7 +177,7 @@ We've created multiple guides for different needs:
    vercel env add GOOGLE_APPLICATION_CREDENTIALS # Base64 string from step 4
    ```
 
-**Full details:** [AUTHENTICATION_SETUP.md - Google Cloud Platform](AUTHENTICATION_SETUP.md#google-cloud-platform-setup)
+**Full details:** [AUTHENTICATION_SETUP.md - Google Cloud Platform](AUTHENTICATION_SETUP.md)
 
 ### Apple Sign-In Quick Setup
 
