@@ -17,10 +17,19 @@ class OpenAIClient:
             model: Model name to use
         """
         api_key = api_key or os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise RuntimeError("Set OPENAI_API_KEY in env or pass api_key parameter")
-        self.client = openai.AsyncOpenAI(api_key=api_key)
+        if api_key:
+            self.client = openai.AsyncOpenAI(api_key=api_key)
+        else:
+            self.client = None
         self.model = model
+    
+    def is_available(self) -> bool:
+        """Check if client is available (has API key).
+        
+        Returns:
+            True if API key is configured
+        """
+        return self.client is not None
 
     async def chat(
         self,
@@ -37,7 +46,13 @@ class OpenAIClient:
             
         Returns:
             API response dict
+            
+        Raises:
+            RuntimeError: If API key is not configured
         """
+        if not self.client:
+            raise RuntimeError("OPENAI_API_KEY not configured")
+        
         response = await self.client.chat.completions.create(
             model=self.model,
             messages=messages,
@@ -144,3 +159,38 @@ class OpenAIClient:
             "session_review": response["content"],
             "usage": response["usage"],
         }
+    
+    async def quick_triage(self, context: Dict[str, Any]) -> str:
+        """Quick triage response for immediate tilt intervention.
+        
+        Used as fallback when Grok is not available.
+        
+        Args:
+            context: Dict with situation, emotion, intensity, etc.
+            
+        Returns:
+            Triage guidance text
+        """
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    "You are Therapy Rex, a poker mental game coach. "
+                    "Provide immediate, compassionate triage for tilt situations. "
+                    "Be direct, supportive, and action-oriented."
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"Situation: {context.get('situation', '')}\n"
+                    f"Emotion: {context.get('emotion', '')}\n"
+                    f"Intensity: {context.get('intensity', 0)}/10\n"
+                    f"Body Sensation: {context.get('body_sensation', '')}\n"
+                    f"Still Playing: {context.get('still_playing', False)}"
+                ),
+            },
+        ]
+
+        response = await self.chat(messages, temperature=0.5)
+        return response["content"]

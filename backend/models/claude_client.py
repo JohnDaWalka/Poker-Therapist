@@ -17,10 +17,19 @@ class ClaudeClient:
             model: Model name to use
         """
         api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
-        if not api_key:
-            raise RuntimeError("Set ANTHROPIC_API_KEY in env or pass api_key parameter")
-        self.client = anthropic.AsyncAnthropic(api_key=api_key)
+        if api_key:
+            self.client = anthropic.AsyncAnthropic(api_key=api_key)
+        else:
+            self.client = None
         self.model = model
+    
+    def is_available(self) -> bool:
+        """Check if client is available (has API key).
+        
+        Returns:
+            True if API key is configured
+        """
+        return self.client is not None
 
     async def chat(
         self,
@@ -39,7 +48,13 @@ class ClaudeClient:
             
         Returns:
             API response dict
+            
+        Raises:
+            RuntimeError: If API key is not configured
         """
+        if not self.client:
+            raise RuntimeError("ANTHROPIC_API_KEY not configured")
+        
         response = await self.client.messages.create(
             model=self.model,
             max_tokens=max_tokens,
