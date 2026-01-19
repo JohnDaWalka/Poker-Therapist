@@ -42,7 +42,7 @@ async def _import_text(
     hand_history_text: str,
     rpc_url: Optional[str],
     verify_onchain: bool,
-    verify_rng: bool,
+    should_verify_rng: bool,
 ) -> CoinPokerImportResponse:
     parsed = parse_many(hand_history_text)
     if not parsed:
@@ -97,7 +97,7 @@ async def _import_text(
                 if model.verified:
                     verified += 1
 
-            if verify_rng:
+            if should_verify_rng:
                 rng = verify_rng(h.raw_text)
                 model.rng_verification = rng
                 model.rng_phrase = rng.get("phrase") or model.rng_phrase
@@ -128,7 +128,7 @@ async def import_coinpoker_text(request: CoinPokerImportTextRequest) -> CoinPoke
             hand_history_text=request.hand_history_text,
             rpc_url=request.rpc_url,
             verify_onchain=request.verify_onchain,
-            verify_rng=request.verify_rng,
+            should_verify_rng=request.verify_rng,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
@@ -153,7 +153,7 @@ async def import_coinpoker_file(
             hand_history_text=text,
             rpc_url=rpc_url,
             verify_onchain=verify_onchain,
-            verify_rng=verify_rng,
+            should_verify_rng=verify_rng,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
