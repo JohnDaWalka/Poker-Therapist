@@ -24,12 +24,7 @@ Meet Rex, your elite poker coach with advanced voice capabilities:
 - 🎭 **Voice Cloning** - Create custom Rex voice profiles
 
 👥 **Authorized VIP Users**: Full voice features enabled for:
-- m.fanelli1@icloud.com
-- johndawalka@icloud.com
-- mauro.fanelli@ctstate.edu
-- maurofanellijr@gmail.com
-- cooljack87@icloud.com
-- jdwalka@pm.me
+Mauro Mark Nazareno Fanelli --- Giulian Albert Fanelli
 
 See [VOICE_INTEGRATION.md](VOICE_INTEGRATION.md) for voice setup and [ENHANCED_VOICE_GUIDE.md](ENHANCED_VOICE_GUIDE.md) for new features guide.
 
