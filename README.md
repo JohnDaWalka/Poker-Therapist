@@ -154,6 +154,29 @@ Deploy the FastAPI backend to Vercel for serverless hosting:
 
 For detailed deployment instructions, see [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)
 
+### 🔐 Authentication Setup
+
+Configure authentication for Microsoft (Windows/Azure AD), Google (OAuth 2.0/GCP), and Apple Sign-In:
+
+1. **Quick Configuration Guide**
+   ```bash
+   # Follow the step-by-step credential setup
+   # See: CREDENTIAL_CONFIGURATION_GUIDE.md
+   ```
+
+2. **Verify Your Configuration**
+   ```bash
+   # Run the automated verification script
+   python scripts/verify_auth_config.py
+   ```
+
+3. **Documentation**
+   - [CREDENTIAL_CONFIGURATION_GUIDE.md](CREDENTIAL_CONFIGURATION_GUIDE.md) - Step-by-step credential setup
+   - [AUTHENTICATION_SETUP.md](AUTHENTICATION_SETUP.md) - Complete authentication documentation
+   - [GOOGLE_CLOUD_SETUP.md](GOOGLE_CLOUD_SETUP.md) - Google Cloud Platform integration
+   - [AUTH_QUICKSTART.md](AUTH_QUICKSTART.md) - Quick start guide
+   - [DEPLOYMENT_VERIFICATION.md](DEPLOYMENT_VERIFICATION.md) - End-to-end testing checklist
+
 ---
 
 ## Original Project: Autonomous Advent of Code
