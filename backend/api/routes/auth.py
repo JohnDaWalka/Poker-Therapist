@@ -3,7 +3,7 @@
 import os
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Query, Response
+from fastapi import APIRouter, Header, HTTPException, Query, Response
 from pydantic import BaseModel, EmailStr
 
 from backend.auth import AuthService
@@ -63,6 +63,13 @@ class UserInfoResponse(BaseModel):
     email: EmailStr
     name: Optional[str] = None
     provider: str
+
+
+class LogoutRequest(BaseModel):
+    """Request model for logout."""
+    
+    provider: str
+    token: str
 
 
 @router.get("/")
@@ -151,6 +158,7 @@ async def oauth_callback(
     provider: str,
     code: str = Query(..., description="Authorization code from OAuth provider"),
     state: Optional[str] = Query(None, description="State parameter for CSRF protection"),
+    redirect_uri: Optional[str] = Query(None, description="Redirect URI used in authorization request"),
 ) -> TokenResponse:
     """Handle OAuth 2.0 callback and exchange code for tokens.
     
@@ -158,6 +166,7 @@ async def oauth_callback(
         provider: Authentication provider (google, microsoft, apple)
         code: Authorization code from OAuth callback
         state: State parameter for CSRF validation
+        redirect_uri: Redirect URI used in authorization (optional, falls back to default)
         
     Returns:
         Access token and refresh token
@@ -171,8 +180,13 @@ async def oauth_callback(
             detail="Authentication service not configured"
         )
     
-    # Get redirect URI from environment based on provider
-    redirect_uri = _get_redirect_uri(provider)
+    # Use provided redirect_uri or fall back to default
+    if not redirect_uri:
+        redirect_uri = _get_redirect_uri(provider)
+    
+    # NOTE: State validation should be implemented by the client
+    # The client should store the state value before redirecting to auth URL
+    # and verify it matches when receiving the callback
     
     try:
         access_token, refresh_token, user_info = auth_service.handle_oauth_callback(
@@ -264,7 +278,7 @@ async def refresh_access_token(request: RefreshTokenRequest) -> TokenResponse:
 
 @router.get("/me", response_model=UserInfoResponse)
 async def get_current_user(
-    authorization: str = Query(..., description="Bearer token in format 'Bearer <token>'")
+    authorization: str = Header(..., description="Bearer token in format 'Bearer <token>'")
 ) -> UserInfoResponse:
     """Get current user information from access token.
     
@@ -306,15 +320,11 @@ async def get_current_user(
 
 
 @router.post("/logout")
-async def logout(
-    provider: str = Query(..., description="Provider to logout from"),
-    token: str = Query(..., description="Token to revoke"),
-) -> dict:
+async def logout(request: LogoutRequest) -> dict:
     """Logout and revoke tokens.
     
     Args:
-        provider: Authentication provider
-        token: Token to revoke
+        request: Logout request with provider and token
         
     Returns:
         Logout status
@@ -325,7 +335,7 @@ async def logout(
             detail="Authentication service not configured"
         )
     
-    success = auth_service.revoke_token(token, provider)
+    success = auth_service.revoke_token(request.token, request.provider)
     
     return {
         "success": success,
