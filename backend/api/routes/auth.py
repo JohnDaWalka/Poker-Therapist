@@ -1,5 +1,6 @@
 """Authentication API routes for OAuth 2.0 flows."""
 
+import logging
 import os
 from typing import Optional
 
@@ -8,13 +9,19 @@ from pydantic import BaseModel, EmailStr
 
 from backend.auth import AuthService
 
+# Configure logging
+logger = logging.getLogger(__name__)
+
+# Constants
+BEARER_PREFIX = "Bearer "
+
 router = APIRouter()
 
 # Initialize auth service
 try:
     auth_service = AuthService()
 except ValueError as e:
-    print(f"Warning: Auth service initialization failed: {e}")
+    logger.warning(f"Auth service initialization failed: {e}")
     auth_service = None
 
 
@@ -298,13 +305,13 @@ async def get_current_user(
         )
     
     # Extract token from Authorization header
-    if not authorization.startswith("Bearer "):
+    if not authorization.startswith(BEARER_PREFIX):
         raise HTTPException(
             status_code=401,
-            detail="Invalid authorization header format. Expected 'Bearer <token>'"
+            detail=f"Invalid authorization header format. Expected '{BEARER_PREFIX}<token>'"
         )
     
-    token = authorization[7:]  # Remove 'Bearer ' prefix
+    token = authorization[len(BEARER_PREFIX):]  # Remove Bearer prefix
     
     try:
         payload = auth_service.validate_token(token)
