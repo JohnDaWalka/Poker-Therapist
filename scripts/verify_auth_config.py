@@ -112,7 +112,8 @@ def verify_microsoft_auth() -> bool:
         print_error("Missing required Microsoft credentials:")
         for var in missing:
             print(f"  - {var}")
-        print_info("See AUTHENTICATION_SETUP.md for Microsoft Azure AD setup")
+        print_info("See CREDENTIAL_CONFIGURATION_GUIDE.md for step-by-step setup")
+        print_info("Or see AUTHENTICATION_SETUP.md for detailed technical reference")
         return False
     
     print_success("All Microsoft credentials configured")
@@ -164,7 +165,8 @@ def verify_google_auth() -> bool:
         print_error("Missing required Google credentials:")
         for var in missing:
             print(f"  - {var}")
-        print_info("See GOOGLE_CLOUD_SETUP.md for Google Cloud Platform setup")
+        print_info("See CREDENTIAL_CONFIGURATION_GUIDE.md for step-by-step setup")
+        print_info("Or see GOOGLE_CLOUD_SETUP.md for detailed GCP integration guide")
         return False
     
     print_success("All Google credentials configured")
@@ -212,7 +214,8 @@ def verify_apple_auth() -> bool:
         print_warning("Apple Sign-In not fully configured (optional for iOS/macOS/watchOS)")
         for var in missing:
             print(f"  - {var}")
-        print_info("See AUTHENTICATION_SETUP.md for Apple Developer setup")
+        print_info("See CREDENTIAL_CONFIGURATION_GUIDE.md for step-by-step setup")
+        print_info("Or see AUTHENTICATION_SETUP.md for Apple Developer setup")
         return False
     
     print_success("All Apple credentials configured")
@@ -277,7 +280,8 @@ def verify_google_storage() -> bool:
         print_error("Missing required Google Cloud Storage configuration:")
         for var in missing:
             print(f"  - {var}")
-        print_info("See GOOGLE_CLOUD_SETUP.md for Cloud Storage setup")
+        print_info("See CREDENTIAL_CONFIGURATION_GUIDE.md for step-by-step setup")
+        print_info("Or see GOOGLE_CLOUD_SETUP.md for detailed Cloud Storage setup")
         return False
     
     print_success("All Google Cloud Storage variables configured")
@@ -434,12 +438,19 @@ def main() -> int:
         print_info("1. Start the backend: cd backend && uvicorn api.main:app --reload")
         print_info("2. Test authentication flows in your application")
         print_info("3. See DEPLOYMENT_VERIFICATION.md for complete testing checklist")
+        print_info("\nDocumentation:")
+        print_info("- CREDENTIAL_CONFIGURATION_GUIDE.md - Step-by-step setup guide")
+        print_info("- AUTH_REFERENCE.md - Quick reference and commands")
+        print_info("- AUTHENTICATION_SETUP.md - Detailed technical reference")
+        print_info("- GOOGLE_CLOUD_SETUP.md - GCP integration guide")
         return 0
     else:
         print_warning("Some checks failed. Review the errors above and fix them.")
         print_info("Documentation:")
-        print_info("- AUTHENTICATION_SETUP.md - Complete setup guide")
-        print_info("- GOOGLE_CLOUD_SETUP.md - Google Cloud Platform setup")
+        print_info("- CREDENTIAL_CONFIGURATION_GUIDE.md - Step-by-step setup guide")
+        print_info("- AUTH_REFERENCE.md - Quick reference and troubleshooting")
+        print_info("- AUTHENTICATION_SETUP.md - Detailed technical reference")
+        print_info("- GOOGLE_CLOUD_SETUP.md - GCP integration guide")
         print_info("- AUTH_QUICKSTART.md - Quick start guide")
         return 1
 
