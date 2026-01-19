@@ -30,7 +30,7 @@ _COMBINED_SEED_RE = re.compile(r"^\s*(?P<hex>[a-f0-9]{64})\s*\(combined\)\s*$", 
 # Example line:
 # 41. 2f65... <- H(be3b...004163) | ASCII: ... - ok
 _VERIFY_LINE_RE = re.compile(
-    r"^\s*\d+\.\s*(?P<expected>[a-fA-F0-9]{64})\s*(?:<-\s*H\((?P<input>[a-fA-F0-9]+)\))?\s*(?P<tail>.*)$",
+    r"^\s*\d+\.\s*(?P<expected>[a-fA-F0-9]{64})\s*(?:<-\s*H\((?P<input>[a-fA-F0-9]+)\))?\s*.*$",
     re.MULTILINE,
 )
 
