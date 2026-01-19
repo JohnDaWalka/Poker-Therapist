@@ -34,19 +34,27 @@ cp .env.example .env.local
 
 ### 1.2 Verify .gitignore
 
-Ensure these files are in `.gitignore`:
+**CRITICAL SECURITY STEP**: Ensure these files are in `.gitignore` before proceeding:
 
 ```bash
 # Check that sensitive files are ignored
 grep -E "\.env\.local|service-account.*\.json|\.p8$" .gitignore
 ```
 
-If not present, add them:
+If not present, add them immediately:
 
 ```bash
 echo ".env.local" >> .gitignore
 echo "*service-account*.json" >> .gitignore
 echo "*.p8" >> .gitignore
+echo "config/*.json" >> .gitignore
+echo "config/*.p8" >> .gitignore
+```
+
+**Verify they're excluded**:
+```bash
+git status --ignored | grep -E "\.env\.local|service-account|\.p8"
+# These files should show as ignored
 ```
 
 ## Step 2: Configure Microsoft Authentication (Institutional SSO)
@@ -187,12 +195,16 @@ This enables OAuth 2.0/OpenID Connect with Google for accessing GCP APIs.
 4. **Description**: "Service account for Poker Therapist Cloud Storage access"
 5. **Click**: Create and Continue
 6. **Grant role**: Storage Object Admin (or Storage Admin for full access)
-7. **Click**: Done
-8. **Click on the service account** → Keys → Add Key → Create new key
-9. **Key type**: JSON
-10. **Click**: Create
-11. **Save the JSON file** to: `config/google-service-account.json`
+7. **Click**: Create and Continue
+8. **Grant role**: Storage Object Admin (or Storage Admin for full access)
+9. **Click**: Done
+10. **Click on the service account** → Keys → Add Key → Create new key
+11. **Key type**: JSON
+12. **Click**: Create
+13. **Save the JSON file** to: `config/google-service-account.json`
     - ⚠️ **CRITICAL**: Keep this file secure and NEVER commit to git
+    - ⚠️ **Verify**: Run `git status` - file should NOT appear (should be ignored)
+    - ⚠️ **If it appears**: Check `.gitignore` includes `*service-account*.json` and `config/*.json`
 
 ### 3.6 Create Cloud Storage Bucket
 
@@ -254,7 +266,10 @@ This step is **optional** and only required if you're deploying to iOS, macOS, o
 4. **Configure**: Select your primary App ID
 5. **Click**: Continue → Register
 6. **Download**: The .p8 file
-   - ⚠️ **CRITICAL**: Save securely - you cannot download it again
+   - ⚠️ **CRITICAL**: Save to `config/apple-auth-key.p8`
+   - ⚠️ **CRITICAL**: You cannot download it again - save securely
+   - ⚠️ **Verify**: Run `git status` - file should NOT appear (should be ignored)
+   - ⚠️ **If it appears**: Check `.gitignore` includes `*.p8` and `config/*.p8`
 7. **Note**: The Key ID (you'll need this)
 
 ### 4.4 Update .env.local
