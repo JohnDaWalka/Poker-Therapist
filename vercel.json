@@ -25,6 +25,15 @@
     "OPENAI_API_KEY": "@openai_api_key",
     "ANTHROPIC_API_KEY": "@anthropic_api_key",
     "GOOGLE_API_KEY": "@google_api_key",
-    "AUTHORIZED_EMAILS": "@authorized_emails"
+    "AUTHORIZED_EMAILS": "@authorized_emails",
+    "JWT_SECRET_KEY": "@jwt_secret_key",
+    "AZURE_TENANT_ID": "@azure_tenant_id",
+    "AZURE_CLIENT_ID": "@azure_client_id",
+    "AZURE_CLIENT_SECRET": "@azure_client_secret",
+    "GOOGLE_CLIENT_ID": "@google_client_id",
+    "GOOGLE_CLIENT_SECRET": "@google_client_secret",
+    "GOOGLE_CLOUD_PROJECT_ID": "@google_cloud_project_id",
+    "GOOGLE_STORAGE_BUCKET_NAME": "@google_storage_bucket_name",
+    "GOOGLE_SERVICE_ACCOUNT_JSON": "@google_service_account_json"
   }
 }

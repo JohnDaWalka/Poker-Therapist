@@ -212,3 +212,9 @@ windows/build/
 
 # Temporary files
 /tmp/
+
+# Authentication credentials and service account keys
+*service-account*.json
+*.p8
+config/*.json
+config/*.p8
