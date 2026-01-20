@@ -176,6 +176,7 @@ Configure authentication for Microsoft (Windows/Azure AD), Google (OAuth 2.0/GCP
    - [GOOGLE_CLOUD_SETUP.md](GOOGLE_CLOUD_SETUP.md) - Google Cloud Platform integration
    - [AUTH_QUICKSTART.md](AUTH_QUICKSTART.md) - Quick start guide
    - [DEPLOYMENT_VERIFICATION.md](DEPLOYMENT_VERIFICATION.md) - End-to-end testing checklist
+   - [VERCEL_AUTH_SETUP.md](VERCEL_AUTH_SETUP.md) - Vercel deployment with authentication
 
 ---
 
