@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.agent.memory.db_session import init_db
-from backend.api.routes import analyze, coinpoker, deep_session, n8n, tracking, triage
+from backend.api.routes import analyze, auth, coinpoker, deep_session, n8n, tracking, triage
 
 
 @asynccontextmanager
@@ -51,6 +51,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(triage.router, prefix="/api", tags=["Triage"])
 app.include_router(deep_session.router, prefix="/api", tags=["Deep Session"])
 app.include_router(analyze.router, prefix="/api", tags=["Analysis"])
