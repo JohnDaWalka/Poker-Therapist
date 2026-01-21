@@ -4,9 +4,11 @@
   "builds": [
     {
       "src": "api/index.py",
-      "use": "@vercel/python",
+      "use": "@vercel/python@6.2.1",
       "config": {
-        "maxLambdaSize": "50mb"
+        "maxLambdaSize": "50mb",
+        "runtime": "python3.12",
+        "excludeFiles": "{tests/**,test_*.py,*_test.py,docs/**,*.md,tmp/**,*.log,*.db,*.db-journal,dossiers/**,ios/**,windows/**,flutter/**,cli/**,.streamlit/secrets.toml,chatbot_history.db,.cache/**,__pycache__/**,*.pyc}"
       }
     }
   ],
@@ -35,5 +37,11 @@
     "ENABLE_APPLE_AUTH": "false",
     "DEFAULT_AUTH_PROVIDER": "google",
     "REQUIRE_AUTHENTICATION": "false"
+  },
+  "functions": {
+    "api/index.py": {
+      "memory": 3008,
+      "maxDuration": 60
+    }
   }
 }
