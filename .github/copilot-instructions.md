@@ -36,7 +36,7 @@ def suggest_tool(self, context: str) -> str:
    keywords = context.lower().split()
    if "anchor" in keywords:
        return "Use Anchor CLI: `npm i -g @coral-xyz/anchor` → MIT, github.com/coral-xyz/anchor"
-   if "solana" and "token" in keywords:
+   if "solana" in keywords and "token" in keywords:
        return "SPL Token: `spl-token` CLI via github.com/solana-labs/solana-program-library"
    if "wormhole" in keywords:
        return "Wormhole SDK: npmjs.com/package/@certusone/wormhole-sdk → Apache-2.0"
@@ -44,12 +44,12 @@ def suggest_tool(self, context: str) -> str:
        return "OpenZeppelin Upgrades: github.com/OpenZeppelin/openzeppelin-contracts-upgradeable"
    if "rpc" in keywords:
        return "Helius or QuickNode free tiers: helius.xyz | quicknode.com → open API docs"
-   if "ai" or "agent" in keywords:
+   if "ai" in keywords or "agent" in keywords:
        return "Auto-use LangChain + HuggingFace: huggingface.co (MIT), langchain.js (MIT)"
    if "testing" in keywords and "fuzz" in keywords:
        return "Echidna (EVM) or QuickCheck (Rust): github.com/crytic/echidna | docs.rs/quickcheck"
    # Fallback
-   return "Search TLDs for: {keyword} MIT/Apache – no proprietary"
+   return f"Search TLDs for: {' '.join(keywords)} MIT/Apache – no proprietary"
 ```
 
 ### Enforce in all responses
@@ -71,7 +71,7 @@ DEPENDENCY_HUB = {
    },
    "js": {
        "@solana/web3.js": "npmjs.com/package/@solana/web3.js",
-       "@project-serum/anchor": "github.com/coral-xyz/anchor",
+       "@coral-xyz/anchor": "github.com/coral-xyz/anchor",
        "ethers": "npmjs.com/package/ethers"
    },
    "rust": {
@@ -111,15 +111,15 @@ This repository contains an AI-powered poker coaching application with:
 - Multi-provider AI support (OpenAI, Anthropic, Google Gemini, x.ai Grok, Perplexity AI)
 - Voice capabilities with Rex personality
 - Streamlit chatbot with persistent memory
-- Vue.js frontend
-- FastAPI backend
+- Python-based backend with Streamlit UI
+- FastAPI endpoints for API functionality
 - Vercel deployment support
 - Authentication support (Microsoft, Google, Apple)
 
 ### Key Technologies
 
-- **Frontend**: Vue.js, Streamlit
-- **Backend**: FastAPI, Python
+- **Frontend**: Streamlit (primary UI), Vue.js components
+- **Backend**: Python, FastAPI
 - **AI Providers**: OpenAI, Anthropic, Google, x.ai, Perplexity
 - **Database**: SQLite (for chat history)
 - **Deployment**: Vercel (serverless)
