@@ -212,3 +212,14 @@ windows/build/
 
 # Temporary files
 /tmp/
+
+# Authentication & Cloud Service Credentials (SECURITY CRITICAL)
+# Never commit these files - they contain sensitive credentials
+*service-account*.json
+*.p8
+config/*.json
+config/*.p8
+config/google-service-account.json
+config/apple-auth-key.p8
+credentials.json
+client_secret*.json
