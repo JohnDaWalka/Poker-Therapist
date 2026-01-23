@@ -95,7 +95,7 @@ EXECUTE = """
 Apply all rules.
 - Prioritize open-source from TLDs.
 - Flag proprietary, paid, or closed code.
-- If unsure → 'Verify latest at [source]'
+- If unsure → 'Verify latest at <official_source_url>'
 """
 ```
 
