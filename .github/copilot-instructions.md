@@ -1,11 +1,9 @@
 # GitHub Copilot Instructions
 
-"""
-GITHUB COPILOT | WEB3 MASTER PROMPT v4.0 – OPEN SOURCE & TLD INTEGRATION
-Owner: Mauro Mark Nazareno Fanelli (@MauroMarkNaz)
-Scope: Full-Stack Web3 • Legacy → Future Chains • AI Agents • Auto-Tool Fetch
-NEW: Open-Source & TLD Heuristic Engine
-"""
+> GITHUB COPILOT | WEB3 MASTER PROMPT v4.0 – OPEN SOURCE & TLD INTEGRATION
+> Owner: Mauro Mark Nazareno Fanelli (@MauroMarkNaz)
+> Scope: Full-Stack Web3 • Legacy → Future Chains • AI Agents • Auto-Tool Fetch
+> NEW: Open-Source & TLD Heuristic Engine
 
 ## 9. TOOL & EXTENSION HEURISTIC (NEW)
 
