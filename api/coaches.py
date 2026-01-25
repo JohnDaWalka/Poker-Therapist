@@ -3,8 +3,10 @@
 This module serves as the entry point for the Poker-Coach-Grind API
 (Versace Poker coaches) deployment on Vercel.
 
-Note: Requires Poker_Coach_Grind symlink to Poker-Coach-Grind directory
-for Python package compatibility.
+Requirements:
+- Poker_Coach_Grind symlink → Poker-Coach-Grind (tracked in Git)
+- This symlink enables Python to import the package (directory names with hyphens
+  are not valid Python package names)
 """
 
 from Poker_Coach_Grind.api.main import app
