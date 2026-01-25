@@ -13,7 +13,6 @@ import os
 from pathlib import Path
 import importlib.util
 import logging
-import traceback
 
 # Setup paths for proper package imports when running in Vercel
 # Vercel sets cwd to the project root (Poker-Coach-Grind)
@@ -87,6 +86,7 @@ try:
 except Exception as e:
     # Fallback: Create a simple FastAPI app with error message
     from fastapi import FastAPI
+
     # Log the exception with stack trace on the server side
     logger = logging.getLogger(__name__)
     logger.exception("Failed to load main application", exc_info=e)
@@ -94,7 +94,7 @@ except Exception as e:
     # Return a generic error message without exposing internal details
     app = FastAPI(title="Poker-Coach-Grind API (Import Error)")
     handler = app
-
+    
     @app.get("/")
     async def root():
         # Do not expose the raw exception; report a generic degraded status
@@ -102,10 +102,7 @@ except Exception as e:
     
     @app.get("/health")
     async def health():
-        return {
-            "status": "degraded",
-            "error": "Application failed to start correctly."
-        }
+        return {"status": "degraded", "error": "Initialization failure"}
 
 # Alternative exports for better framework detection
 __all__ = ["app", "handler"]
