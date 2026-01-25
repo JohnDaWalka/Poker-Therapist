@@ -98,7 +98,9 @@ This project uses **CRYSTALS-Dilithium** (NIST ML-DSA) for post-quantum cryptogr
 - ✅ **Automated Signing** - GitHub Actions workflow for every release
 - ✅ **Easy Verification** - Python script and Docker support for signature verification
 
-See [PQC_SIGNING.md](PQC_SIGNING.md) for detailed documentation and verification instructions.
+**Documentation:**
+- 📘 [PQC_SIGNING.md](PQC_SIGNING.md) - Complete technical documentation
+- ⚡ [PQC_QUICKSTART.md](PQC_QUICKSTART.md) - Quick start guide (5 minutes)
 
 **Quick Verification:**
 ```bash
