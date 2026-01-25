@@ -42,15 +42,15 @@ Created detailed setup guide covering:
 
 ## New Vercel API Key
 
-**Note**: A new Vercel API token has been provided in PR #114. This token must be added as a GitHub Secret for automated deployments to work.
+**Note**: Any Vercel API token that has been shared in PR descriptions, comments, or other repository metadata must be immediately revoked in the Vercel dashboard.
 
-⚠️ **IMPORTANT**: For security reasons, the actual token value is not included in this document. Repository administrators should retrieve the token from PR #114 or the secure communication channel where it was shared.
+⚠️ **IMPORTANT**: Generate a new Vercel API token directly from the Vercel dashboard and add it only as a GitHub Secret. The token value must never be stored in this repository, in PR descriptions, commit messages, or any other public/semi-public location.
 
 ## Required GitHub Secrets
 
 The following secrets need to be configured in the GitHub repository:
 
-1. **VERCEL_TOKEN** - The Vercel API token provided in PR #114
+1. **VERCEL_TOKEN** - A Vercel API token generated in the Vercel dashboard and stored exclusively as a GitHub Secret
 2. **VERCEL_ORG_ID** - Your Vercel organization ID
 3. **VERCEL_PROJECT_ID** - Your Vercel project ID
 
