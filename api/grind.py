@@ -15,10 +15,30 @@ sys.path.insert(0, str(project_root))
 
 # Import the Poker-Coach-Grind API module
 # Using importlib to handle the hyphenated directory name
-grind_api = importlib.import_module('Poker-Coach-Grind.api.main')
-
-# Get the FastAPI app instance
-app = grind_api.app
+try:
+    grind_api = importlib.import_module('Poker-Coach-Grind.api.main')
+    app = grind_api.app
+except (ImportError, AttributeError) as e:
+    # If the module or app cannot be imported, create a minimal error response
+    from fastapi import FastAPI
+    from fastapi.responses import JSONResponse
+    
+    app = FastAPI(title="Poker-Coach-Grind API (Error)")
+    
+    @app.get("/")
+    async def error_root():
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": "Failed to load Poker-Coach-Grind API",
+                "detail": str(e),
+                "message": "Please check the application logs"
+            }
+        )
+    
+    # Re-raise the error for visibility in Vercel logs
+    import logging
+    logging.error(f"Failed to import Poker-Coach-Grind API: {e}")
 
 # Export the ASGI application
 # Vercel's experimental framework preset automatically detects 'app' as the ASGI application
@@ -27,6 +47,3 @@ handler = app
 
 # Alternative exports for better framework detection
 __all__ = ["app", "handler"]
-
-
-
