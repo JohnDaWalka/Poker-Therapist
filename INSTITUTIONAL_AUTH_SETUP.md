@@ -168,7 +168,7 @@ DEFAULT_AUTH_PROVIDER=microsoft
 
 1. Navigate to: **APIs & Services** → **Library**
 2. Search and enable:
-   - Google+ API (for OAuth)
+   - Google Identity Services API (for OAuth)
    - Cloud Storage API (for data storage)
    - Cloud Identity API (for user management)
 
