@@ -6,7 +6,6 @@ The full Poker-Coach-Grind functionality should be accessed through dedicated de
 """
 
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse, RedirectResponse
 
 app = FastAPI(
     title="Poker-Coach-Grind Gateway",
