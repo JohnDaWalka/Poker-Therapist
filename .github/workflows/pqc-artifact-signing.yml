@@ -52,7 +52,7 @@ jobs:
 
       - name: Verify OQS provider installation
         run: |
-          /opt/oqs-openssl/bin/openssl list -providers -verbose -provider oqsprovider -provider default | grep -i oqs || echo "OQS provider verification"
+          /opt/oqs-openssl/bin/openssl list -providers -verbose -provider oqsprovider -provider default | grep -i oqs
           /opt/oqs-openssl/bin/openssl list -signature-algorithms -provider oqsprovider | grep -i dilithium || echo "Dilithium algorithms available"
 
       - name: Generate Dilithium3 keypair
