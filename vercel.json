@@ -3,6 +3,10 @@
   "name": "poker-therapist",
   "routes": [
     {
+      "src": "/grind/(.*)",
+      "dest": "/api/grind.py"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/index.py"
     },
@@ -13,6 +17,10 @@
   ],
   "functions": {
     "api/index.py": {
+      "memory": 2048,
+      "maxDuration": 60
+    },
+    "api/grind.py": {
       "memory": 2048,
       "maxDuration": 60
     }
