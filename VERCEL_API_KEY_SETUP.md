@@ -23,7 +23,7 @@ The Poker Therapist application uses Vercel for serverless deployment. To enable
 2. **Add VERCEL_TOKEN Secret**
    - Click **New repository secret**
    - Name: `VERCEL_TOKEN`
-   - Value: `<your-vercel-api-token>` (use the token from PR #114 or generate a new one from Vercel Dashboard)
+   - Value: `<your-vercel-api-token>` (generate a new token from the Vercel Dashboard)
    - Click **Add secret**
 
 3. **Add VERCEL_ORG_ID Secret** (if not already configured)
