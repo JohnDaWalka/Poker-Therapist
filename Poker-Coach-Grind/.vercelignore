@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+.mypy_cache/
+.pytest_cache/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Testing
+tests/
+test_*.py
+*_test.py
+
+# Documentation
+docs/
+*.md
+!README.md
+!VERCEL_DEPLOYMENT.md
+
+# Database files
+*.db
+*.db-journal
+
+# Temporary files
+tmp/
+*.log
+*.tmp
+
+# CLI (not needed for API deployment)
+cli/
+
+# UI (not needed for API deployment)
+ui/
+
+# n8n workflows (not needed for API deployment)
+n8n-workflows/

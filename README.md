@@ -2,6 +2,8 @@
 
 An AI-powered poker coaching application with advanced multimodal chatbot integration and voice capabilities.
 
+> **📝 Note**: For clarification on project names and structure, see [NAMING_CONVENTIONS.md](NAMING_CONVENTIONS.md)
+
 ## Features
 
 ### 🎙️ Rex - Voice-Enabled Poker Coach (ENHANCED!)
