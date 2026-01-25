@@ -14,7 +14,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-@app.get("/")
 @app.get("/grind")
 @app.get("/grind/")
 async def grind_root():
@@ -30,13 +29,11 @@ async def grind_root():
         }
     }
 
-@app.get("/health")
 @app.get("/grind/health")
 async def health():
-    """Health check endpoint."""
+    """Health check endpoint for grind service."""
     return {"status": "healthy", "service": "poker-coach-grind-gateway"}
 
-@app.get("/info")
 @app.get("/grind/info")
 async def info():
     """Information about Poker-Coach-Grind."""
