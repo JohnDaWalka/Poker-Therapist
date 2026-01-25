@@ -13,8 +13,13 @@
     <main class="main-content">
       <router-view />
     </main>
+    <SpeedInsights />
   </div>
 </template>
+
+<script setup>
+import { SpeedInsights } from '@vercel/speed-insights/vue';
+</script>
 
 <script>
 export default {
