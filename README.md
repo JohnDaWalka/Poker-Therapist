@@ -85,6 +85,27 @@ Automate your poker coaching workflows with n8n:
 See [n8n-workflows/README.md](n8n-workflows/README.md) and [n8n-workflows/SETUP_GUIDE.md](n8n-workflows/SETUP_GUIDE.md) for setup instructions.
 
 [![Sourcery](https://img.shields.io/badge/Sourcery-enabled-brightgreen)](https://sourcery.ai)
+[![Post-Quantum Signing](https://img.shields.io/badge/🔐_Post--Quantum-CRYSTALS--Dilithium-blue)](PQC_SIGNING.md)
+[![NIST ML-DSA](https://img.shields.io/badge/NIST-ML--DSA--65-purple)](https://csrc.nist.gov/pubs/fips/204/ipd)
+
+### 🔐 Post-Quantum Cryptography
+
+This project uses **CRYSTALS-Dilithium** (NIST ML-DSA) for post-quantum cryptographic signing of artifacts and releases. All releases are signed using quantum-resistant signatures to ensure authenticity and integrity, even against future quantum computer attacks.
+
+**Security Features:**
+- ✅ **Quantum-Resistant Signatures** - NIST-standardized post-quantum cryptography
+- ✅ **Open-Source Tools** - MIT/Apache-2.0 licensed (liboqs, oqs-provider)
+- ✅ **Automated Signing** - GitHub Actions workflow for every release
+- ✅ **Easy Verification** - Python script and Docker support for signature verification
+
+See [PQC_SIGNING.md](PQC_SIGNING.md) for detailed documentation and verification instructions.
+
+**Quick Verification:**
+```bash
+# Download signature bundle from GitHub Actions artifacts
+python scripts/verify_pqc_signatures.py signed-artifacts/
+```
+
 ## Quick Start
 
 ### Vue.js Application
