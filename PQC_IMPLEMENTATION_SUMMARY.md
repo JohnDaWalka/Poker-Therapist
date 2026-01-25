@@ -127,7 +127,7 @@ All tools are open-source with permissive licenses:
 
 ## 📁 Files Changed/Added
 
-### Added Files (9 total)
+### Added Files (7 total)
 1. `.github/workflows/pqc-artifact-signing.yml` - Main workflow
 2. `PQC_SIGNING.md` - Technical documentation
 3. `PQC_QUICKSTART.md` - Quick start guide
