@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "name": "poker-coaches",
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.py"
+    }
+  ],
+  "functions": {
+    "api/index.py": {
+      "memory": 2048,
+      "maxDuration": 60
+    }
+  }
+}
