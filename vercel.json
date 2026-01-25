@@ -3,11 +3,11 @@
   "name": "poker-therapist",
   "routes": [
     {
-      "src": "/coaches/(.*)",
+      "src": "/api/coaches/(.*)",
       "dest": "/api/coaches.py"
     },
     {
-      "src": "/api/coaches/(.*)",
+      "src": "/coaches/(.*)",
       "dest": "/api/coaches.py"
     },
     {
