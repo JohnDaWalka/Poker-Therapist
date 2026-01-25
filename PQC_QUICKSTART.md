@@ -111,11 +111,11 @@ sudo usermod -aG docker $USER
 python scripts/verify_pqc_signatures.py --use-docker signed-artifacts/
 ```
 
-Or install oqs-provider locally (see [PQC_SIGNING.md](../PQC_SIGNING.md))
+Or install oqs-provider locally (see [PQC_SIGNING.md](PQC_SIGNING.md))
 
 ## More Information
 
-- Full documentation: [PQC_SIGNING.md](../PQC_SIGNING.md)
+- Full documentation: [PQC_SIGNING.md](PQC_SIGNING.md)
 - Open Quantum Safe: https://openquantumsafe.org
 - NIST PQC Project: https://csrc.nist.gov/projects/post-quantum-cryptography
 

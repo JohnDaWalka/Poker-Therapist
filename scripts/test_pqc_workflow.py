@@ -12,6 +12,7 @@ Usage:
 import sys
 import yaml
 from pathlib import Path
+from typing import Tuple
 
 
 def print_result(test_name: str, passed: bool, details: str = "") -> None:
@@ -28,7 +29,7 @@ def test_workflow_exists() -> bool:
     return workflow_path.exists()
 
 
-def test_workflow_yaml_valid() -> tuple[bool, str]:
+def test_workflow_yaml_valid() -> Tuple[bool, str]:
     """Test that workflow YAML is valid"""
     workflow_path = Path(".github/workflows/pqc-artifact-signing.yml")
     try:
@@ -39,7 +40,7 @@ def test_workflow_yaml_valid() -> tuple[bool, str]:
         return False, str(e)
 
 
-def test_workflow_triggers() -> tuple[bool, str]:
+def test_workflow_triggers() -> Tuple[bool, str]:
     """Test that workflow has correct triggers"""
     workflow_path = Path(".github/workflows/pqc-artifact-signing.yml")
     with open(workflow_path) as f:
@@ -62,7 +63,7 @@ def test_workflow_triggers() -> tuple[bool, str]:
     return True, ""
 
 
-def test_documentation_exists() -> tuple[bool, str]:
+def test_documentation_exists() -> Tuple[bool, str]:
     """Test that documentation files exist"""
     docs = [
         "PQC_SIGNING.md",
@@ -80,7 +81,7 @@ def test_documentation_exists() -> tuple[bool, str]:
     return True, ""
 
 
-def test_verification_script() -> tuple[bool, str]:
+def test_verification_script() -> Tuple[bool, str]:
     """Test that verification script exists and is executable"""
     script_path = Path("scripts/verify_pqc_signatures.py")
 
@@ -96,7 +97,7 @@ def test_verification_script() -> tuple[bool, str]:
     return True, ""
 
 
-def test_readme_updated() -> tuple[bool, str]:
+def test_readme_updated() -> Tuple[bool, str]:
     """Test that README mentions PQC signing"""
     readme_path = Path("README.md")
 
@@ -122,7 +123,7 @@ def test_readme_updated() -> tuple[bool, str]:
     return True, ""
 
 
-def test_workflow_jobs() -> tuple[bool, str]:
+def test_workflow_jobs() -> Tuple[bool, str]:
     """Test that workflow has required jobs"""
     workflow_path = Path(".github/workflows/pqc-artifact-signing.yml")
     with open(workflow_path) as f:
