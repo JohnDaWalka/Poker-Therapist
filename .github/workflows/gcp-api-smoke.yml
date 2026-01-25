@@ -30,7 +30,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Check if GCP secrets are configured
+        id: check-secrets
+        run: |
+          if [ -n "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ] && [ -n "${{ secrets.GCP_SERVICE_ACCOUNT }}" ]; then
+            echo "secrets_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "secrets_available=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Skip message
+        if: steps.check-secrets.outputs.secrets_available != 'true'
+        run: |
+          echo "⚠️  Skipping GCP API smoke tests - GCP secrets not configured"
+          echo "To enable these tests, configure the following repository secrets:"
+          echo "  - GCP_WORKLOAD_IDENTITY_PROVIDER"
+          echo "  - GCP_SERVICE_ACCOUNT"
+
       - name: Authenticate to Google Cloud
+        if: steps.check-secrets.outputs.secrets_available == 'true'
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
@@ -38,9 +56,11 @@ jobs:
           project_id: gen-lang-client-0928153103
 
       - name: Set GCP Project ID
+        if: steps.check-secrets.outputs.secrets_available == 'true'
         run: echo "GCP_PROJECT_ID=gen-lang-client-0928153103" >> $GITHUB_ENV
 
       - name: Run GCP API Smoke Tests
+        if: steps.check-secrets.outputs.secrets_available == 'true'
         run: |
           python scripts/gcp_api_smoke_test.py
 
