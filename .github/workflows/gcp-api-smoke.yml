@@ -7,6 +7,9 @@ on:
   schedule:
     - cron: '0 2 * * *'
 
+env:
+  GCP_PROJECT_ID: gen-lang-client-0928153103
+
 jobs:
   smoke-test:
     name: Run GCP API Smoke Tests
@@ -33,7 +36,7 @@ jobs:
       - name: Check if GCP secrets are configured
         id: check-secrets
         run: |
-          if [ -n "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ] && [ -n "${{ secrets.GCP_SERVICE_ACCOUNT }}" ]; then
+          if [ "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" != "" ] && [ "${{ secrets.GCP_SERVICE_ACCOUNT }}" != "" ]; then
             echo "secrets_available=true" >> $GITHUB_OUTPUT
           else
             echo "secrets_available=false" >> $GITHUB_OUTPUT
@@ -53,11 +56,7 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-          project_id: gen-lang-client-0928153103
-
-      - name: Set GCP Project ID
-        if: steps.check-secrets.outputs.secrets_available == 'true'
-        run: echo "GCP_PROJECT_ID=gen-lang-client-0928153103" >> $GITHUB_ENV
+          project_id: ${{ env.GCP_PROJECT_ID }}
 
       - name: Run GCP API Smoke Tests
         if: steps.check-secrets.outputs.secrets_available == 'true'
