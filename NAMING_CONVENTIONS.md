@@ -11,7 +11,7 @@ This document clarifies the naming conventions used in the Poker Therapist proje
 - **Root Directory**: `/` (repository root)
 - **Focus**: Mental game coaching, therapy, AI-powered advice
 
-### Grind API: "Poker-Coaches" 
+### Poker-Coach-Grind API (Vercel: "Poker-Coaches")
 - **Purpose**: Bankroll tracking, hand history, and performance analytics
 - **Vercel Project**: `poker-coaches`
 - **Vercel URL**: `https://poker-coaches.vercel.app`
