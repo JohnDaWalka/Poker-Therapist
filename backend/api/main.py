@@ -87,14 +87,7 @@ async def health() -> dict[str, str]:
 
 @app.get("/api/hello", response_class=PlainTextResponse)
 async def hello() -> str:
-    """Optimized hello world endpoint for Vercel serverless deployment.
-    
-    Returns plain text response with minimal overhead, following Vercel's
-    serverless best practices for fast cold start and execution.
-    
-    Returns:
-        Plain text "Hello, world!" message
-    """
+    """Return a plain text hello world message."""
     return "Hello, world!"
 
 
