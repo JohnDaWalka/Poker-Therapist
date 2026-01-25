@@ -137,20 +137,25 @@ For detailed documentation, see [docs/STREAMLIT_CHATBOT.md](docs/STREAMLIT_CHATB
 
 Deploy the FastAPI backend to Vercel for serverless hosting:
 
-1. **Connect your repository to Vercel**
+1. **Configure Vercel API Key** (for automated deployments)
+   - See [VERCEL_API_KEY_SETUP.md](VERCEL_API_KEY_SETUP.md) for detailed instructions
+   - Set up GitHub Actions secrets for automated deployments
+
+2. **Connect your repository to Vercel**
    - Visit https://vercel.com/new
    - Import the repository
    - Vercel will auto-detect the `vercel.json` configuration
 
-2. **Configure environment variables in Vercel dashboard**
+3. **Configure environment variables in Vercel dashboard**
    - `XAI_API_KEY`
    - `OPENAI_API_KEY`
    - `ANTHROPIC_API_KEY` (optional)
    - `GOOGLE_API_KEY` (optional)
    - `AUTHORIZED_EMAILS`
 
-3. **Deploy**
+4. **Deploy**
    - Click "Deploy" and your API will be live!
+   - Or push to main/master for automatic deployment via GitHub Actions
 
 For detailed deployment instructions, see [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)
 
@@ -192,6 +197,7 @@ Configure authentication for Microsoft (Windows/Azure AD), Google (OAuth 2.0/GCP
 - 🧪 [AUTH_TESTING_GUIDE.md](AUTH_TESTING_GUIDE.md) - **NEW!** End-to-end testing procedures (15k+ characters)
 - ✅ [DEPLOYMENT_VERIFICATION.md](DEPLOYMENT_VERIFICATION.md) - Deployment checklist
 - 🚀 [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md) - Vercel deployment guide
+- 🔑 [VERCEL_API_KEY_SETUP.md](VERCEL_API_KEY_SETUP.md) - Vercel API key configuration
 
 **What's Implemented:**
 ✅ Microsoft Azure AD / Windows Authentication (Organization SSO)  

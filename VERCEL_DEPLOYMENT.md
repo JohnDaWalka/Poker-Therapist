@@ -6,7 +6,8 @@ This guide explains how to deploy the Poker Therapist application to Vercel.
 
 1. A Vercel account (sign up at https://vercel.com)
 2. Vercel CLI installed (optional, for command-line deployment)
-3. Required API keys:
+3. Vercel API token configured (see [VERCEL_API_KEY_SETUP.md](./VERCEL_API_KEY_SETUP.md))
+4. Required API keys:
    - xAI API key
    - OpenAI API key
    - Anthropic API key (optional)
@@ -178,6 +179,7 @@ Vercel automatically redeploys when you push to your connected Git repository:
 
 ## Additional Resources
 
+- [VERCEL_API_KEY_SETUP.md](./VERCEL_API_KEY_SETUP.md) - **Configure Vercel API key for automated deployments**
 - [Vercel Documentation](https://vercel.com/docs)
 - [Vercel Python Runtime](https://vercel.com/docs/runtimes#official-runtimes/python)
 - [FastAPI Deployment Guide](https://fastapi.tiangolo.com/deployment/)
