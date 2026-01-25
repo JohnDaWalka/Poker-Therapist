@@ -91,17 +91,14 @@ except Exception as e:
     logger = logging.getLogger(__name__)
     logger.exception("Failed to load main application", exc_info=e)
     
-        # Return a generic error message without exposing internal details
+    # Return a generic error message without exposing internal details
     app = FastAPI(title="Poker-Coach-Grind API (Import Error)")
     handler = app
-            "note": "An internal error occurred during initialization. Check server logs for details."
+
+    @app.get("/")
     async def root():
-        return {
-            "error": "Failed to load main application",
-            "message": "An internal error occurred while starting the application.",
         # Do not expose the raw exception; report a generic degraded status
         return {"status": "degraded", "error": "Initialization failure"}
-        }
     
     @app.get("/health")
     async def health():
