@@ -5,6 +5,7 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 
 from backend.agent.memory.db_session import init_db
 from backend.api.routes import analyze, auth, coinpoker, deep_session, n8n, tracking, triage
@@ -82,6 +83,12 @@ async def health() -> dict[str, str]:
         Health status
     """
     return {"status": "healthy"}
+
+
+@app.get("/api/hello", response_class=PlainTextResponse)
+async def hello() -> str:
+    """Return a plain text hello world message."""
+    return "Hello, world!"
 
 
 if __name__ == "__main__":
