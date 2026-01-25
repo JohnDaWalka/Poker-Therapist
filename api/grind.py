@@ -10,11 +10,11 @@ from fastapi import FastAPI
 app = FastAPI(
     title="Poker-Coach-Grind Gateway",
     description="Gateway to Poker-Coach-Grind functionality",
-    version="1.0.0"
+    version="1.0.0",
+    redirect_slashes=True
 )
 
 @app.get("/grind")
-@app.get("/grind/")
 async def grind_root():
     """Root endpoint for grind routes."""
     return {
