@@ -360,7 +360,7 @@ def _get_redirect_uri(provider: str) -> str:
         Redirect URI for the provider
     """
     # Check for Vercel deployment
-    vercel_url = os.getenv("VERCEL_URL")
+    vercel_url = os.getenv("VERCEL_URL", None)
     if vercel_url:
         # Use Vercel URL for production
         return f"https://{vercel_url}/api/auth/callback/{provider}"
