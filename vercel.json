@@ -3,12 +3,8 @@
   "name": "poker-therapist",
   "routes": [
     {
-      "src": "/api/coaches/(.*)",
-      "dest": "/api/coaches.py"
-    },
-    {
-      "src": "/coaches/(.*)",
-      "dest": "/api/coaches.py"
+      "src": "/grind/(.*)",
+      "dest": "/api/grind.py"
     },
     {
       "src": "/api/(.*)",
@@ -24,7 +20,7 @@
       "memory": 2048,
       "maxDuration": 60
     },
-    "api/coaches.py": {
+    "api/grind.py": {
       "memory": 2048,
       "maxDuration": 60
     }
