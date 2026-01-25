@@ -30,28 +30,35 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
-      - name: Pull Vercel Environment Information
+      - name: Pull Vercel Environment Information (Preview)
+        if: github.event_name == 'pull_request'
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Pull Vercel Environment Information (Production)
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Build Project Artifacts
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Project Artifacts to Vercel (Preview)
         if: github.event_name == 'pull_request'
+        id: deploy-preview
         run: |
           url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
           echo "Preview URL: $url"
-          echo "VERCEL_PREVIEW_URL=$url" >> $GITHUB_ENV
+          echo "url=$url" >> $GITHUB_OUTPUT
 
       - name: Deploy Project Artifacts to Vercel (Production)
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        id: deploy-production
         run: |
           url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
           echo "Production URL: $url"
-          echo "VERCEL_PRODUCTION_URL=$url" >> $GITHUB_ENV
+          echo "url=$url" >> $GITHUB_OUTPUT
 
       - name: Comment PR with Preview URL
-        if: github.event_name == 'pull_request' && env.VERCEL_PREVIEW_URL != ''
+        if: github.event_name == 'pull_request' && steps.deploy-preview.outputs.url != ''
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -60,5 +67,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '✅ Vercel Preview Deployment: ' + process.env.VERCEL_PREVIEW_URL
+              body: '✅ Vercel Preview Deployment: ' + '${{ steps.deploy-preview.outputs.url }}'
             })
