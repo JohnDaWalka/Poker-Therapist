@@ -1,6 +1,26 @@
 {
   "version": 2,
   "name": "poker-therapist",
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python@6.2.1",
+      "config": {
+        "maxLambdaSize": "50mb",
+        "runtime": "python3.12",
+        "excludeFiles": "{tests/**,test_*.py,*_test.py,docs/**,*.md,tmp/**,*.log,*.db,*.db-journal,dossiers/**,ios/**,windows/**,flutter/**,cli/**,.streamlit/secrets.toml,chatbot_history.db,.cache/**,__pycache__/**,*.pyc}"
+      }
+    },
+    {
+      "src": "api/coaches.py",
+      "use": "@vercel/python@6.2.1",
+      "config": {
+        "maxLambdaSize": "50mb",
+        "runtime": "python3.12",
+        "excludeFiles": "{tests/**,test_*.py,*_test.py,docs/**,*.md,tmp/**,*.log,*.db,*.db-journal,dossiers/**,ios/**,windows/**,flutter/**,cli/**,.streamlit/secrets.toml,chatbot_history.db,.cache/**,__pycache__/**,*.pyc}"
+      }
+    }
+  ],
   "routes": [
     {
       "src": "/api/coaches/(.*)",
@@ -21,11 +41,11 @@
   ],
   "functions": {
     "api/index.py": {
-      "memory": 2048,
+      "memory": 3008,
       "maxDuration": 60
     },
     "api/coaches.py": {
-      "memory": 2048,
+      "memory": 3008,
       "maxDuration": 60
     }
   }
