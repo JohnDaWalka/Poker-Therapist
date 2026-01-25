@@ -6,9 +6,6 @@ The full Poker-Coach-Grind functionality should be accessed through dedicated de
 """
 
 from fastapi import FastAPI
-import sys
-from pathlib import Path
-import importlib
 
 app = FastAPI(
     title="Poker-Coach-Grind Gateway",
@@ -30,36 +27,6 @@ async def grind_root():
             "info": "/grind/info"
         }
     }
-# Import the Poker-Coach-Grind API module
-# Using importlib to handle the hyphenated directory name
-try:
-    grind_api = importlib.import_module('Poker-Coach-Grind.api.main')
-    app = grind_api.app
-except (ImportError, AttributeError) as e:
-    # Log the error immediately for visibility in Vercel logs
-    logging.exception(f"Failed to import Poker-Coach-Grind API: {e}")
-    
-    # Create a minimal error response app
-    # If the module or app cannot be imported, create a minimal error response
-    from fastapi import FastAPI
-    from fastapi.responses import JSONResponse
-    
-    app = FastAPI(title="Poker-Coach-Grind API (Error)")
-    
-    @app.get("/")
-    async def error_root():
-        return JSONResponse(
-            status_code=500,
-            content={
-                "error": "Failed to load Poker-Coach-Grind API",
-                "detail": str(e),
-                "message": "Please check the application logs"
-            }
-        )
-    
-    # Re-raise the error for visibility in Vercel logs
-    import logging
-    logging.error(f"Failed to import Poker-Coach-Grind API: {e}")
 
 @app.get("/grind/health")
 async def health():
