@@ -38,9 +38,13 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Build Project Artifacts
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts (Production)
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        run: vercel build --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
+      - name: Build Project Artifacts (Preview)
+        if: github.event_name != 'push' || (github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master')
+        run: vercel build --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Project Artifacts to Vercel (Preview)
         if: github.event_name == 'pull_request'
         id: deploy-preview
