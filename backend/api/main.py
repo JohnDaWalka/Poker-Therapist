@@ -5,6 +5,7 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 
 from backend.agent.memory.db_session import init_db
 from backend.api.routes import analyze, auth, coinpoker, deep_session, n8n, tracking, triage
@@ -82,6 +83,19 @@ async def health() -> dict[str, str]:
         Health status
     """
     return {"status": "healthy"}
+
+
+@app.get("/api/hello", response_class=PlainTextResponse)
+async def hello() -> str:
+    """Optimized hello world endpoint for Vercel serverless deployment.
+    
+    Returns plain text response with minimal overhead, following Vercel's
+    serverless best practices for fast cold start and execution.
+    
+    Returns:
+        Plain text "Hello, world!" message
+    """
+    return "Hello, world!"
 
 
 if __name__ == "__main__":
