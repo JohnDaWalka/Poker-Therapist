@@ -42,9 +42,9 @@ Created detailed setup guide covering:
 
 ## New Vercel API Key
 
-**API Token**: `vck_8QX6kQ5Pv80zStMbgiwczLN2MxOdBfoQ00mCDvFKq4m41CjuzZ0xb28S`
+**Note**: A new Vercel API token has been provided in PR #114. This token must be added as a GitHub Secret for automated deployments to work.
 
-⚠️ **IMPORTANT**: This token must be added as a GitHub Secret named `VERCEL_TOKEN` in the repository settings.
+⚠️ **IMPORTANT**: For security reasons, the actual token value is not included in this document. Repository administrators should retrieve the token from PR #114 or the secure communication channel where it was shared.
 
 ## Required GitHub Secrets
 
@@ -62,7 +62,7 @@ The following secrets need to be configured in the GitHub repository:
    - Go to: https://github.com/JohnDaWalka/Poker-Therapist/settings/secrets/actions
    - Click "New repository secret"
    - Name: `VERCEL_TOKEN`
-   - Value: `vck_8QX6kQ5Pv80zStMbgiwczLN2MxOdBfoQ00mCDvFKq4m41CjuzZ0xb28S`
+   - Value: `<your-vercel-api-token>` (use the token from PR #114 or generate from Vercel Dashboard)
    - Click "Add secret"
 
 2. **Add Organization ID** (if not already set):

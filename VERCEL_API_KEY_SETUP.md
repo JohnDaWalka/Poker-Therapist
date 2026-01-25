@@ -8,9 +8,9 @@ The Poker Therapist application uses Vercel for serverless deployment. To enable
 
 ## New Vercel API Key
 
-**API Key**: `vck_8QX6kQ5Pv80zStMbgiwczLN2MxOdBfoQ00mCDvFKq4m41CjuzZ0xb28S`
+**Important**: A new Vercel API key has been generated for this project (referenced in PR #114). This key must be configured as a GitHub Secret.
 
-⚠️ **SECURITY NOTICE**: This API key provides access to your Vercel account. Never commit it directly to source control.
+⚠️ **SECURITY NOTICE**: API keys provide access to your Vercel account. Never commit them directly to source control or documentation files. Always store them securely as GitHub Secrets or in environment variables.
 
 ## Step-by-Step Configuration
 
@@ -23,7 +23,7 @@ The Poker Therapist application uses Vercel for serverless deployment. To enable
 2. **Add VERCEL_TOKEN Secret**
    - Click **New repository secret**
    - Name: `VERCEL_TOKEN`
-   - Value: `vck_8QX6kQ5Pv80zStMbgiwczLN2MxOdBfoQ00mCDvFKq4m41CjuzZ0xb28S`
+   - Value: `<your-vercel-api-token>` (use the token from PR #114 or generate a new one from Vercel Dashboard)
    - Click **Add secret**
 
 3. **Add VERCEL_ORG_ID Secret** (if not already configured)
@@ -94,7 +94,7 @@ npm install -g vercel@latest
 vercel login
 
 # Or set the token as an environment variable
-export VERCEL_TOKEN=vck_8QX6kQ5Pv80zStMbgiwczLN2MxOdBfoQ00mCDvFKq4m41CjuzZ0xb28S
+export VERCEL_TOKEN=<your-vercel-api-token>
 
 # Deploy from command line
 vercel --token=$VERCEL_TOKEN
