@@ -21,7 +21,7 @@ try:
     app = grind_api.app
 except (ImportError, AttributeError) as e:
     # Log the error immediately for visibility in Vercel logs
-    logging.error(f"Failed to import Poker-Coach-Grind API: {e}")
+    logging.exception(f"Failed to import Poker-Coach-Grind API: {e}")
     
     # Create a minimal error response app
     from fastapi import FastAPI
