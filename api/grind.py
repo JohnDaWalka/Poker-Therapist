@@ -19,6 +19,10 @@ try:
     grind_api = importlib.import_module('Poker-Coach-Grind.api.main')
     app = grind_api.app
 except (ImportError, AttributeError) as e:
+    # Log the error immediately for visibility in Vercel logs
+    logging.exception(f"Failed to import Poker-Coach-Grind API: {e}")
+    
+    # Create a minimal error response app
     # If the module or app cannot be imported, create a minimal error response
     from fastapi import FastAPI
     from fastapi.responses import JSONResponse
