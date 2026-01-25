@@ -87,10 +87,6 @@ try:
 except Exception as e:
     # Fallback: Create a simple FastAPI app with error message
     from fastapi import FastAPI
-    # Log the detailed exception and stack trace on the server side
-    logging.exception("Failed to load main application during startup")
-    
-
     # Log the exception with stack trace on the server side
     logger = logging.getLogger(__name__)
     logger.exception("Failed to load main application", exc_info=e)
