@@ -15,16 +15,16 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Install build dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y ninja-build cmake build-essential git
-          
+
       - name: Build liboqs
         run: |
           git clone --depth 1 --branch main https://github.com/open-quantum-safe/liboqs.git /tmp/liboqs
@@ -33,7 +33,7 @@ jobs:
           cmake -GNinja -DCMAKE_INSTALL_PREFIX=/opt/liboqs ..
           ninja
           sudo ninja install
-          
+
       - name: Build OpenSSL with OQS support
         run: |
           git clone --depth 1 --branch openssl-3.4 https://github.com/openssl/openssl.git /tmp/openssl
@@ -41,7 +41,7 @@ jobs:
           ./config --prefix=/opt/oqs-openssl no-shared
           make -j$(nproc)
           sudo make install_sw
-          
+
       - name: Build oqs-provider
         run: |
           git clone --depth 1 --branch main https://github.com/open-quantum-safe/oqs-provider.git /tmp/oqs-provider
@@ -49,12 +49,12 @@ jobs:
           cmake -DOPENSSL_ROOT_DIR=/opt/oqs-openssl -DCMAKE_PREFIX_PATH=/opt/liboqs -S . -B _build
           cmake --build _build
           sudo cmake --install _build
-          
+
       - name: Verify OQS provider installation
         run: |
           /opt/oqs-openssl/bin/openssl list -providers -verbose -provider oqsprovider -provider default | grep -i oqs || echo "OQS provider verification"
           /opt/oqs-openssl/bin/openssl list -signature-algorithms -provider oqsprovider | grep -i dilithium || echo "Dilithium algorithms available"
-          
+
       - name: Generate Dilithium3 keypair
         run: |
           mkdir -p pqc-keys
@@ -62,52 +62,52 @@ jobs:
           /opt/oqs-openssl/bin/openssl pkey -provider oqsprovider -in pqc-keys/dilithium3-private.pem -pubout -out pqc-keys/dilithium3-public.pem
           echo "✓ Dilithium3 keypair generated"
           ls -lh pqc-keys/
-          
+
       - name: Create artifacts directory
         run: |
           mkdir -p artifacts-to-sign
-          
+
       - name: Collect artifacts to sign
         run: |
           # Copy Python source files
           find . -type f -name "*.py" -not -path "*/\.*" -not -path "*/tests/*" -not -path "*/venv/*" -not -path "*/__pycache__/*" | head -20 | while read file; do
             cp "$file" "artifacts-to-sign/$(basename $file)" 2>/dev/null || true
           done
-          
+
           # Copy configuration files
           [ -f requirements.txt ] && cp requirements.txt artifacts-to-sign/
           [ -f pyproject.toml ] && cp pyproject.toml artifacts-to-sign/
           [ -f README.md ] && cp README.md artifacts-to-sign/
-          
+
           # List what we're signing
           echo "=== Artifacts to be signed ==="
           ls -lh artifacts-to-sign/
-          
+
       - name: Sign artifacts with Dilithium3
         run: |
           mkdir -p signed-artifacts
           cd artifacts-to-sign
-          
+
           for file in *; do
             if [ -f "$file" ]; then
               echo "Signing: $file"
               /opt/oqs-openssl/bin/openssl dgst -sha256 -sign ../pqc-keys/dilithium3-private.pem \
                 -provider oqsprovider -provider default \
                 -out "../signed-artifacts/${file}.dilithium3.sig" "$file"
-              
+
               # Create a manifest entry
               sha256sum "$file" >> ../signed-artifacts/MANIFEST.txt
               echo "  Signature: ${file}.dilithium3.sig" >> ../signed-artifacts/MANIFEST.txt
             fi
           done
-          
+
           echo "✓ All artifacts signed with Dilithium3"
-          
+
       - name: Verify signatures
         run: |
           cd artifacts-to-sign
           echo "=== Verifying signatures ==="
-          
+
           for file in *; do
             if [ -f "$file" ] && [ -f "../signed-artifacts/${file}.dilithium3.sig" ]; then
               echo -n "Verifying: $file ... "
@@ -121,53 +121,53 @@ jobs:
               fi
             fi
           done
-          
+
           echo "✓ All signatures verified successfully"
-          
+
       - name: Create signature bundle
         run: |
           # Create README for signatures
           cat > signed-artifacts/README.md << 'EOF'
           # Post-Quantum Cryptography Signatures
-          
+
           This directory contains CRYSTALS-Dilithium (ML-DSA) signatures for project artifacts.
-          
+
           ## Algorithm
           - **Signature Scheme**: CRYSTALS-Dilithium3 (NIST ML-DSA Level 3)
           - **Hash Algorithm**: SHA-256
           - **Security Level**: ~128-bit post-quantum security
-          
+
           ## Verification
-          
+
           To verify signatures, you need:
           1. OpenSSL 3.x with oqs-provider
           2. The public key: `dilithium3-public.pem`
           3. The original artifact files
-          
+
           ### Verification Command
           ```bash
           openssl dgst -sha256 -verify dilithium3-public.pem \
             -provider oqsprovider -provider default \
             -signature <file>.dilithium3.sig <file>
           ```
-          
+
           See the main project documentation for detailed setup instructions.
-          
+
           ## Files
           - `dilithium3-public.pem`: Public key for verification
           - `*.dilithium3.sig`: Signature files
           - `MANIFEST.txt`: List of signed files with SHA-256 checksums
           EOF
-          
+
           # Copy artifacts for archival
           cp -r artifacts-to-sign/* signed-artifacts/ 2>/dev/null || true
-          
+
           # Create tarball
           tar -czf pqc-signatures.tar.gz signed-artifacts/
-          
+
           echo "✓ Signature bundle created"
           ls -lh pqc-signatures.tar.gz
-          
+
       - name: Upload signature artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -176,29 +176,29 @@ jobs:
             signed-artifacts/
             pqc-signatures.tar.gz
           retention-days: 90
-          
+
       - name: Create release summary
         if: github.event_name == 'release'
         run: |
           cat > release-pqc-summary.md << EOF
           ## 🔐 Post-Quantum Cryptography Signatures
-          
+
           This release includes CRYSTALS-Dilithium3 (NIST ML-DSA) signatures for all artifacts.
-          
+
           **Algorithm**: Dilithium3 (128-bit post-quantum security)
           **Signed Artifacts**: $(ls -1 signed-artifacts/*.sig | wc -l) files
-          
+
           Download the signature bundle from the workflow artifacts to verify authenticity.
-          
+
           ### Quick Verification
           1. Download \`pqc-signatures.tar.gz\` from workflow artifacts
           2. Extract and use the included public key
           3. Follow instructions in \`signed-artifacts/README.md\`
           EOF
-          
+
           echo "=== Release Summary ==="
           cat release-pqc-summary.md
-          
+
       - name: Comment on release (if release event)
         if: github.event_name == 'release'
         uses: actions/github-script@v7
@@ -207,10 +207,10 @@ jobs:
           script: |
             const fs = require('fs');
             const summary = fs.readFileSync('release-pqc-summary.md', 'utf8');
-            
+
             // Find the release
             const release = context.payload.release;
-            
+
             if (release) {
               await github.rest.repos.updateRelease({
                 owner: context.repo.owner,
