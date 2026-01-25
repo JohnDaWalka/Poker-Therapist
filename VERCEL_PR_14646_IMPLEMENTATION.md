@@ -12,7 +12,7 @@ This document describes the implementation of Vercel PR #14646, which introduces
 - **Explicit Runtime Version**: Specified `@vercel/python@6.2.1` to use the latest Python runtime with experimental framework support
 - **Python Version**: Explicitly set `runtime: "python3.12"` to align with Vercel's default Python version
 - **Bundle Optimization**: Added comprehensive `excludeFiles` configuration to reduce serverless bundle size
-- **Function Configuration**: Added dedicated `functions` section with memory and duration limits
+- **Function Configuration**: Added `memory` and `maxDuration` settings in the build config (Vercel requires these in `config` section, not separate `functions` section)
 
 **New Configuration Features:**
 ```json
@@ -24,16 +24,12 @@ This document describes the implementation of Vercel PR #14646, which introduces
       "config": {
         "maxLambdaSize": "50mb",
         "runtime": "python3.12",
+        "memory": 3008,
+        "maxDuration": 60,
         "excludeFiles": "{tests/**,test_*.py,*_test.py,docs/**,*.md,tmp/**,*.log,*.db,*.db-journal,dossiers/**,ios/**,windows/**,flutter/**,cli/**,.streamlit/secrets.toml,chatbot_history.db,.cache/**,__pycache__/**,*.pyc}"
       }
     }
-  ],
-  "functions": {
-    "api/index.py": {
-      "memory": 3008,
-      "maxDuration": 60
-    }
-  }
+  ]
 }
 ```
 
