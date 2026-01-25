@@ -8,7 +8,6 @@ detect and optimize ASGI applications like FastAPI.
 import sys
 from pathlib import Path
 import importlib
-import logging
 
 # Add the project root to sys.path to enable proper module imports
 project_root = Path(__file__).parent.parent
@@ -24,6 +23,7 @@ except (ImportError, AttributeError) as e:
     logging.exception(f"Failed to import Poker-Coach-Grind API: {e}")
     
     # Create a minimal error response app
+    # If the module or app cannot be imported, create a minimal error response
     from fastapi import FastAPI
     from fastapi.responses import JSONResponse
     
@@ -39,6 +39,10 @@ except (ImportError, AttributeError) as e:
                 "message": "Please check the application logs"
             }
         )
+    
+    # Re-raise the error for visibility in Vercel logs
+    import logging
+    logging.error(f"Failed to import Poker-Coach-Grind API: {e}")
 
 # Export the ASGI application
 # Vercel's experimental framework preset automatically detects 'app' as the ASGI application
