@@ -1,20 +1,9 @@
 {
-  "version": 2,
-  "name": "poker-therapist",
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/index.py"
-    }
-  ],
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "api/index.py": {
-      "memory": 2048,
-      "maxDuration": 60
+      "memory": 1024,
+      "maxDuration": 30
     }
   }
 }
