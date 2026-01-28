@@ -70,9 +70,11 @@ jobs:
 
       - name: Collect artifacts to sign
         run: |
-          # Copy Python source files
-          find . -type f -name "*.py" -not -path "*/\.*" -not -path "*/tests/*" -not -path "*/venv/*" -not -path "*/__pycache__/*" | while read file; do
-            cp "$file" "artifacts-to-sign/$(basename $file)" 2>/dev/null || true
+          # Copy Python source files, preserving directory structure to avoid basename collisions
+          find . -type f -name "*.py" -not -path "*/\.*" -not -path "*/tests/*" -not -path "*/venv/*" -not -path "*/__pycache__/*" | while IFS= read -r file; do
+            dest="artifacts-to-sign/${file#./}"
+            mkdir -p "$(dirname "$dest")"
+            cp "$file" "$dest" 2>/dev/null || true
           done
 
           # Copy configuration files
