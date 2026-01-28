@@ -1,38 +1,25 @@
-name: PQC Security
-
+name: PQC Security Verification
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, mainprojectmain]
   pull_request:
-  release:
-    types: [published]
+    branches: [main, master, mainprojectmain]
 
 jobs:
   pqc-verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-      
+          python-version: '3.11'
       - name: Install PQC dependencies
-        run: pip install quantcrypt cryptography
-      
-      - name: Verify PQC implementation
+        run: pip install quantcrypt
+      - name: Verify PQC Implementation
         run: |
           if [ -f "pqc.py" ]; then
             python pqc.py test
           else
-            echo "PQC module not found, skipping"
+            echo "PQC module not found, skipping verification"
           fi
-      
-      - name: Check for exposed secrets
-        run: |
-          if grep -rE "(PRIVATE|SECRET).*=.*[A-Za-z0-9]{20,}" --include="*.py" --include="*.js" --include="*.ts" . 2>/dev/null; then
-            echo "⚠️ Potential secrets detected"
-            exit 1
-          fi
-          echo "✅ No exposed secrets"

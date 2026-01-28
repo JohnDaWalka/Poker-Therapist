@@ -1,26 +1,27 @@
-# Post-Quantum Cryptography - Poker-Therapist
+# Post-Quantum Cryptography (PQC) Security
 
-This repository is protected with **NIST post-quantum cryptography**.
+This repository is protected with **NIST-standardized post-quantum cryptography**.
 
-## Algorithms
-- **ML-KEM-1024** (FIPS 203) - Key Encapsulation
-- **ML-DSA-87** (FIPS 204) - Digital Signatures
-- **AES-256-GCM** - Symmetric Encryption
+## Algorithms Used
+- **ML-KEM-1024** (FIPS 203) - Key encapsulation
+- **ML-DSA-87** (FIPS 204) - Digital signatures
+- **AES-256-GCM** - Symmetric encryption
+
+## Files
+- `pqc.py` - Core PQC module
+- `pqc_api.py` - API protection utilities
+- `pqc_files.py` - File encryption utilities
 
 ## Usage
-
-```bash
-# Generate keys
-python pqc.py keygen poker_therapist
-
-# Encrypt sensitive files
-python pqc_files.py encrypt <file> <key_name>
-
-# Verify signatures
-python pqc.py verify <signed_file>
+```python
+from pqc import PQCrypto
+pqc = PQCrypto()
+encrypted = pqc.encrypt(data, public_key)
 ```
 
-## Key Storage
-Keys are stored in `~/.pqc-keys/`
-- Public keys (`*.pub.json`) can be committed
-- Private keys (`*.key`) must NEVER be committed
+## Key Management
+Public keys are in `security/` directory.
+Private keys are stored locally in `~/.pqc-keys/`
+
+---
+*Secured with quantum-resistant cryptography*
