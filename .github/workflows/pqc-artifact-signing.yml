@@ -9,6 +9,7 @@ on:
         description: 'Pattern for artifacts to sign (default: all)'
         required: false
         default: '**/*'
+        # TODO: Use this input to filter which artifacts are collected/signed instead of signing all artifacts.
 
 jobs:
   pqc-sign-artifacts:
