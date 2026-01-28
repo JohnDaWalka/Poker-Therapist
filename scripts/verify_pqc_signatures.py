@@ -234,7 +234,6 @@ def main() -> int:
     
     # Determine verification method
     use_docker = False
-    use_local = False
     
     if args.use_docker and args.use_local:
         print_error("Cannot specify both --use-docker and --use-local")
@@ -243,7 +242,8 @@ def main() -> int:
     if args.use_docker:
         use_docker = True
     elif args.use_local:
-        use_local = True
+        # Explicitly using local OpenSSL
+        use_docker = False
     else:
         # Auto-detect
         has_docker = check_docker()
@@ -253,7 +253,7 @@ def main() -> int:
             use_docker = True
             print_info("Using Docker for verification (recommended)")
         elif has_local:
-            use_local = True
+            use_docker = False
             print_info("Using local OpenSSL with oqs-provider")
         else:
             print_error("No suitable verification method found")
