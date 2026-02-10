@@ -20,7 +20,7 @@ project_root = Path(__file__).parent.parent.absolute()
 parent_of_root = project_root.parent
 
 # Get package name from directory name, handling hyphens
-package_name = project_root.name
+package_name = project_root.name.replace('-', '_')
 
 # Add both paths to ensure imports work
 for path in [str(project_root), str(parent_of_root)]:
