@@ -89,7 +89,7 @@ except Exception as e:
 
     # Log the exception with stack trace on the server side
     logger = logging.getLogger(__name__)
-    logger.exception("Failed to load main application", exc_info=e)
+    logger.exception("Failed to load main application")
     
     # Return a generic error message without exposing internal details
     app = FastAPI(title="Poker-Coach-Grind API (Import Error)")
