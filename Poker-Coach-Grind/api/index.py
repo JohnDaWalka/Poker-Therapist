@@ -49,7 +49,6 @@ if package_name not in sys.modules:
     db_pkg.__package__ = f'{package_name}.database'
     db_pkg.__path__ = [str(project_root / 'database')]
     sys.modules[f'{package_name}.database'] = db_pkg
-    
     # Create the crypto subpackage
     crypto_pkg = types.ModuleType(f'{package_name}.crypto')
     crypto_pkg.__package__ = f'{package_name}.crypto'
