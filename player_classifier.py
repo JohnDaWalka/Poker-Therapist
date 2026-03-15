@@ -56,7 +56,7 @@ def classify_player(vpip: float, pfr: float, threebet: float) -> str:
     if vpip > 35 and pfr < 15:
         return "Loose Passive"
 
-    if vpip > 25 and pfr > 18:
+    if 25 < vpip <= 40 and 18 < pfr <= 35:
         return "LAG"
 
     return "Unknown"
@@ -155,6 +155,8 @@ def _run_tests() -> None:
 
     # Unknown
     assert classify_player(22, 5, 1) == "Unknown", "Unknown fallback failed"
+    # Out-of-bounds for LAG (VPIP > 40, no other archetype matches)
+    assert classify_player(45, 32, 10) == "Unknown", "Out-of-bounds LAG should be Unknown"
     print("  ✓ Unknown fallback")
 
     # --- get_strategy_suggestions tests ---

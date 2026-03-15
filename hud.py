@@ -32,6 +32,8 @@ from typing import Dict, Any, List
 
 from player_classifier import get_strategy_suggestions
 
+_BULLET = "\u2022"  # •
+
 
 # ---------------------------------------------------------------------------
 # Public formatters
@@ -75,7 +77,7 @@ def format_hud_display(stats: Dict[str, Any], *, show_strategy: bool = True) -> 
         lines.append("")
         lines.append("Strategy adjustments:")
         for tip in suggestions:
-            lines.append(f"  \u2022 {tip}")
+            lines.append(f"  {_BULLET} {tip}")
 
     return "\n".join(lines)
 
