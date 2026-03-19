@@ -1,6 +1,7 @@
 """Deep session endpoint."""
 
 from datetime import datetime
+from typing import Optional
 from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException
@@ -12,8 +13,15 @@ from backend.agent.session_types.deep_session import DeepTherapySession
 from backend.api.models import DeepSessionRequest, DeepSessionResponse
 
 router = APIRouter()
-orchestrator = AIOrchestrator()
-deep_handler = DeepTherapySession(orchestrator)
+_deep_handler: Optional[DeepTherapySession] = None
+
+
+def _get_deep_handler() -> DeepTherapySession:
+    """Return the shared DeepTherapySession, creating it lazily on first use."""
+    global _deep_handler
+    if _deep_handler is None:
+        _deep_handler = DeepTherapySession(AIOrchestrator())
+    return _deep_handler
 
 
 @router.post("/deep-session", response_model=DeepSessionResponse)
@@ -36,7 +44,7 @@ async def deep_session(request: DeepSessionRequest) -> DeepSessionResponse:
             "user_id": request.user_id,
         }
         
-        result = await deep_handler.conduct(context)
+        result = await _get_deep_handler().conduct(context)
         
         # Save session to database
         async with get_db() as db:
