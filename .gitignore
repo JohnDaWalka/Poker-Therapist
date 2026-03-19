@@ -13,3 +13,6 @@ __pycache__/
 security/config.yaml
 !security/config.template.yaml
 !security/*.pqc
+
+# Excel tracker exports (generated at runtime) — track template and named trackers
+export_tracker.xlsx
