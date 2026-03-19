@@ -35,7 +35,7 @@ app = FastAPI(
     version="1.0.0",
 )
 
-_cache = PlayerStatsCache()
+_cache = PlayerStatsCache(db_path=Path("/tmp") / "poker_stats.db")
 # Note: in Vercel's serverless environment each function instance is isolated;
 # the SQLite database lives in an ephemeral /tmp directory.  Stats persist
 # within a single warm instance but are not shared across concurrent invocations.
