@@ -1,5 +1,7 @@
 """Analysis endpoints for hand, voice, and video."""
 
+from typing import Optional
+
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from backend.agent.ai_orchestrator import AIOrchestrator
@@ -11,7 +13,15 @@ from backend.api.models import (
 )
 
 router = APIRouter()
-orchestrator = AIOrchestrator()
+_orchestrator: Optional[AIOrchestrator] = None
+
+
+def _get_orchestrator() -> AIOrchestrator:
+    """Return the shared AIOrchestrator, creating it lazily on first use."""
+    global _orchestrator
+    if _orchestrator is None:
+        _orchestrator = AIOrchestrator()
+    return _orchestrator
 
 
 @router.post("/analyze/hand", response_model=HandAnalysisResponse)
@@ -32,7 +42,7 @@ async def analyze_hand(request: HandAnalysisRequest) -> HandAnalysisResponse:
             "user_id": request.user_id,
         }
         
-        result = await orchestrator.route_query("hand_analysis", context)
+        result = await _get_orchestrator().route_query("hand_analysis", context)
         
         # Extract learning points
         learning_points = [
@@ -76,7 +86,7 @@ async def analyze_voice(
             "user_id": user_id,
         }
         
-        result = await orchestrator.route_query("voice_rant", context)
+        result = await _get_orchestrator().route_query("voice_rant", context)
         
         # Extract emotions and triggers (simplified)
         detected_emotions = ["frustration", "stress"]
@@ -117,7 +127,7 @@ async def analyze_video(
             "user_id": user_id,
         }
         
-        result = await orchestrator.route_query("session_video", context)
+        result = await _get_orchestrator().route_query("session_video", context)
         
         # Extract structured data (simplified)
         body_language = ["tense shoulders", "rapid movements"]

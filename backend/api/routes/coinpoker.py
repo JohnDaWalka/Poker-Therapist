@@ -32,7 +32,15 @@ from backend.blockchain.evm_rpc import verify_tx
 
 
 router = APIRouter()
-orchestrator = AIOrchestrator()
+_orchestrator: Optional[AIOrchestrator] = None
+
+
+def _get_orchestrator() -> AIOrchestrator:
+    """Return the shared AIOrchestrator, creating it lazily on first use."""
+    global _orchestrator
+    if _orchestrator is None:
+        _orchestrator = AIOrchestrator()
+    return _orchestrator
 
 
 async def _import_text(
@@ -218,7 +226,7 @@ async def coinpoker_session_review(
             "rng_mismatch_samples": mismatch_samples,
         }
 
-        ai = await orchestrator.route_query("session_review", context)
+        ai = await _get_orchestrator().route_query("session_review", context)
         return CoinPokerSessionReviewResponse(
             strategy_review=ai.get("strategy_review", ""),
             therapy_review=ai.get("therapy_review", ""),

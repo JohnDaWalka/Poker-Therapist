@@ -1,6 +1,7 @@
 """Triage endpoint."""
 
 from datetime import datetime
+from typing import Optional
 from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException
@@ -13,8 +14,15 @@ from backend.agent.session_types.tilt_triage import TiltTriageSession
 from backend.api.models import TriageRequest, TriageResponse
 
 router = APIRouter()
-orchestrator = AIOrchestrator()
-triage_handler = TiltTriageSession(orchestrator)
+_triage_handler: Optional[TiltTriageSession] = None
+
+
+def _get_triage_handler() -> TiltTriageSession:
+    """Return the shared TiltTriageSession, creating it lazily on first use."""
+    global _triage_handler
+    if _triage_handler is None:
+        _triage_handler = TiltTriageSession(AIOrchestrator())
+    return _triage_handler
 
 
 @router.post("/triage", response_model=TriageResponse)
@@ -38,7 +46,7 @@ async def triage(request: TriageRequest) -> TriageResponse:
             "user_id": request.user_id,
         }
         
-        result = await triage_handler.conduct(context)
+        result = await _get_triage_handler().conduct(context)
         
         # Save session to database
         async with get_db() as db:

@@ -1,0 +1,25 @@
+name: PQC Security Verification
+on:
+  push:
+    branches: [main, master, mainprojectmain]
+  pull_request:
+    branches: [main, master, mainprojectmain]
+
+jobs:
+  pqc-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install PQC dependencies
+        run: pip install quantcrypt cryptography
+      - name: Verify PQC Implementation
+        run: |
+          if [ -f "pqc.py" ]; then
+            python pqc.py test
+          else
+            echo "PQC module not found, skipping verification"
+          fi
