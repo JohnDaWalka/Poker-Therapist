@@ -186,7 +186,7 @@ class EquityCalculator:
                     villain_wins += 1
                 else:
                     ties += 1
-            except:
+            except Exception:
                 # Invalid hand, skip
                 ties += 1
         
