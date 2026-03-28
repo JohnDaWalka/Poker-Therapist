@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker HUD Overlay</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: transparent;
+            color: #fff;
+        }
+
+        .hud-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 15px;
+            min-width: 200px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .hud-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4CAF50;
+            text-align: center;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 5px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #ddd;
+        }
+
+        .stat-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .stat-value.warning {
+            color: #FF9800;
+        }
+
+        .stat-value.danger {
+            color: #f44336;
+        }
+
+        .player-name {
+            text-align: center;
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #4CAF50;
+        }
+
+        .controls {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .btn-small {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+            margin: 0 3px;
+        }
+
+        .btn-small:hover {
+            background: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <div class="hud-container">
+        <div class="hud-title">🃏 POKER HUD</div>
+        <div class="player-name" id="player-name">Villain</div>
+        
+        <div class="stat-row">
+            <span class="stat-label">Stack:</span>
+            <span class="stat-value" id="stack">25.5bb</span>
+        </div>
+        
+        <div class="stat-row">
+            <span class="stat-label">VPIP:</span>
+            <span class="stat-value" id="vpip">23%</span>
+        </div>
+        
+        <div class="stat-row">
+            <span class="stat-label">3-Bet:</span>
+            <span class="stat-value warning" id="threebet">8%</span>
+        </div>
+        
+        <div class="controls">
+            <button class="btn-small" onclick="refreshStats()">Refresh</button>
+            <button class="btn-small" onclick="togglePosition()">Move</button>
+        </div>
+    </div>
+
+    <script>
+        let position = 'right';
+        
+        function refreshStats() {
+            // Simulate stat refresh (in production, would fetch from server)
+            const vpip = Math.floor(Math.random() * 40) + 15;
+            const threebet = Math.floor(Math.random() * 15) + 3;
+            const stack = (Math.random() * 40 + 10).toFixed(1);
+            
+            document.getElementById('vpip').textContent = vpip + '%';
+            document.getElementById('threebet').textContent = threebet + '%';
+            document.getElementById('stack').textContent = stack + 'bb';
+            
+            // Color code based on values
+            const vpipEl = document.getElementById('vpip');
+            if (vpip < 20) {
+                vpipEl.className = 'stat-value';
+            } else if (vpip < 30) {
+                vpipEl.className = 'stat-value warning';
+            } else {
+                vpipEl.className = 'stat-value danger';
+            }
+            
+            const threebetEl = document.getElementById('threebet');
+            if (threebet > 10) {
+                threebetEl.className = 'stat-value danger';
+            } else if (threebet > 5) {
+                threebetEl.className = 'stat-value warning';
+            } else {
+                threebetEl.className = 'stat-value';
+            }
+        }
+        
+        function togglePosition() {
+            const container = document.querySelector('.hud-container');
+            if (position === 'right') {
+                container.style.right = 'auto';
+                container.style.left = '20px';
+                position = 'left';
+            } else {
+                container.style.left = 'auto';
+                container.style.right = '20px';
+                position = 'right';
+            }
+        }
+        
+        // Auto-refresh every 5 seconds
+        setInterval(refreshStats, 5000);
+    </script>
+</body>
+</html>

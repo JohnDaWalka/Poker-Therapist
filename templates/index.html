@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Training Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 30px;
+            color: #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .game-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+
+        .game-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .game-btn:hover {
+            background: #1976D2;
+            transform: scale(1.05);
+        }
+
+        .game-btn.active {
+            background: #4CAF50;
+        }
+
+        .card-input-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+
+        .card-input-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .card-input {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            min-width: 200px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+
+        .btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #FF9800;
+        }
+
+        .btn-secondary:hover {
+            background: #F57C00;
+        }
+
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 10px;
+            border-left: 5px solid #4CAF50;
+        }
+
+        .result-box.error {
+            background: #ffebee;
+            border-left-color: #f44336;
+        }
+
+        .result-box h3 {
+            margin-bottom: 15px;
+            color: #2e7d32;
+        }
+
+        .result-box.error h3 {
+            color: #c62828;
+        }
+
+        .card-display {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 15px 10px;
+            min-width: 50px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .card.hearts, .card.diamonds {
+            color: #d32f2f;
+        }
+
+        .card.clubs, .card.spades {
+            color: #000;
+        }
+
+        .boards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .board-item {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+        }
+
+        .board-item h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .comparison-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fff3e0;
+            border-radius: 10px;
+            border-left: 5px solid #FF9800;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .help-text {
+            color: #666;
+            font-size: 14px;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        .training-question {
+            background: #fff3e0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #FF9800;
+        }
+
+        .training-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .option-btn {
+            padding: 15px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .option-btn:hover {
+            background: #e3f2fd;
+            border-color: #2196F3;
+        }
+
+        .option-btn.correct {
+            background: #c8e6c9;
+            border-color: #4CAF50;
+        }
+
+        .option-btn.incorrect {
+            background: #ffcdd2;
+            border-color: #f44336;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .game-selector {
+                flex-direction: column;
+            }
+
+            .boards-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🃏 Poker Training Suite</h1>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="/advanced" style="color: #4CAF50; text-decoration: none; padding: 10px 20px; border: 2px solid #4CAF50; border-radius: 8px; display: inline-block; transition: all 0.3s;">
+                🎯 Advanced Tools (Range Visualizer, Equity Calculator, GTO, HUD)
+            </a>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('evaluate')">Hand Evaluator</button>
+            <button class="tab" onclick="switchTab('compare')">Board Comparison</button>
+            <button class="tab" onclick="switchTab('training')">Training Mode</button>
+        </div>
+
+        <!-- Hand Evaluator Tab -->
+        <div id="evaluate-tab" class="tab-content active">
+            <h2>Hand Evaluator</h2>
+            
+            <div class="game-selector">
+                <button class="game-btn active" onclick="selectGame('evaluate', 'holdem')">Texas Hold'em</button>
+                <button class="game-btn" onclick="selectGame('evaluate', 'omaha')">Omaha</button>
+            </div>
+
+            <div class="card-input-section">
+                <h3>Hole Cards</h3>
+                <div class="card-input">
+                    <input type="text" id="eval-hole-cards" placeholder="e.g., As Kh (or Ah Kd Qc Js for Omaha)">
+                    <button class="btn btn-secondary" onclick="randomCards('eval-hole')">Random</button>
+                </div>
+                <p class="help-text">Enter cards like: As, Kh, Qd, Jc, Ts (A=Ace, K=King, Q=Queen, J=Jack, T=Ten, h=hearts, d=diamonds, c=clubs, s=spades)</p>
+            </div>
+
+            <div class="card-input-section">
+                <h3>Board Cards</h3>
+                <div class="card-input">
+                    <input type="text" id="eval-board" placeholder="e.g., 9h 8d 7c 6s 5h">
+                    <button class="btn btn-secondary" onclick="randomCards('eval-board')">Random</button>
+                </div>
+            </div>
+
+            <button class="btn" onclick="evaluateHand()">Evaluate Hand</button>
+
+            <div id="eval-result"></div>
+        </div>
+
+        <!-- Board Comparison Tab -->
+        <div id="compare-tab" class="tab-content">
+            <h2>Board Comparison</h2>
+            
+            <div class="game-selector">
+                <button class="game-btn active" onclick="selectGame('compare', 'holdem')">Texas Hold'em</button>
+                <button class="game-btn" onclick="selectGame('compare', 'omaha')">Omaha</button>
+            </div>
+
+            <div class="card-input-section">
+                <h3>Hole Cards</h3>
+                <div class="card-input">
+                    <input type="text" id="compare-hole-cards" placeholder="e.g., As Kh">
+                    <button class="btn btn-secondary" onclick="randomCards('compare-hole')">Random</button>
+                </div>
+            </div>
+
+            <div class="card-input-section">
+                <h3>Boards to Compare</h3>
+                <div id="boards-input">
+                    <div class="card-input" style="margin-bottom: 10px;">
+                        <input type="text" class="board-input" placeholder="Board 1: e.g., Ah Kd Qc Jh Ts">
+                        <button class="btn btn-secondary" onclick="randomCards(this.previousElementSibling)">Random</button>
+                    </div>
+                    <div class="card-input" style="margin-bottom: 10px;">
+                        <input type="text" class="board-input" placeholder="Board 2: e.g., 2h 3d 4c 5h 6s">
+                        <button class="btn btn-secondary" onclick="randomCards(this.previousElementSibling)">Random</button>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="addBoard()">Add Another Board</button>
+            </div>
+
+            <button class="btn" onclick="compareBoards()">Compare Boards</button>
+
+            <div id="compare-result"></div>
+        </div>
+
+        <!-- Training Mode Tab -->
+        <div id="training-tab" class="tab-content">
+            <h2>Training Mode</h2>
+            
+            <div class="game-selector">
+                <button class="game-btn active" onclick="selectGame('training', 'holdem')">Texas Hold'em</button>
+                <button class="game-btn" onclick="selectGame('training', 'omaha')">Omaha</button>
+            </div>
+
+            <button class="btn" onclick="startTraining()">Start New Training Session</button>
+
+            <div id="training-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentGameType = {
+            'evaluate': 'holdem',
+            'compare': 'holdem',
+            'training': 'holdem'
+        };
+        let currentSession = null;
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        function selectGame(tab, gameType) {
+            currentGameType[tab] = gameType;
+            
+            // Update buttons
+            const buttons = event.target.parentElement.querySelectorAll('.game-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        async function randomCards(target) {
+            const gameType = currentGameType[target.includes('eval') ? 'evaluate' : 
+                                          target.includes('compare') ? 'compare' : 'training'];
+            let count;
+            
+            if (target.includes('hole') || target === 'eval-hole' || target === 'compare-hole') {
+                count = gameType === 'holdem' ? 2 : 4;
+            } else {
+                count = 5; // board cards
+            }
+
+            try {
+                const response = await fetch(`/api/random-cards?count=${count}`);
+                const data = await response.json();
+                
+                let inputElement;
+                if (typeof target === 'string') {
+                    inputElement = document.getElementById(target + '-cards');
+                    if (!inputElement) {
+                        inputElement = document.getElementById(target);
+                    }
+                } else {
+                    inputElement = target;
+                }
+                
+                if (inputElement) {
+                    inputElement.value = data.cards.join(' ');
+                }
+            } catch (error) {
+                console.error('Error getting random cards:', error);
+            }
+        }
+
+        async function evaluateHand() {
+            const holeCards = document.getElementById('eval-hole-cards').value.trim().split(/\s+/);
+            const board = document.getElementById('eval-board').value.trim().split(/\s+/);
+            const gameType = currentGameType['evaluate'];
+
+            try {
+                const response = await fetch('/api/evaluate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        game_type: gameType,
+                        hole_cards: holeCards,
+                        board: board
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    showResult('eval-result', data.error, true);
+                } else {
+                    showEvalResult(data);
+                }
+            } catch (error) {
+                showResult('eval-result', 'Error evaluating hand: ' + error.message, true);
+            }
+        }
+
+        function showEvalResult(data) {
+            const resultDiv = document.getElementById('eval-result');
+            resultDiv.className = 'result-box';
+            resultDiv.innerHTML = `
+                <h3>Result</h3>
+                <p><strong>Game Type:</strong> ${data.game_type}</p>
+                <p><strong>Hand Rank:</strong> <span class="rank-badge">${data.hand_rank}</span></p>
+                <div>
+                    <strong>Your Hole Cards:</strong>
+                    <div class="card-display">${displayCards(data.hole_cards)}</div>
+                </div>
+                <div>
+                    <strong>Board:</strong>
+                    <div class="card-display">${displayCards(data.board)}</div>
+                </div>
+                <div>
+                    <strong>Best 5-Card Hand:</strong>
+                    <div class="card-display">${displayCards(data.best_hand)}</div>
+                </div>
+            `;
+        }
+
+        function displayCards(cards) {
+            return cards.map(card => {
+                const suit = card.slice(-1);
+                let suitClass = '';
+                if (suit === '♥' || suit === '♦') suitClass = 'hearts';
+                if (suit === '♣' || suit === '♠') suitClass = 'spades';
+                return `<div class="card ${suitClass}">${card}</div>`;
+            }).join('');
+        }
+
+        function addBoard() {
+            const boardsInput = document.getElementById('boards-input');
+            const newInput = document.createElement('div');
+            newInput.className = 'card-input';
+            newInput.style.marginBottom = '10px';
+            newInput.innerHTML = `
+                <input type="text" class="board-input" placeholder="Board: e.g., Ah Kd Qc Jh Ts">
+                <button class="btn btn-secondary" onclick="randomCards(this.previousElementSibling)">Random</button>
+            `;
+            boardsInput.appendChild(newInput);
+        }
+
+        async function compareBoards() {
+            const holeCards = document.getElementById('compare-hole-cards').value.trim().split(/\s+/);
+            const boardInputs = document.querySelectorAll('.board-input');
+            const boards = Array.from(boardInputs)
+                .map(input => input.value.trim().split(/\s+/))
+                .filter(board => board.length > 0 && board[0] !== '');
+            
+            const gameType = currentGameType['compare'];
+
+            if (boards.length < 2) {
+                showResult('compare-result', 'Please enter at least 2 boards to compare', true);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/compare-boards', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        game_type: gameType,
+                        hole_cards: holeCards,
+                        boards: boards
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    showResult('compare-result', data.error, true);
+                } else {
+                    showCompareResult(data);
+                }
+            } catch (error) {
+                showResult('compare-result', 'Error comparing boards: ' + error.message, true);
+            }
+        }
+
+        function showCompareResult(data) {
+            const resultDiv = document.getElementById('compare-result');
+            resultDiv.className = 'comparison-result';
+            
+            let html = `<h3>Board Comparison Results (Best to Worst)</h3>`;
+            
+            data.results.forEach((result, index) => {
+                html += `
+                    <div class="board-item">
+                        <h4>Board ${result.board_number} ${index === 0 ? '🏆 BEST' : ''}</h4>
+                        <div class="card-display">${displayCards(result.board)}</div>
+                        <p><strong>Hand:</strong> <span class="rank-badge">${result.hand_rank}</span></p>
+                        <p><strong>Best 5 Cards:</strong></p>
+                        <div class="card-display">${displayCards(result.best_hand)}</div>
+                    </div>
+                `;
+            });
+            
+            resultDiv.innerHTML = html;
+        }
+
+        async function startTraining() {
+            const gameType = currentGameType['training'];
+            
+            try {
+                const response = await fetch('/api/training/new', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        game_type: gameType,
+                        difficulty: 'medium'
+                    })
+                });
+
+                const data = await response.json();
+                currentSession = data.session_id;
+                showTrainingQuestion(data);
+            } catch (error) {
+                showResult('training-content', 'Error starting training: ' + error.message, true);
+            }
+        }
+
+        function showTrainingQuestion(data) {
+            const contentDiv = document.getElementById('training-content');
+            contentDiv.innerHTML = `
+                <div class="training-question">
+                    <h3>What is your hand?</h3>
+                    <div>
+                        <strong>Your Cards:</strong>
+                        <div class="card-display">${displayCards(data.hole_cards)}</div>
+                    </div>
+                    <div>
+                        <strong>Board:</strong>
+                        <div class="card-display">${displayCards(data.board)}</div>
+                    </div>
+                </div>
+
+                <div class="training-options">
+                    <button class="option-btn" onclick="submitAnswer('Royal Flush')">Royal Flush</button>
+                    <button class="option-btn" onclick="submitAnswer('Straight Flush')">Straight Flush</button>
+                    <button class="option-btn" onclick="submitAnswer('Four of a Kind')">Four of a Kind</button>
+                    <button class="option-btn" onclick="submitAnswer('Full House')">Full House</button>
+                    <button class="option-btn" onclick="submitAnswer('Flush')">Flush</button>
+                    <button class="option-btn" onclick="submitAnswer('Straight')">Straight</button>
+                    <button class="option-btn" onclick="submitAnswer('Three of a Kind')">Three of a Kind</button>
+                    <button class="option-btn" onclick="submitAnswer('Two Pair')">Two Pair</button>
+                    <button class="option-btn" onclick="submitAnswer('Pair')">Pair</button>
+                    <button class="option-btn" onclick="submitAnswer('High Card')">High Card</button>
+                </div>
+
+                <div id="training-feedback"></div>
+            `;
+        }
+
+        async function submitAnswer(answer) {
+            if (!currentSession) return;
+
+            try {
+                const response = await fetch(`/api/training/${currentSession}/check`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({answer: answer})
+                });
+
+                const data = await response.json();
+                showTrainingFeedback(data);
+            } catch (error) {
+                console.error('Error checking answer:', error);
+            }
+        }
+
+        function showTrainingFeedback(data) {
+            const feedbackDiv = document.getElementById('training-feedback');
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            // Highlight correct/incorrect
+            buttons.forEach(btn => {
+                if (btn.textContent === data.user_answer) {
+                    btn.classList.add(data.correct ? 'correct' : 'incorrect');
+                }
+                if (btn.textContent === data.correct_answer && !data.correct) {
+                    btn.classList.add('correct');
+                }
+                btn.disabled = true;
+            });
+
+            feedbackDiv.className = data.correct ? 'result-box' : 'result-box error';
+            feedbackDiv.innerHTML = `
+                <h3>${data.correct ? '✅ Correct!' : '❌ Incorrect'}</h3>
+                <p><strong>Correct Answer:</strong> ${data.correct_answer}</p>
+                <p><strong>Best Hand:</strong></p>
+                <div class="card-display">${displayCards(data.best_hand)}</div>
+                <button class="btn" onclick="startTraining()" style="margin-top: 15px;">Next Question</button>
+            `;
+        }
+
+        function showResult(divId, message, isError = false) {
+            const resultDiv = document.getElementById(divId);
+            resultDiv.className = isError ? 'result-box error' : 'result-box';
+            resultDiv.innerHTML = `<h3>${isError ? 'Error' : 'Result'}</h3><p>${message}</p>`;
+        }
+    </script>
+</body>
+</html>
