@@ -3,6 +3,11 @@ __pycache__/
 *.py[cod]
 *.pyo
 
+# Virtual environments
+venv/
+.venv/
+env/
+
 # SQLite databases (generated at runtime)
 *.db
 *.sqlite3
@@ -16,3 +21,18 @@ security/config.yaml
 
 # Excel tracker exports (generated at runtime) — track template and named trackers
 export_tracker.xlsx
+
+# Node.js (frontend)
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
