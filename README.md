@@ -12,6 +12,7 @@ Poker Therapist brings together poker engine logic, training tools, AI coaching,
 - **Player Analysis** — HUD overlay, opponent classification (LAG/TAG/LP/TP), and statistics tracking
 - **Excel Tracker** — Session and bankroll tracking via Excel exports
 - **Gemini Poker Coach** — TypeScript frontend powered by Google Gemini AI
+- **Chroma Poker** — Vue.js hand analysis dashboard with Vuex state management
 - **Cross-Platform Support** — Windows, macOS, and Linux
 - **Post-Quantum Security** — ML-KEM-1024 + ML-DSA-87 cryptographic protection
 - **Vercel Deployment** — Serverless FastAPI backend
@@ -20,6 +21,14 @@ Poker Therapist brings together poker engine logic, training tools, AI coaching,
 
 ```
 ├── api/                    # FastAPI serverless handler (Vercel)
+├── chroma-poker/           # Chroma Poker — Vue.js hand analysis frontend
+│   ├── src/
+│   │   ├── App.vue         # Root Vue component
+│   │   ├── api/            # Axios API layer
+│   │   ├── components/     # PokerHandAnalysis Vue component
+│   │   └── store/          # Vuex state management
+│   ├── tests/              # Jest component/API/store tests + Python tests
+│   └── pyproject.toml      # Python project config
 ├── docs/                   # Documentation
 │   ├── COMPATIBILITY.md    # Platform compatibility guide
 │   ├── FEATURES.md         # Detailed feature list
@@ -107,6 +116,15 @@ python nash_train.py
 cd frontend
 npm install
 npm run dev
+```
+
+### Running the Chroma Poker Vue Frontend
+
+```bash
+cd chroma-poker
+npm install
+npm run serve
+# Open http://localhost:8080
 ```
 
 ### Quick Start Script
@@ -198,3 +216,4 @@ This project consolidates the following repositories:
 | [Shark](https://github.com/JohnDaWalka/Shark) | Cross-platform support, Windows compatibility |
 | [Gemi](https://github.com/JohnDaWalka/Gemi) | Gemini Poker Coach TypeScript frontend |
 | [Poker-Guru](https://github.com/JohnDaWalka/Poker-Guru) | GTO solver and poker guru |
+| [Chroma_Poker](https://github.com/JohnDaWalka/Chroma_Poker) | Vue.js hand analysis dashboard with Vuex state management |
