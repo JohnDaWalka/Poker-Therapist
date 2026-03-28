@@ -1,0 +1,42 @@
+# Sourcery AI Configuration
+# Documentation: https://docs.sourcery.ai/
+
+# Files and directories to ignore during analysis
+ignore:
+  - .git
+  # Sourcery primarily analyzes Python code; GitHub workflows are excluded by default
+  - .github/workflows
+  - node_modules
+  - venv
+  - .venv
+  - __pycache__
+  - '*.pyc'
+  - dist
+  - build
+
+# Rule settings for code analysis
+rule_settings:
+  enable:
+    - default
+  rule_types:
+    - refactoring
+    - suggestion
+    - comment
+
+# Code quality metrics
+metrics:
+  quality_threshold: 25.0
+
+# Clone detection settings
+clone_detection:
+  min_lines: 3
+  min_duplicates: 2
+  identical_clones_only: false
+
+# GitHub integration settings
+github:
+  labels: []
+  ignore_labels:
+    - sourcery-ignore
+  request_review: author
+  sourcery_branch: sourcery/{base_branch}
