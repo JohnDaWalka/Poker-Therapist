@@ -614,4 +614,4 @@ if __name__ == '__main__':
     
     print("Starting Poker Training Server...")
     print("Visit http://localhost:5000 to start training!")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=os.environ.get('FLASK_DEBUG', 'false').lower() == 'true', host='0.0.0.0', port=5000)

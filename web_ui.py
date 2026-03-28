@@ -3,6 +3,8 @@ Simple Web UI for Poker Equity Calculation
 A minimal, focused interface for range vs range equity calculations
 """
 
+import os
+
 from flask import Flask, request, jsonify, render_template_string
 from equity_sim import range_vs_range
 
@@ -373,4 +375,4 @@ if __name__ == "__main__":
     print("Starting Simple Poker Equity Calculator...")
     print("Visit http://localhost:5001 for the equity calculator")
     print("Visit http://localhost:5001/advanced for advanced tools")
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(debug=os.environ.get('FLASK_DEBUG', 'false').lower() == 'true', host='0.0.0.0', port=5001)
