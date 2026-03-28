@@ -1,0 +1,33 @@
+Warning: PyTorch not available, using NumPy arrays instead
+============================================================
+Nash Equilibrium Trainer - CFR for Poker
+============================================================
+
+Training players with CFR...
+Iteration 100/500
+  Player 0 avg strategy: FOLD=0.837, CALL=0.023, RAISE=0.140
+Iteration 200/500
+  Player 0 avg strategy: FOLD=0.925, CALL=0.010, RAISE=0.064
+Iteration 300/500
+  Player 0 avg strategy: FOLD=0.945, CALL=0.008, RAISE=0.047
+Iteration 400/500
+  Player 0 avg strategy: FOLD=0.961, CALL=0.005, RAISE=0.033
+Iteration 500/500
+  Player 0 avg strategy: FOLD=0.969, CALL=0.004, RAISE=0.027
+
+============================================================
+Training Complete!
+============================================================
+
+Final Average Strategies (Nash Equilibrium Approximation):
+Player 0: FOLD=0.969, CALL=0.004, RAISE=0.027
+Player 1: FOLD=0.833, CALL=0.058, RAISE=0.109
+Player 2: FOLD=0.987, CALL=0.002, RAISE=0.012
+Player 3: FOLD=0.943, CALL=0.055, RAISE=0.002
+Player 4: FOLD=0.505, CALL=0.463, RAISE=0.032
+
+============================================================
+Evaluation (avg payoff vs random opponent):
+Player 0: -1.10 BB per game
+Player 1: -1.10 BB per game
+Player 2: -1.10 BB per game

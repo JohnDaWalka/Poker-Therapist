@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Poker Tools</title>
+    <link rel="stylesheet" href="/static/advanced.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Advanced Poker Tools</h1>
+        
+        <div class="nav-links">
+            <a href="/" class="nav-link">← Back to Training</a>
+            <a href="/hud" class="nav-link" target="_blank">Open HUD Overlay</a>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('range')">Range Visualizer</button>
+            <button class="tab" onclick="switchTab('equity')">Equity Calculator</button>
+            <button class="tab" onclick="switchTab('gto')">GTO Trainer</button>
+            <button class="tab" onclick="switchTab('history')">Hand History</button>
+        </div>
+
+        <!-- Range Visualizer Tab -->
+        <div id="range-tab" class="tab-content active">
+            <h2>Hand Range Visualizer</h2>
+            <p class="help-text">Click on hands to add/remove them from your range. Pairs are on the diagonal, suited hands above, offsuit below.</p>
+            
+            <div class="range-presets">
+                <button class="btn" onclick="addPresetRange('all_pairs')">All Pairs</button>
+                <button class="btn" onclick="addPresetRange('premium_pairs')">Premium Pairs (JJ+)</button>
+                <button class="btn" onclick="addPresetRange('broadway')">Broadway</button>
+                <button class="btn" onclick="addPresetRange('suited_connectors')">Suited Connectors</button>
+                <button class="btn" onclick="addPresetRange('any_ace')">Any Ace</button>
+                <button class="btn btn-secondary" onclick="clearRange()">Clear All</button>
+            </div>
+
+            <div class="range-matrix" id="range-matrix"></div>
+            
+            <div class="range-summary">
+                <h3>Selected Range</h3>
+                <div id="range-list"></div>
+                <p>Total hands: <span id="range-count">0</span></p>
+            </div>
+        </div>
+
+        <!-- Equity Calculator Tab -->
+        <div id="equity-tab" class="tab-content">
+            <h2>Equity Calculator</h2>
+            <p class="help-text">Calculate equity between two hands or ranges using Monte Carlo simulation (10,000 trials)</p>
+            
+            <div class="equity-inputs">
+                <div class="input-group">
+                    <label>Range 1:</label>
+                    <input type="text" id="range1" placeholder="e.g., AKs, AA, or QQ+" value="AA">
+                </div>
+                
+                <div class="input-group">
+                    <label>Range 2:</label>
+                    <input type="text" id="range2" placeholder="e.g., KK, AKo, or JJ+" value="KK">
+                </div>
+                
+                <div class="input-group">
+                    <label>Board (optional):</label>
+                    <input type="text" id="equity-board" placeholder="e.g., As Kh 7d">
+                </div>
+                
+                <div class="input-group">
+                    <label>Simulations:</label>
+                    <input type="number" id="simulations" value="10000" min="1000" max="100000" step="1000">
+                </div>
+                
+                <button class="btn" onclick="calculateEquity()">Calculate Equity</button>
+            </div>
+            
+            <div id="equity-result"></div>
+        </div>
+
+        <!-- GTO Trainer Tab -->
+        <div id="gto-tab" class="tab-content">
+            <h2>GTO Trainer</h2>
+            <p class="help-text">Practice GTO (Game Theory Optimal) preflop ranges for common situations</p>
+            
+            <div class="gto-scenarios">
+                <h3>Select a Scenario:</h3>
+                <select id="gto-scenario" onchange="loadGTOScenario()">
+                    <option value="">-- Choose Scenario --</option>
+                    <option value="BTN_vs_BB_15bb">Button vs Big Blind (15bb)</option>
+                    <option value="BTN_vs_BB_30bb">Button vs Big Blind (30bb)</option>
+                    <option value="CO_vs_BTN_100bb">Cutoff vs Button (100bb)</option>
+                </select>
+            </div>
+            
+            <div id="gto-info"></div>
+            
+            <div class="gto-quiz">
+                <h3>Test Your Knowledge</h3>
+                <div class="input-group">
+                    <label>Enter a hand:</label>
+                    <input type="text" id="gto-hand" placeholder="e.g., AKs, 77, or QJo">
+                    <button class="btn" onclick="checkGTOHand()">Check</button>
+                </div>
+                <div id="gto-result"></div>
+            </div>
+        </div>
+
+        <!-- Hand History Parser Tab -->
+        <div id="history-tab" class="tab-content">
+            <h2>Hand History Parser</h2>
+            <p class="help-text">Paste your PokerStars hand history to calculate statistics (VPIP, PFR, 3-bet)</p>
+            
+            <div class="history-input">
+                <textarea id="hand-history" rows="15" placeholder="Paste PokerStars hand history here...
+
+Example format:
+PokerStars Hand #123456789: Hold'em No Limit ($0.50/$1.00) - 2024/01/01
+Table 'Example' 6-max Seat #1 is the button
+Seat 1: Player1 ($100 in chips)
+Seat 2: Player2 ($50 in chips)
+..."></textarea>
+                
+                <button class="btn" onclick="parseHandHistory()">Parse Hand</button>
+            </div>
+            
+            <div id="history-result"></div>
+            
+            <div class="stats-summary" id="stats-summary" style="display: none;">
+                <h3>Player Statistics</h3>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-vpip">0%</div>
+                        <div class="stat-label">VPIP</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-pfr">0%</div>
+                        <div class="stat-label">PFR</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-3bet">0%</div>
+                        <div class="stat-label">3-Bet</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-hands">0</div>
+                        <div class="stat-label">Total Hands</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/advanced.js"></script>
+</body>
+</html>
