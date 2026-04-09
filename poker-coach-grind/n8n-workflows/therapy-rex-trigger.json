@@ -1,0 +1,184 @@
+{
+  "name": "Therapy Rex Auto-Trigger",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "therapy-trigger",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook - Performance Event",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "therapy-trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8001/api/bankroll/stats/={{ $json.user_id }}",
+        "method": "GET",
+        "options": {}
+      },
+      "name": "Get User Stats",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Analyze recent performance to determine session type\nconst stats = items[0].json;\nconst triggerData = items[0].json.trigger_data || {};\n\nlet sessionType = 'tilt_triage';\nlet priority = 'medium';\nlet reason = 'general_check_in';\n\n// Check for downswing (multiple losses)\nif (stats.net_profit < -1000 && triggerData.losing_streak >= 3) {\n  sessionType = 'deep_session';\n  priority = 'high';\n  reason = 'downswing_detected';\n}\n\n// Check for large single loss\nif (triggerData.last_session_loss < -500) {\n  sessionType = 'tilt_triage';\n  priority = 'high';\n  reason = 'large_loss';\n}\n\n// Check for late night play (potential fatigue)\nconst hour = new Date().getHours();\nif (hour >= 2 && hour <= 6) {\n  priority = 'high';\n  reason = 'late_night_fatigue';\n}\n\nreturn {\n  json: {\n    user_id: stats.user_id,\n    session_type: sessionType,\n    priority: priority,\n    trigger_reason: reason,\n    context: {\n      net_profit: stats.net_profit,\n      roi: stats.roi,\n      recent_loss: triggerData.last_session_loss,\n      losing_streak: triggerData.losing_streak\n    }\n  }\n};"
+      },
+      "name": "Determine Session Type",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8001/api/n8n/webhook/therapy-session",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "user_id",
+              "value": "={{ $json.user_id }}"
+            },
+            {
+              "name": "session_type",
+              "value": "={{ $json.session_type }}"
+            },
+            {
+              "name": "trigger_reason",
+              "value": "={{ $json.trigger_reason }}"
+            },
+            {
+              "name": "context",
+              "value": "={{ $json.context }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Trigger Therapy Rex Session",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.priority }}",
+              "value2": "high"
+            }
+          ]
+        }
+      },
+      "name": "High Priority?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "message": "🚨 URGENT: Therapy Rex Session Triggered\n\nUser: {{ $json.user_id }}\nSession Type: {{ $json.session_type }}\nReason: {{ $json.trigger_reason }}\n\nContext:\n- Net Profit: ${{ $json.context.net_profit.toFixed(2) }}\n- ROI: {{ $json.context.roi.toFixed(2) }}%\n- Recent Loss: ${{ Math.abs($json.context.recent_loss).toFixed(2) }}\n- Losing Streak: {{ $json.context.losing_streak }} sessions\n\nImmediate attention recommended.",
+        "additionalFields": {}
+      },
+      "name": "Send Urgent Alert",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 1,
+      "position": [1250, 200],
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "1",
+          "name": "Discord Webhook"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "to": "user@example.com",
+        "subject": "Therapy Rex Session Scheduled",
+        "text": "A therapy session has been scheduled based on your recent performance. Please check your dashboard for details.",
+        "options": {}
+      },
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1250, 400],
+      "credentials": {
+        "smtp": {
+          "id": "3",
+          "name": "SMTP"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook - Performance Event": {
+      "main": [
+        [
+          {
+            "node": "Get User Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Stats": {
+      "main": [
+        [
+          {
+            "node": "Determine Session Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Session Type": {
+      "main": [
+        [
+          {
+            "node": "Trigger Therapy Rex Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Therapy Rex Session": {
+      "main": [
+        [
+          {
+            "node": "High Priority?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Priority?": {
+      "main": [
+        [
+          {
+            "node": "Send Urgent Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

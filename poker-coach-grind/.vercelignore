@@ -1,0 +1,43 @@
+# Exclude files that are not needed for Vercel deployment
+
+# Local development / Streamlit UI (not used by the serverless function)
+ui/
+
+# CLI tooling
+cli/
+
+# n8n workflow definitions (JSON config only, not runtime code)
+n8n-workflows/
+
+# Documentation
+README.md
+*.md
+
+# Local database files
+*.db
+*.sqlite
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Test files
+tests/
+test_*.py
+*_test.py
+
+# Build/egg artifacts
+*.egg-info/
+dist/
+build/
+
+# Environment files (configure secrets in Vercel dashboard instead)
+.env
+.env.*

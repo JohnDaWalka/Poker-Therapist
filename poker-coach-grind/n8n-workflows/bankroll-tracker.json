@@ -1,0 +1,184 @@
+{
+  "name": "Bankroll Tracker Automation",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "When clicking 'Test workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bankroll-transaction",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 450],
+      "webhookId": "bankroll-transaction"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8001/api/n8n/webhook/bankroll-transaction",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "user_id",
+              "value": "={{ $json.user_id }}"
+            },
+            {
+              "name": "amount",
+              "value": "={{ $json.amount }}"
+            },
+            {
+              "name": "transaction_type",
+              "value": "={{ $json.transaction_type }}"
+            },
+            {
+              "name": "stakes",
+              "value": "={{ $json.stakes }}"
+            },
+            {
+              "name": "notes",
+              "value": "={{ $json.notes }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Create Bankroll Transaction",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [450, 450]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.amount }}",
+              "operation": "smaller",
+              "value2": -500
+            }
+          ]
+        }
+      },
+      "name": "Large Loss?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [650, 450]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/api/triage",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "user_id",
+              "value": "={{ $json.user_id }}"
+            },
+            {
+              "name": "trigger_reason",
+              "value": "large_loss_detected"
+            },
+            {
+              "name": "context",
+              "value": "={{ { \"loss_amount\": $json.amount } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Trigger Therapy Rex",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [850, 350]
+    },
+    {
+      "parameters": {
+        "message": "Transaction recorded: {{ $json.transaction_type }} {{ $json.amount }}",
+        "additionalFields": {}
+      },
+      "name": "Send Discord Notification",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 1,
+      "position": [850, 550],
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "1",
+          "name": "Discord Webhook"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [
+        [
+          {
+            "node": "Create Bankroll Transaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Create Bankroll Transaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Bankroll Transaction": {
+      "main": [
+        [
+          {
+            "node": "Large Loss?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Large Loss?": {
+      "main": [
+        [
+          {
+            "node": "Trigger Therapy Rex",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Discord Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
