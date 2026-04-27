@@ -3,6 +3,8 @@ Poker Training Server - Flask application for interactive poker training.
 Provides API endpoints for hand evaluation and board comparison.
 """
 
+import logging
+
 from flask import Flask, render_template, jsonify, request, send_from_directory
 from flask_cors import CORS
 import os
@@ -21,6 +23,8 @@ app = Flask(__name__,
            static_folder='static',
            template_folder='templates')
 CORS(app)
+
+logger = logging.getLogger(__name__)
 
 # Store training sessions
 training_sessions = {}
@@ -93,7 +97,8 @@ def evaluate_hand():
         return jsonify(result)
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/compare-boards', methods=['POST'])
@@ -123,7 +128,8 @@ def compare_boards():
         })
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/training/new', methods=['POST'])
@@ -266,7 +272,8 @@ def calculate_equity():
         return jsonify(result)
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/equity/range-vs-range', methods=['POST'])
@@ -284,7 +291,8 @@ def equity_range_vs_range():
         return jsonify(result)
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/gto/scenarios', methods=['GET'])
@@ -328,7 +336,8 @@ def parse_hand_history():
         return jsonify(result)
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/handhistory/stats', methods=['POST'])
@@ -342,7 +351,8 @@ def calculate_hand_stats():
         return jsonify(stats)
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 # Multi-way equity calculator endpoints
@@ -363,7 +373,8 @@ def equity_multi_way():
         return jsonify(result)
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 # New poker variant endpoints
@@ -383,7 +394,8 @@ def evaluate_stud():
         return jsonify(result)
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/evaluate/razz', methods=['POST'])
@@ -402,7 +414,8 @@ def evaluate_razz():
         return jsonify(result)
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 # Training scenarios endpoints
@@ -428,7 +441,8 @@ def generate_scenario():
         return jsonify(scenario.to_dict())
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/scenarios/check-answer', methods=['POST'])
@@ -454,7 +468,8 @@ def check_scenario_answer():
         })
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 # Statistics tracking endpoints
@@ -465,7 +480,8 @@ def get_user_stats(user_id):
         report = stats_tracker.get_user_report(user_id)
         return jsonify(report)
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/stats/global', methods=['GET'])
@@ -475,7 +491,8 @@ def get_global_stats():
         stats = stats_tracker.get_global_stats()
         return jsonify(stats)
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/stats/record-session', methods=['POST'])
@@ -496,7 +513,8 @@ def record_training_session():
         return jsonify({'success': True})
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/stats/record-equity', methods=['POST'])
@@ -513,7 +531,8 @@ def record_equity_calc():
         return jsonify({'success': True})
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 # Multiplayer session endpoints
@@ -531,7 +550,8 @@ def create_multiplayer_session():
         return jsonify({'session_id': session_id, 'success': True})
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/multiplayer/join', methods=['POST'])
@@ -547,7 +567,8 @@ def join_multiplayer_session():
         return jsonify(result)
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/multiplayer/start/<session_id>', methods=['POST'])
@@ -557,7 +578,8 @@ def start_multiplayer_session(session_id):
         result = multiplayer_manager.start_session(session_id)
         return jsonify(result)
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/multiplayer/session/<session_id>', methods=['GET'])
@@ -567,7 +589,8 @@ def get_multiplayer_session(session_id):
         session = multiplayer_manager.get_session(session_id)
         return jsonify(session)
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/multiplayer/list', methods=['GET'])
@@ -577,7 +600,8 @@ def list_multiplayer_sessions():
         sessions = multiplayer_manager.list_available_sessions()
         return jsonify({'sessions': sessions})
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/multiplayer/record-result', methods=['POST'])
@@ -594,7 +618,8 @@ def record_multiplayer_result():
         return jsonify(response)
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 @app.route('/api/multiplayer/end/<session_id>', methods=['POST'])
@@ -604,7 +629,8 @@ def end_multiplayer_session(session_id):
         result = multiplayer_manager.end_session(session_id)
         return jsonify(result)
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        logger.exception("Unexpected error")
+        return jsonify({'error': 'An internal error occurred'}), 500
 
 
 if __name__ == '__main__':
