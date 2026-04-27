@@ -97,7 +97,7 @@ def evaluate_hand():
         return jsonify(result)
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -128,7 +128,7 @@ def compare_boards():
         })
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -272,7 +272,7 @@ def calculate_equity():
         return jsonify(result)
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -291,7 +291,7 @@ def equity_range_vs_range():
         return jsonify(result)
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -336,7 +336,7 @@ def parse_hand_history():
         return jsonify(result)
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -351,7 +351,7 @@ def calculate_hand_stats():
         return jsonify(stats)
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -373,7 +373,7 @@ def equity_multi_way():
         return jsonify(result)
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -394,7 +394,7 @@ def evaluate_stud():
         return jsonify(result)
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -414,7 +414,7 @@ def evaluate_razz():
         return jsonify(result)
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -441,7 +441,7 @@ def generate_scenario():
         return jsonify(scenario.to_dict())
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -468,7 +468,7 @@ def check_scenario_answer():
         })
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -480,7 +480,7 @@ def get_user_stats(user_id):
         report = stats_tracker.get_user_report(user_id)
         return jsonify(report)
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -491,7 +491,7 @@ def get_global_stats():
         stats = stats_tracker.get_global_stats()
         return jsonify(stats)
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -513,7 +513,7 @@ def record_training_session():
         return jsonify({'success': True})
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -531,7 +531,7 @@ def record_equity_calc():
         return jsonify({'success': True})
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -550,7 +550,7 @@ def create_multiplayer_session():
         return jsonify({'session_id': session_id, 'success': True})
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -567,7 +567,7 @@ def join_multiplayer_session():
         return jsonify(result)
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -578,7 +578,7 @@ def start_multiplayer_session(session_id):
         result = multiplayer_manager.start_session(session_id)
         return jsonify(result)
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -589,7 +589,7 @@ def get_multiplayer_session(session_id):
         session = multiplayer_manager.get_session(session_id)
         return jsonify(session)
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -600,7 +600,7 @@ def list_multiplayer_sessions():
         sessions = multiplayer_manager.list_available_sessions()
         return jsonify({'sessions': sessions})
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -618,7 +618,7 @@ def record_multiplayer_result():
         return jsonify(response)
     
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 
@@ -629,7 +629,7 @@ def end_multiplayer_session(session_id):
         result = multiplayer_manager.end_session(session_id)
         return jsonify(result)
     except Exception as e:
-        logger.exception("Unexpected error")
+        logger.exception("Unexpected error in %s", request.endpoint)
         return jsonify({'error': 'An internal error occurred'}), 500
 
 

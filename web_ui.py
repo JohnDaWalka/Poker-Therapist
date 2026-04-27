@@ -364,7 +364,7 @@ def calc():
         return jsonify(result)
     
     except Exception as e:
-        logger.exception("Unexpected error in equity calculation")
+        logger.exception("Unexpected error in equity calculation at %s", request.path)
         return jsonify({"error": "An internal error occurred"}), 500
 
 
