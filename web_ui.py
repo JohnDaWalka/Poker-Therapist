@@ -3,12 +3,15 @@ Simple Web UI for Poker Equity Calculation
 A minimal, focused interface for range vs range equity calculations
 """
 
+import logging
 import os
 
 from flask import Flask, request, jsonify, render_template_string
 from equity_sim import range_vs_range
 
 app = Flask(__name__)
+
+logger = logging.getLogger(__name__)
 
 HTML = """
 <!doctype html>
@@ -361,7 +364,8 @@ def calc():
         return jsonify(result)
     
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        logger.exception("Unexpected error in equity calculation at %s", request.path)
+        return jsonify({"error": "An internal error occurred"}), 500
 
 
 @app.route("/advanced")
